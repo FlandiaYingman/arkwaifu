@@ -1,3 +1,4 @@
+// Package arkres provides functionalities for getting Arknight resources.
 package arkres
 
 import (
@@ -5,11 +6,14 @@ import (
 	"strings"
 )
 
+// Version represents a response of "https://ak-conf.hypergryph.com/config/prod/official/Android/version".
 type Version struct {
 	ResVersion    string `json:"resVersion"`
 	ClientVersion string `json:"clientVersion"`
 }
 
+// Resources represents a response of
+// "https://ak.hycdn.cn/assetbundle/official/Android/assets/{resVersion}/hot_update_list.json"
 type Resources struct {
 	FullPack        FullPack   `json:"fullPack"`
 	VersionId       string     `json:"versionId"`
