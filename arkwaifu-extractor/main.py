@@ -45,6 +45,27 @@ def unpack_image_assets(src: Path, dst: Path, filters: List[str]):
                     executor.submit(unpack_image_assets, it, dst, filters)
 
 
+def unpack_text_assets(src: Path, dst: Path, filters: List[str]):
+    if src.is_file():
+        env = UnityPy.load(str(src))
+        for path, obj in env.container.items():
+            if obj.type.name not in ["TextAsset"]:
+                continue
+            if any(path.startswith(f) for f in filters):
+                dest = dst.joinpath(*path.split('/'))
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                data = obj.read()
+
+                with open(dest, "wb") as file:
+                    file.write(bytes(data.script))
+                print(f"{path}=>{dest}")
+    else:
+        with ProcessPoolExecutor() as executor:
+            for it in src.glob('**/*'):
+                if it.is_file():
+                    executor.submit(unpack_text_assets, it, dst, filters)
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(
@@ -60,15 +81,27 @@ def main():
         "src", nargs="+",
         help="Path to source file or directory."
     )
-    unpack_parser = subparsers.add_parser(
+    unpack_image = subparsers.add_parser(
         "unpack-image",
         help="unpack image assets from sources"
     )
-    unpack_parser.add_argument(
+    unpack_image.add_argument(
         "src", nargs="+",
         help="Path to source file or directory."
     )
-    unpack_parser.add_argument(
+    unpack_image.add_argument(
+        "dst",
+        help="Path to destination directory."
+    )
+    unpack_text = subparsers.add_parser(
+        "unpack-text",
+        help="unpack text assets from sources"
+    )
+    unpack_text.add_argument(
+        "src", nargs="+",
+        help="Path to source file or directory."
+    )
+    unpack_text.add_argument(
         "dst",
         help="Path to destination directory."
     )
@@ -84,6 +117,9 @@ def main():
         case "unpack-image":
             for src in args.src:
                 unpack_image_assets(Path(src), Path(args.dst), filters=args.filter)
+        case "unpack-text":
+            for src in args.src:
+                unpack_text_assets(Path(src), Path(args.dst), filters=args.filter)
 
 
 if __name__ == '__main__':
