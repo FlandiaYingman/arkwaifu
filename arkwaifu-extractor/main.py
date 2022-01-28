@@ -39,6 +39,7 @@ def unpack_image_assets(src: Path, dst: Path, filters: List[str]):
                 else:
                     print(f"{path} type not supported", file=sys.stderr)
     else:
+        print("Searching files...")
         with ProcessPoolExecutor() as executor:
             for it in src.glob('**/*'):
                 if it.is_file():
@@ -61,6 +62,7 @@ def unpack_text_assets(src: Path, dst: Path, filters: List[str]):
                 print(f"{path}=>{dest}")
     else:
         with ProcessPoolExecutor() as executor:
+            print("Searching files...")
             for it in src.glob('**/*'):
                 if it.is_file():
                     executor.submit(unpack_text_assets, it, dst, filters)
