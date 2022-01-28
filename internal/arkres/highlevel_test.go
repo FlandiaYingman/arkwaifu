@@ -114,16 +114,16 @@ func TestGetRes(t *testing.T) {
 			}
 			infos = FilterResInfosRegexp(infos, tt.filter)
 			dst := filepath.Join(tmp, fmt.Sprintf("arkres-test-%v", test.HashObjSafe(tt.name)[:8]))
-			err = GetImageRes(infos, dst)
+			err = GetRes(infos, dst)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetImageRes() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetRes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			} else if err != nil {
 				return
 			}
 			gotHash := test.HashDir(dst)
 			if !reflect.DeepEqual(gotHash, tt.wantHash) {
-				t.Errorf("GetImageRes() gotHash = %v, wantHash %v", gotHash, tt.wantHash)
+				t.Errorf("GetRes() gotHash = %v, wantHash %v", gotHash, tt.wantHash)
 			}
 		})
 	}

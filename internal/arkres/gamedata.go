@@ -174,7 +174,7 @@ func GetStoryTxt(resVersion string, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	err = GetTextRes(FilterResInfosRegexp(infos, regexp.MustCompile("gamedata/story")), "tmp")
+	err = GetRes(FilterResInfosRegexp(infos, regexp.MustCompile("gamedata/story")), "tmp")
 	if err != nil {
 		return "", err
 	}
