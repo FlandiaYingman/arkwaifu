@@ -20,52 +20,32 @@ def list_assets(src: Path, filters: List[str]):
                 list_assets(it, filters)
 
 
-def unpack_image_assets(src: Path, dst: Path, filters: List[str]):
+def unpack(src: Path, dst: Path, filters: List[str]):
     PIL.Image.preinit()
     PIL.Image.init()
     if src.is_file():
         env = UnityPy.load(str(src))
         for path, obj in env.container.items():
-            if obj.type.name not in ["Texture2D", "Sprite"]:
-                continue
             if any(path.startswith(f) for f in filters):
                 dest = dst.joinpath(*path.split('/'))
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 data = obj.read()
-
-                if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
-                    data.image.save(dest)
+                if obj.type.name in ["Texture2D", "Sprite"]:
+                    if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
+                        data.image.save(dest)
+                        print(f"{path}=>{dest}")
+                    else:
+                        print(f"{path} type not supported", file=sys.stderr)
+                if obj.type.name in ["TextAsset"]:
+                    with open(dest, "wb") as file:
+                        file.write(bytes(data.script))
                     print(f"{path}=>{dest}")
-                else:
-                    print(f"{path} type not supported", file=sys.stderr)
     else:
         print("Searching files...")
         with ProcessPoolExecutor() as executor:
             for it in src.glob('**/*'):
                 if it.is_file():
-                    executor.submit(unpack_image_assets, it, dst, filters)
-
-
-def unpack_text_assets(src: Path, dst: Path, filters: List[str]):
-    if src.is_file():
-        env = UnityPy.load(str(src))
-        for path, obj in env.container.items():
-            if obj.type.name not in ["TextAsset"]:
-                continue
-            if any(path.startswith(f) for f in filters):
-                dest = dst.joinpath(*path.split('/'))
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                data = obj.read()
-
-                with open(dest, "wb") as file:
-                    file.write(bytes(data.script))
-                print(f"{path}=>{dest}")
-    else:
-        with ProcessPoolExecutor() as executor:
-            print("Searching files...")
-            for it in src.glob('**/*'):
-                if it.is_file():
-                    executor.submit(unpack_text_assets, it, dst, filters)
+                    executor.submit(unpack, it, dst, filters)
 
 
 def main():
@@ -83,27 +63,15 @@ def main():
         "src", nargs="+",
         help="Path to source file or directory."
     )
-    unpack_image = subparsers.add_parser(
-        "unpack-image",
+    unpack_parser = subparsers.add_parser(
+        "unpack",
         help="unpack image assets from sources"
     )
-    unpack_image.add_argument(
+    unpack_parser.add_argument(
         "src", nargs="+",
         help="Path to source file or directory."
     )
-    unpack_image.add_argument(
-        "dst",
-        help="Path to destination directory."
-    )
-    unpack_text = subparsers.add_parser(
-        "unpack-text",
-        help="unpack text assets from sources"
-    )
-    unpack_text.add_argument(
-        "src", nargs="+",
-        help="Path to source file or directory."
-    )
-    unpack_text.add_argument(
+    unpack_parser.add_argument(
         "dst",
         help="Path to destination directory."
     )
@@ -116,12 +84,9 @@ def main():
         case "list":
             for src in args.src:
                 list_assets(Path(src), filters=args.filter)
-        case "unpack-image":
+        case "unpack":
             for src in args.src:
-                unpack_image_assets(Path(src), Path(args.dst), filters=args.filter)
-        case "unpack-text":
-            for src in args.src:
-                unpack_text_assets(Path(src), Path(args.dst), filters=args.filter)
+                unpack(Path(src), Path(args.dst), filters=args.filter)
 
 
 if __name__ == '__main__':
