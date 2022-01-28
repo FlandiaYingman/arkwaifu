@@ -57,8 +57,8 @@ func GetResInfos(resVersion string) ([]ResInfo, error) {
 	return infos, nil
 }
 
-// GetRes gets the resources to specified destination directory.
-func GetRes(infos []ResInfo, dest string) error {
+// GetImageRes gets the resources to specified destination directory.
+func GetImageRes(infos []ResInfo, dest string) error {
 	urls := make([]string, len(infos))
 	for i, info := range infos {
 		urls[i] = info.GetUrl()
@@ -80,12 +80,44 @@ func GetRes(infos []ResInfo, dest string) error {
 	}
 
 	dstUp := filepath.Clean(dest)
-	err = unpackResources(dstUz, dstUp)
+	err = unpackImageResources(dstUz, dstUp)
 	if err != nil {
 		return err
 	}
 
 	_ = os.RemoveAll(dstTmp)
+	return nil
+}
+
+// GetTextRes gets the resources to specified destination directory.
+func GetTextRes(infos []ResInfo, dest string) error {
+	urls := make([]string, len(infos))
+	for i, info := range infos {
+		urls[i] = info.GetUrl()
+	}
+
+	dstTmp := filepath.Join(dest, "tmp")
+	var err error
+
+	dstDl := filepath.Join(dstTmp, "dl")
+	err = downloadResources(urls, dstDl)
+	if err != nil {
+		return err
+	}
+
+	dstUz := filepath.Join(dstTmp, "uz")
+	err = unzipResources(dstDl, dstUz)
+	if err != nil {
+		return err
+	}
+
+	dstUp := filepath.Clean(dest)
+	err = unpackTextResources(dstUz, dstUp)
+	if err != nil {
+		return err
+	}
+
+	//_ = os.RemoveAll(dstTmp)
 	return nil
 }
 
