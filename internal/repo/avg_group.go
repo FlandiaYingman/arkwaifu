@@ -11,8 +11,14 @@ import (
 type AvgGroup struct {
 	bun.BaseModel `bun:"table:avg_groups"`
 
-	ID   string `bun:",pk"`
+	// ID is the unique id of the AvgGroup.
+	// e.g.: "1stact" (骑兵与猎人), "act15side" (将进酒).
+	ID string `bun:",pk"`
+	// Name is the name of the AvgGroup, can be the mainline chapter name, the activity name or the operator record name.
+	// e.g.: "骑兵与猎人", "怒号光明", "学者之心", "火山".
 	Name string
+
+	// Avgs is the Avg that belong to the AvgGroup. Currently, each Avg belongs to one and only one AvgGroup.
 	Avgs []*Avg `bun:"rel:has-many,join:id=group_id"`
 }
 

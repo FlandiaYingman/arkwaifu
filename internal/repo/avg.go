@@ -10,12 +10,22 @@ import (
 type Avg struct {
 	bun.BaseModel `bun:"table:avgs"`
 
-	StoryID   string `bun:",pk"`
+	// StoryID is the unique ID of the Avg.
+	// e.g.: "1stact_level_a001_01_beg".
+	StoryID string `bun:",pk"`
+	// StoryCode is the level code of the Avg, sometimes can be empty (in such case the Avg has no associated level).
+	// e.g.: "GT-1", "1-7".
 	StoryCode string
+	// StoryName is the name of the Avg. The Avg of the same level usually have the same StoryName.
+	// e.g.: "埋藏", "我也要大干一场".
 	StoryName string
-	StoryTxt  string
-	AvgTag    string
+	// StoryTxt is the relative path to the Avg script text, based on "/assets/torappu/dynamicassets/gamedata/" without the extension.
+	// e.g.: "activities/act9d0/level_act9d0_06_end" (actually pointing to "/assets/torappu/dynamicassets/gamedata/activities/act9d0/level_act9d0_06_end.txt").
+	StoryTxt string
+	// AvgTag is the type of the Avg, which can only be "行动前", "行动后" or "幕间".
+	AvgTag string
 
+	// GroupID is the ID of the AvgGroup which this Avg belongs to.
 	GroupID string `bun:"group_id"`
 }
 
