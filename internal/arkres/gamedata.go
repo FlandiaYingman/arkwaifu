@@ -115,13 +115,13 @@ type StoryReviewData struct {
 }
 
 type StoryData struct {
-	StoryID    string  `json:"storyId"`
-	StoryGroup string  `json:"storyGroup"`
-	StorySort  int64   `json:"storySort"`
-	StoryCode  *string `json:"storyCode"`
-	StoryName  string  `json:"storyName"`
-	StoryTxt   string  `json:"storyTxt"`
-	AvgTag     AvgTag  `json:"avgTag"`
+	StoryID    string `json:"storyId"`
+	StoryGroup string `json:"storyGroup"`
+	StorySort  int64  `json:"storySort"`
+	StoryCode  string `json:"storyCode"`
+	StoryName  string `json:"storyName"`
+	StoryTxt   string `json:"storyTxt"`
+	AvgTag     AvgTag `json:"avgTag"`
 }
 
 type ActType string
