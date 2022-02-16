@@ -1,7 +1,7 @@
 package arkres
 
 import (
-	"arkwaifu/internal/test"
+	"arkwaifu/internal/app/test"
 	"fmt"
 	"os"
 	"path/filepath"

@@ -1,7 +1,7 @@
 package infra
 
 import (
-	"arkwaifu/internal/config"
+	"arkwaifu/internal/app/config"
 	"context"
 	"database/sql"
 	"github.com/uptrace/bun"
