@@ -2,12 +2,14 @@ package gamedata
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/facette/natsort"
+	"path/filepath"
 	"sort"
 )
 
 func GetStoryReviewData(gamedata string) ([]StoryReviewData, error) {
-	dataPath := "zh_CN/gamedata/excel/story_review_table.json"
+	dataPath := "excel/story_review_table.json"
 	gamedataJson, err := GetText(gamedata, dataPath)
 	if err != nil {
 		return nil, err
@@ -27,6 +29,12 @@ func GetStoryReviewData(gamedata string) ([]StoryReviewData, error) {
 	sort.Sort(sortStoryReviewData(data))
 
 	return data, nil
+}
+
+func GetStoryText(gamedataDir string, storyTextPath string) (string, error) {
+	storyTextPath = fmt.Sprintf("%s.txt", storyTextPath)
+	storyTextPath = filepath.Join("story", storyTextPath)
+	return GetText(gamedataDir, storyTextPath)
 }
 
 type StoryReviewTable map[string]StoryReviewData
