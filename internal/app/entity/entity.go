@@ -17,7 +17,7 @@ type Avg struct {
 	// StoryName is the name of the Avg. The Avg of the same level usually have the same StoryName.
 	// e.g.: "埋藏", "我也要大干一场".
 	StoryName string
-	// StoryTxt is the relative path to the Avg script text, based on "/assets/torappu/dynamicassets/gamedata/" without the extension.
+	// StoryTxt is the Avg script text.
 	// e.g.: "activities/act9d0/level_act9d0_06_end" (actually pointing to "/assets/torappu/dynamicassets/gamedata/activities/act9d0/level_act9d0_06_end.txt").
 	StoryTxt string
 	// AvgTag is the type of the Avg, which can only be "行动前", "行动后" or "幕间".
