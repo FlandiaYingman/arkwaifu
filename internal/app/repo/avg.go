@@ -51,7 +51,10 @@ func NewAvgRepo(db *bun.DB) (*AvgRepo, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &AvgRepo{db: db}, nil
+	return &AvgRepo{
+		conn: db,
+		db:   db,
+	}, nil
 }
 
 func (r *AvgRepo) GetAvgs(ctx context.Context) ([]*entity.Avg, error) {

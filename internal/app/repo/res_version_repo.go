@@ -66,14 +66,24 @@ func NewResVersionRepo(db *bun.DB) (*ResVersionRepo, error) {
 
 func (r *ResVersionRepo) GetResVersion(ctx context.Context) (string, error) {
 	var resVersion ResVersion
-	err := r.db.
+	exists, err := r.db.
 		NewSelect().
 		Model(&resVersion).
-		Scan(ctx)
+		Exists(ctx)
 	if err != nil {
 		return "", err
 	}
-	return resVersion.ResVersion, nil
+	if exists {
+		err := r.db.
+			NewSelect().
+			Model(&resVersion).
+			Scan(ctx)
+		if err != nil {
+			return "", err
+		}
+		return resVersion.ResVersion, nil
+	}
+	return "", nil
 }
 
 func (r *ResVersionRepo) UpsertResVersion(ctx context.Context, resVersion string) error {
