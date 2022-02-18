@@ -3,80 +3,114 @@ package updateloop
 import (
 	"arkwaifu/internal/app/entity"
 	"arkwaifu/internal/app/service"
-	"arkwaifu/internal/pkg/arkres"
+	"arkwaifu/internal/pkg/arkres/gamedata"
+	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
+	"io/ioutil"
 	"regexp"
 )
 
 type UpdateLoopController struct {
-	avgService service.AvgService
+	avgService *service.AvgService
+}
+
+func NewUpdateLoopController(avgService *service.AvgService) *UpdateLoopController {
+	return &UpdateLoopController{avgService: avgService}
 }
 
 func (c *UpdateLoopController) UpdateResources() error {
+	ctx := context.Background()
+
 	resVersion, err := GetLatestResVersion()
 	if err != nil {
 		return err
 	}
-
-	avgData, err := GetAvgData(resVersion)
+	currentResVersion, err := c.avgService.GetResVersion(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = GetAvgResources(resVersion, "TODO/")
+	// Test whether the resource is up-to-date.
+	if resVersion == currentResVersion {
+		return nil
+	}
+
+	tempDir, err := ioutil.TempDir("", "tmp-*")
 	if err != nil {
 		return err
 	}
 
-	return c.avgService.UpsertAvgs(context.Background(), resVersion, avgData)
+	avgGameData, err := GetAvgGameData(resVersion, tempDir)
+	if err != nil {
+		return err
+	}
+
+	//err = GetAvgResources(resVersion, tempDir)
+	//if err != nil {
+	//	return err
+	//}
+
+	return c.avgService.UpsertAvgs(context.Background(), resVersion, avgGameData)
 }
 
 func GetLatestResVersion() (string, error) {
-	return arkres.GetResVersion()
+	return resource.GetResVersion()
 }
 
-func GetAvgData(resVersion string) ([]entity.AvgGroup, error) {
-	raw, err := arkres.GetStoryReviewData(resVersion)
+func GetAvgGameData(resVersion string, tempDir string) ([]entity.AvgGroup, error) {
+	err := gamedata.Get(resVersion, "", tempDir)
+	if err != nil {
+		return nil, err
+	}
+	raw, err := gamedata.GetStoryReviewData(tempDir)
 	if err != nil {
 		return nil, err
 	}
 
-	return convertRawToAvgGroup(raw), nil
+	return convertRawToAvgGroup(raw, tempDir)
 }
 
 func GetAvgResources(resVersion string, dest string) error {
-	infos, err := arkres.GetResInfos(resVersion)
+	infos, err := resource.GetResInfos(resVersion)
 	if err != nil {
 		return err
 	}
 
-	infos = arkres.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
-	return arkres.GetRes(infos, dest)
+	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
+	return resource.GetRes(infos, dest)
 }
 
-func convertRawToAvgGroup(raw []arkres.StoryReviewData) []entity.AvgGroup {
+func convertRawToAvgGroup(raw []gamedata.StoryReviewData, gamedataDir string) ([]entity.AvgGroup, error) {
 	groups := make([]entity.AvgGroup, len(raw))
 	for i, d := range raw {
+		avgs, err := convertRawToAvg(d.InfoUnlockDatas, gamedataDir)
+		if err != nil {
+			return nil, err
+		}
 		groups[i] = entity.AvgGroup{
 			ID:   d.ID,
 			Name: d.Name,
-			Avgs: convertRawToAvg(d.InfoUnlockDatas),
+			Avgs: avgs,
 		}
 	}
-	return groups
+	return groups, nil
 }
 
-func convertRawToAvg(raw []arkres.StoryData) []*entity.Avg {
+func convertRawToAvg(raw []gamedata.StoryData, gamedataDir string) ([]*entity.Avg, error) {
 	avgs := make([]*entity.Avg, len(raw))
 	for i, data := range raw {
+		text, err := gamedata.GetStoryText(gamedataDir, data.StoryTxt)
+		if err != nil {
+			return nil, err
+		}
 		avgs[i] = &entity.Avg{
 			StoryID:   data.StoryID,
 			StoryCode: data.StoryCode,
 			StoryName: data.StoryName,
-			StoryTxt:  data.StoryTxt,
+			StoryTxt:  text,
 			AvgTag:    string(data.AvgTag),
 			GroupID:   data.StoryGroup,
 		}
 	}
-	return avgs
+	return avgs, nil
 }
