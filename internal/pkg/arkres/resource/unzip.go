@@ -1,4 +1,4 @@
-package arkres
+package resource
 
 import (
 	"context"
