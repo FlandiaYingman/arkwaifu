@@ -12,6 +12,14 @@ type AvgService struct {
 	avgRepo        *repo.AvgRepo
 }
 
+func NewAvgService(rvRepo *repo.ResVersionRepo, agRepo *repo.AvgGroupRepo, aRepo *repo.AvgRepo) *AvgService {
+	return &AvgService{
+		resVersionRepo: rvRepo,
+		avgGroupRepo:   agRepo,
+		avgRepo:        aRepo,
+	}
+}
+
 func (s *AvgService) GetResVersion(ctx context.Context) (string, error) {
 	return s.resVersionRepo.GetResVersion(ctx)
 }
