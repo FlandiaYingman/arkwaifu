@@ -5,7 +5,13 @@ import (
 	"fmt"
 	"github.com/facette/natsort"
 	"path/filepath"
+	"regexp"
 	"sort"
+)
+
+var (
+	backgroundRegexp = regexp.MustCompile(`\[Background\(.*?image="(.*?)".*?\)]`)
+	imageRegexp      = regexp.MustCompile(`\[Image\(.*?image="(.*?)".*?\)]`)
 )
 
 func GetStoryReviewData(gamedata string) ([]StoryReviewData, error) {
@@ -35,6 +41,24 @@ func GetStoryText(gamedataDir string, storyTextPath string) (string, error) {
 	storyTextPath = fmt.Sprintf("%s.txt", storyTextPath)
 	storyTextPath = filepath.Join("story", storyTextPath)
 	return GetText(gamedataDir, storyTextPath)
+}
+
+func GetResourcesFromStoryText(storyText string) (images []string, backgrounds []string) {
+	backgrounds = make([]string, 0)
+	backgroundMatches := backgroundRegexp.FindAllStringSubmatch(storyText, -1)
+	if backgroundMatches != nil {
+		for _, match := range backgroundMatches {
+			backgrounds = append(backgrounds, match[1])
+		}
+	}
+	images = make([]string, 0)
+	imageMatches := imageRegexp.FindAllStringSubmatch(storyText, -1)
+	if imageMatches != nil {
+		for _, match := range imageMatches {
+			images = append(images, match[1])
+		}
+	}
+	return
 }
 
 type StoryReviewTable map[string]StoryReviewData
