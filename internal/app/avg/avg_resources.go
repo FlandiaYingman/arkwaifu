@@ -13,43 +13,43 @@ func NewController(service *Service) Controller {
 	return Controller{service}
 }
 
-type Group struct {
-	ID        string
-	Name      string
-	StoryList []Story
+func (c *Controller) GetGroups(ctx *fiber.Ctx) error {
+	groups, err := c.service.GetGroups(ctx.Context())
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(groups)
 }
 
-type Story struct {
-	ID                string
-	Code              string
-	Name              string
-	Tag               string
-	ImageResList      []string
-	BackgroundResList []string
+func (c *Controller) GetGroupByID(ctx *fiber.Ctx) error {
+	groupID := ctx.Params("groupID")
+	group, err := c.service.GetGroupByID(ctx.Context(), groupID)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(group)
 }
 
-func (c Controller) GetGroups(ctx *fiber.Ctx) error {
-	return nil
-
+func (c *Controller) GetStories(ctx *fiber.Ctx) error {
+	stories, err := c.service.GetStories(ctx.Context())
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(stories)
 }
 
-func (c Controller) GetGroupByID(ctx *fiber.Ctx) error {
-	return nil
-
-}
-
-func (c Controller) GetAvgs(ctx *fiber.Ctx) error {
-	return nil
-
-}
-
-func (c Controller) GetAvgByID(ctx *fiber.Ctx) error {
-	return nil
+func (c *Controller) GetStoryByID(ctx *fiber.Ctx) error {
+	storyID := ctx.Params("storyID")
+	story, err := c.service.GetGroupByID(ctx.Context(), storyID)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(story)
 }
 
 func RegisterController(v0 *server.V0, c Controller) {
 	v0.Get("groups", c.GetGroups)
 	v0.Get("groups/:groupID", c.GetGroupByID)
-	v0.Get("avgs", c.GetAvgs)
-	v0.Get("avgs/:avgID", c.GetAvgByID)
+	v0.Get("stories", c.GetStories)
+	v0.Get("stories/:storyID", c.GetStoryByID)
 }
