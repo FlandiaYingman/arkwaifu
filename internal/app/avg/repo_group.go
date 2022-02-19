@@ -45,6 +45,8 @@ func (r *GroupRepo) GetGroups(ctx context.Context) ([]GroupModel, error) {
 		NewSelect().
 		Model(&items).
 		Relation("Stories").
+		Relation("Stories.Images").
+		Relation("Stories.Backgrounds").
 		Scan(ctx)
 	return items, err
 }
@@ -55,6 +57,8 @@ func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*GroupModel, e
 		NewSelect().
 		Model(&item).
 		Relation("Stories").
+		Relation("Stories.Images").
+		Relation("Stories.Backgrounds").
 		Where("id = ?", id).
 		Scan(ctx)
 	return &item, err

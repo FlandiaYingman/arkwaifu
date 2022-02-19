@@ -75,6 +75,8 @@ func (r *StoryRepo) GetStories(ctx context.Context) ([]StoryModel, error) {
 	err := r.DB.
 		NewSelect().
 		Model(&items).
+		Relation("Images").
+		Relation("Backgrounds").
 		Relation("Group").
 		Scan(ctx)
 	return items, err
@@ -85,6 +87,8 @@ func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*StoryModel, e
 	err := r.DB.
 		NewSelect().
 		Model(&item).
+		Relation("Images").
+		Relation("Backgrounds").
 		Relation("Group").
 		Where("id = ?", id).
 		Scan(ctx)
