@@ -21,7 +21,7 @@ func main() {
 	}
 }
 
-func run(controller *updateloop.UpdateLoopController) {
+func run(controller *updateloop.Controller) {
 	err := controller.UpdateResources()
 	if err != nil {
 		panic(err)

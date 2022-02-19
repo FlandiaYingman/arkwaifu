@@ -1,8 +1,7 @@
 package updateloop
 
 import (
-	"arkwaifu/internal/app/entity"
-	"arkwaifu/internal/app/service"
+	"arkwaifu/internal/app/avg"
 	"arkwaifu/internal/pkg/arkres/gamedata"
 	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
@@ -10,32 +9,31 @@ import (
 	"regexp"
 )
 
-type UpdateLoopController struct {
-	avgService *service.AvgService
+type Controller struct {
+	avgService *avg.Service
 }
 
-func NewUpdateLoopController(avgService *service.AvgService) *UpdateLoopController {
-	return &UpdateLoopController{avgService: avgService}
+func NewController(avgService *avg.Service) *Controller {
+	return &Controller{avgService}
 }
 
-func (c *UpdateLoopController) UpdateResources() error {
+func (c *Controller) UpdateResources() error {
 	ctx := context.Background()
 
 	resVersion, err := GetLatestResVersion()
 	if err != nil {
 		return err
 	}
-	currentResVersion, err := c.avgService.GetResVersion(ctx)
+	currentResVersion, err := c.avgService.GetVersion(ctx)
 	if err != nil {
 		return err
 	}
-
 	// Test whether the resource is up-to-date.
 	if resVersion == currentResVersion {
 		return nil
 	}
 
-	tempDir, err := ioutil.TempDir("", "tmp-*")
+	tempDir, err := ioutil.TempDir("", "arkwaifu-updateloop-*")
 	if err != nil {
 		return err
 	}
@@ -45,19 +43,19 @@ func (c *UpdateLoopController) UpdateResources() error {
 		return err
 	}
 
-	//err = GetAvgResources(resVersion, tempDir)
-	//if err != nil {
+	// err = GetAvgResources(resVersion, tempDir)
+	// if err != nil {
 	//	return err
-	//}
+	// }
 
-	return c.avgService.UpsertAvgs(context.Background(), resVersion, avgGameData)
+	return c.avgService.SetAvgs(resVersion, avgGameData)
 }
 
 func GetLatestResVersion() (string, error) {
 	return resource.GetResVersion()
 }
 
-func GetAvgGameData(resVersion string, tempDir string) ([]entity.AvgGroup, error) {
+func GetAvgGameData(resVersion string, tempDir string) ([]avg.Group, error) {
 	err := gamedata.Get(resVersion, "", tempDir)
 	if err != nil {
 		return nil, err
@@ -67,7 +65,7 @@ func GetAvgGameData(resVersion string, tempDir string) ([]entity.AvgGroup, error
 		return nil, err
 	}
 
-	return convertRawToAvgGroup(raw, tempDir)
+	return groupsFromRaw(raw, tempDir)
 }
 
 func GetAvgResources(resVersion string, dest string) error {
@@ -80,37 +78,38 @@ func GetAvgResources(resVersion string, dest string) error {
 	return resource.GetRes(infos, dest)
 }
 
-func convertRawToAvgGroup(raw []gamedata.StoryReviewData, gamedataDir string) ([]entity.AvgGroup, error) {
-	groups := make([]entity.AvgGroup, len(raw))
-	for i, d := range raw {
-		avgs, err := convertRawToAvg(d.InfoUnlockDatas, gamedataDir)
+func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
+	groups := make([]avg.Group, len(raw))
+	for i, data := range raw {
+		stories, err := storiesFromRaw(data.InfoUnlockDatas, gamedataDir)
 		if err != nil {
 			return nil, err
 		}
-		groups[i] = entity.AvgGroup{
-			ID:   d.ID,
-			Name: d.Name,
-			Avgs: avgs,
+		groups[i] = avg.Group{
+			ID:        data.ID,
+			Name:      data.Name,
+			StoryList: stories,
 		}
 	}
 	return groups, nil
 }
 
-func convertRawToAvg(raw []gamedata.StoryData, gamedataDir string) ([]*entity.Avg, error) {
-	avgs := make([]*entity.Avg, len(raw))
+func storiesFromRaw(raw []gamedata.StoryData, gamedataDir string) ([]avg.Story, error) {
+	stories := make([]avg.Story, len(raw))
 	for i, data := range raw {
 		text, err := gamedata.GetStoryText(gamedataDir, data.StoryTxt)
 		if err != nil {
 			return nil, err
 		}
-		avgs[i] = &entity.Avg{
-			StoryID:   data.StoryID,
-			StoryCode: data.StoryCode,
-			StoryName: data.StoryName,
-			StoryTxt:  text,
-			AvgTag:    string(data.AvgTag),
-			GroupID:   data.StoryGroup,
+		images, backgrounds := gamedata.GetResourcesFromStoryText(text)
+		stories[i] = avg.Story{
+			ID:                data.StoryID,
+			Code:              data.StoryCode,
+			Name:              data.StoryName,
+			Tag:               string(data.AvgTag),
+			ImageResList:      images,
+			BackgroundResList: backgrounds,
 		}
 	}
-	return avgs, nil
+	return stories, nil
 }
