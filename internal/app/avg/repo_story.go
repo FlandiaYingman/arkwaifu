@@ -158,7 +158,7 @@ func (r *StoryRepo) Truncate(ctx context.Context) (err error) {
 	}
 	defer func() { _ = r.EndTx(err) }()
 	_, err = r.DB.NewTruncateTable().
-		Model((*GroupModel)(nil)).
+		Model((*StoryModel)(nil)).
 		Exec(ctx)
 	_, err = r.DB.NewTruncateTable().
 		Model((*ImageModel)(nil)).
