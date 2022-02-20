@@ -40,7 +40,7 @@ func (c *Controller) GetStories(ctx *fiber.Ctx) error {
 
 func (c *Controller) GetStoryByID(ctx *fiber.Ctx) error {
 	storyID := ctx.Params("storyID")
-	story, err := c.service.GetGroupByID(ctx.Context(), storyID)
+	story, err := c.service.GetStoryByID(ctx.Context(), storyID)
 	if err != nil {
 		return err
 	}
