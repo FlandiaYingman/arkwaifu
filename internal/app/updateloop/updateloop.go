@@ -2,25 +2,30 @@ package updateloop
 
 import (
 	"arkwaifu/internal/app/avg"
+	"arkwaifu/internal/app/config"
 	"arkwaifu/internal/pkg/arkres/gamedata"
 	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
-	"io/ioutil"
+	log "github.com/sirupsen/logrus"
+	"os"
+	"path/filepath"
 	"regexp"
 )
 
 type Controller struct {
-	avgService *avg.Service
+	resLocation string
+	avgService  *avg.Service
 }
 
-func NewController(avgService *avg.Service) *Controller {
-	return &Controller{avgService}
+func NewController(avgService *avg.Service, conf *config.Config) *Controller {
+	return &Controller{conf.ResourceLocation, avgService}
 }
 
 func (c *Controller) UpdateResources() error {
 	ctx := context.Background()
+	log.WithFields(log.Fields{}).Info("Attempt to update resources.")
 
-	resVersion, err := GetLatestResVersion()
+	latestResVersion, err := GetLatestResVersion()
 	if err != nil {
 		return err
 	}
@@ -28,27 +33,42 @@ func (c *Controller) UpdateResources() error {
 	if err != nil {
 		return err
 	}
+
 	// Test whether the resource is up-to-date.
-	if resVersion == currentResVersion {
+	logF := log.WithFields(log.Fields{
+		"latestResVersion":  latestResVersion,
+		"currentResVersion": currentResVersion,
+	})
+	if latestResVersion == currentResVersion {
+		logF.Info("Resources are up-to-date.")
 		return nil
+	} else {
+		logF.Info("Resource are out-of-date.")
 	}
 
-	tempDir, err := ioutil.TempDir("", "arkwaifu-updateloop-*")
+	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
+	if err != nil {
+		return err
+	}
+	logF = logF.WithFields(log.Fields{
+		"tempDir": tempDir,
+	})
+
+	logF.Info("Get AVG gamedata.")
+	avgGameData, err := GetAvgGameData(latestResVersion, tempDir)
 	if err != nil {
 		return err
 	}
 
-	avgGameData, err := GetAvgGameData(resVersion, tempDir)
+	resLocation := filepath.Join(c.resLocation, latestResVersion)
+	logF.Info("Get AVG resources")
+	err = GetAvgResources(latestResVersion, resLocation)
 	if err != nil {
 		return err
 	}
 
-	// err = GetAvgResources(resVersion, tempDir)
-	// if err != nil {
-	//	return err
-	// }
-
-	return c.avgService.SetAvgs(resVersion, avgGameData)
+	logF.Info("Set AVGs")
+	return c.avgService.SetAvgs(latestResVersion, avgGameData)
 }
 
 func GetLatestResVersion() (string, error) {
@@ -75,7 +95,21 @@ func GetAvgResources(resVersion string, dest string) error {
 	}
 
 	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
-	return resource.GetRes(infos, dest)
+	err = resource.GetRes(infos, dest)
+	if err != nil {
+		return err
+	}
+
+	err = os.Rename(filepath.Join(dest, "assets/torappu/dynamicassets/avg/images"), filepath.Join(dest, "images"))
+	if err != nil {
+		return err
+	}
+	err = os.Rename(filepath.Join(dest, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(dest, "backgrounds"))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
