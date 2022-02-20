@@ -46,16 +46,8 @@ func (c *Controller) UpdateResources() error {
 		logF.Info("Resource are out-of-date.")
 	}
 
-	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
-	if err != nil {
-		return err
-	}
-	logF = logF.WithFields(log.Fields{
-		"tempDir": tempDir,
-	})
-
 	logF.Info("Get AVG gamedata.")
-	avgGameData, err := GetAvgGameData(latestResVersion, tempDir)
+	avgGameData, err := GetAvgGameData(latestResVersion)
 	if err != nil {
 		return err
 	}
@@ -75,8 +67,14 @@ func GetLatestResVersion() (string, error) {
 	return resource.GetResVersion()
 }
 
-func GetAvgGameData(resVersion string, tempDir string) ([]avg.Group, error) {
-	err := gamedata.Get(resVersion, "", tempDir)
+func GetAvgGameData(resVersion string) ([]avg.Group, error) {
+	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = os.RemoveAll(tempDir) }()
+
+	err = gamedata.Get(resVersion, "", tempDir)
 	if err != nil {
 		return nil, err
 	}
@@ -109,6 +107,10 @@ func GetAvgResources(resVersion string, dest string) error {
 		return err
 	}
 
+	err = os.RemoveAll(filepath.Join(dest, "assets"))
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
