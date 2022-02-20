@@ -13,7 +13,7 @@ This project is currently under development.
   always up-to-date.
 - [x] Complete the AVG part of Ark Waifu. In brief, the AVG part handles the requests related to gamedata (i.e.,
   anything except for image resources).
-- [ ] Complete the Resource part of Ark Waifu. The resource part handles the requests of static resources, like image
+- [x] Complete the Resource part of Ark Waifu. The resource part handles the requests of static resources, like image
   files and background files.
 - [ ] Complete the frontend of Ark Waifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
   groups, and there are AVG stories under the AVG groups. The frontend shows all AVG resources under the user chosen
