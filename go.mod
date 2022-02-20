@@ -3,6 +3,7 @@ module arkwaifu
 go 1.17
 
 require (
+	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/caarlos0/env/v6 v6.9.1
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
