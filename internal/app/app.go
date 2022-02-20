@@ -4,6 +4,7 @@ import (
 	"arkwaifu/internal/app/avg"
 	"arkwaifu/internal/app/config"
 	"arkwaifu/internal/app/infra"
+	"arkwaifu/internal/app/res"
 	"arkwaifu/internal/app/server"
 	"arkwaifu/internal/app/updateloop"
 	"go.uber.org/fx"
@@ -26,6 +27,13 @@ func ProvideOptions() []fx.Option {
 		),
 		fx.Invoke(
 			avg.RegisterController,
+		),
+		fx.Provide(
+			res.NewService,
+			res.NewController,
+		),
+		fx.Invoke(
+			res.RegisterController,
 		),
 		fx.Provide(
 			updateloop.NewController,
