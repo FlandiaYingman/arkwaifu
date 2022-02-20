@@ -90,7 +90,7 @@ func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*StoryModel, e
 		Relation("Images").
 		Relation("Backgrounds").
 		Relation("Group").
-		Where("id = ?", id).
+		Where("s.id = ?", id).
 		Scan(ctx)
 	return &item, err
 }

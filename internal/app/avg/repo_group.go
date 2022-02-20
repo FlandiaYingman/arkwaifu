@@ -59,7 +59,7 @@ func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*GroupModel, e
 		Relation("Stories").
 		Relation("Stories.Images").
 		Relation("Stories.Backgrounds").
-		Where("id = ?", id).
+		Where("g.id = ?", id).
 		Scan(ctx)
 	return &item, err
 }
