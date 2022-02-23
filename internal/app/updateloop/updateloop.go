@@ -117,34 +117,38 @@ func GetAvgResources(resVersion string, dest string) error {
 func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
 	groups := make([]avg.Group, len(raw))
 	for i, data := range raw {
-		stories, err := storiesFromRaw(data.InfoUnlockDatas, gamedataDir)
+		stories, err := storiesFromRaw(data, gamedataDir)
 		if err != nil {
 			return nil, err
 		}
 		groups[i] = avg.Group{
 			ID:        data.ID,
 			Name:      data.Name,
-			StoryList: stories,
+			ActType:   string(data.ActType),
+			StartTime: data.StartTime,
+			Stories:   stories,
 		}
 	}
 	return groups, nil
 }
 
-func storiesFromRaw(raw []gamedata.StoryData, gamedataDir string) ([]avg.Story, error) {
-	stories := make([]avg.Story, len(raw))
-	for i, data := range raw {
-		text, err := gamedata.GetStoryText(gamedataDir, data.StoryTxt)
+func storiesFromRaw(data gamedata.StoryReviewData, gamedataDir string) ([]avg.Story, error) {
+	raws := data.InfoUnlockDatas
+	stories := make([]avg.Story, len(raws))
+	for i, raw := range raws {
+		text, err := gamedata.GetStoryText(gamedataDir, raw.StoryTxt)
 		if err != nil {
 			return nil, err
 		}
 		images, backgrounds := gamedata.GetResourcesFromStoryText(text)
 		stories[i] = avg.Story{
-			ID:                data.StoryID,
-			Code:              data.StoryCode,
-			Name:              data.StoryName,
-			Tag:               string(data.AvgTag),
-			ImageResList:      images,
-			BackgroundResList: backgrounds,
+			ID:          raw.StoryID,
+			Code:        raw.StoryCode,
+			Name:        raw.StoryName,
+			Tag:         string(raw.AvgTag),
+			Images:      images,
+			Backgrounds: backgrounds,
+			GroupID:     data.ID,
 		}
 	}
 	return stories, nil

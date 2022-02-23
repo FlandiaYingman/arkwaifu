@@ -2,22 +2,24 @@ package avg
 
 import (
 	"context"
-	"github.com/uptrace/bun"
 )
 
 type Group struct {
-	ID        string
-	Name      string
-	StoryList []Story
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	ActType   string  `json:"actType"`
+	StartTime int64   `json:"startTime"`
+	Stories   []Story `json:"stories"`
 }
 
 type Story struct {
-	ID                string
-	Code              string
-	Name              string
-	Tag               string
-	ImageResList      []string
-	BackgroundResList []string
+	ID          string   `json:"id"`
+	Code        string   `json:"code"`
+	Name        string   `json:"name"`
+	Tag         string   `json:"tag"`
+	GroupID     string   `json:"groupID"`
+	Images      []string `json:"images"`
+	Backgrounds []string `json:"backgrounds"`
 }
 
 func groupsToModels(groups []Group) ([]GroupModel, []StoryModel) {
@@ -25,11 +27,13 @@ func groupsToModels(groups []Group) ([]GroupModel, []StoryModel) {
 	storyModels := make([]StoryModel, 0, len(groups))
 	for i, group := range groups {
 		groupModels[i] = GroupModel{
-			ID:      group.ID,
-			Name:    group.Name,
-			Stories: nil,
+			ID:        group.ID,
+			Name:      group.Name,
+			ActType:   group.ActType,
+			Stories:   nil,
+			StartTime: group.StartTime,
 		}
-		storyModels = append(storyModels, storiesToModels(group, group.StoryList)...)
+		storyModels = append(storyModels, storiesToModels(group, group.Stories)...)
 	}
 	return groupModels, storyModels
 }
@@ -37,22 +41,21 @@ func groupsToModels(groups []Group) ([]GroupModel, []StoryModel) {
 func storiesToModels(group Group, stories []Story) []StoryModel {
 	groupModels := make([]StoryModel, len(stories))
 	for i, story := range stories {
-		images := make([]*ImageModel, len(story.ImageResList))
-		for i, image := range story.ImageResList {
+		images := make([]*ImageModel, len(story.Images))
+		for i, image := range story.Images {
 			images[i] = &ImageModel{
 				StoryID: story.ID,
 				Image:   image,
 			}
 		}
-		backgrounds := make([]*BackgroundModel, len(story.BackgroundResList))
-		for i, background := range story.BackgroundResList {
+		backgrounds := make([]*BackgroundModel, len(story.Backgrounds))
+		for i, background := range story.Backgrounds {
 			backgrounds[i] = &BackgroundModel{
 				StoryID:    story.ID,
 				Background: background,
 			}
 		}
 		groupModels[i] = StoryModel{
-			BaseModel:   bun.BaseModel{},
 			ID:          story.ID,
 			Code:        story.Code,
 			Name:        story.Name,
@@ -71,7 +74,9 @@ func groupsFromModels(groupModels []GroupModel) []Group {
 		groups[i] = Group{
 			ID:        model.ID,
 			Name:      model.Name,
-			StoryList: storiesFromModelsPtr(model.Stories),
+			ActType:   model.ActType,
+			StartTime: model.StartTime,
+			Stories:   storiesFromModelsPtr(model.Stories),
 		}
 	}
 	return groups
@@ -97,7 +102,9 @@ func groupFromModel(model GroupModel) Group {
 	return Group{
 		ID:        model.ID,
 		Name:      model.Name,
-		StoryList: storiesFromModelsPtr(model.Stories),
+		ActType:   model.ActType,
+		StartTime: model.StartTime,
+		Stories:   storiesFromModelsPtr(model.Stories),
 	}
 }
 
@@ -111,12 +118,13 @@ func storyFromModel(model StoryModel) Story {
 		backgrounds[i] = background.Background
 	}
 	return Story{
-		ID:                model.ID,
-		Code:              model.Code,
-		Name:              model.Name,
-		Tag:               model.Tag,
-		ImageResList:      images,
-		BackgroundResList: backgrounds,
+		ID:          model.ID,
+		Code:        model.Code,
+		Name:        model.Name,
+		Tag:         model.Tag,
+		Images:      images,
+		Backgrounds: backgrounds,
+		GroupID:     model.GroupID,
 	}
 }
 

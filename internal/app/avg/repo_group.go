@@ -22,6 +22,9 @@ type GroupModel struct {
 	// e.g.: "骑兵与猎人", "怒号光明", "学者之心", "火山".
 	Name string
 
+	ActType   string
+	StartTime int64
+
 	// Stories is the stories belong to the group.
 	Stories []*StoryModel `bun:"rel:has-many,join:id=group_id"`
 }
