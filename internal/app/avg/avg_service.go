@@ -5,11 +5,10 @@ import (
 )
 
 type Group struct {
-	ID        string  `json:"id"`
-	Name      string  `json:"name"`
-	ActType   string  `json:"actType"`
-	StartTime int64   `json:"startTime"`
-	Stories   []Story `json:"stories"`
+	ID      string  `json:"id"`
+	Name    string  `json:"name"`
+	ActType string  `json:"actType"`
+	Stories []Story `json:"stories"`
 }
 
 type Story struct {
@@ -27,11 +26,10 @@ func groupsToModels(groups []Group) ([]GroupModel, []StoryModel) {
 	storyModels := make([]StoryModel, 0, len(groups))
 	for i, group := range groups {
 		groupModels[i] = GroupModel{
-			ID:        group.ID,
-			Name:      group.Name,
-			ActType:   group.ActType,
-			Stories:   nil,
-			StartTime: group.StartTime,
+			ID:      group.ID,
+			Name:    group.Name,
+			ActType: group.ActType,
+			Stories: nil,
 		}
 		storyModels = append(storyModels, storiesToModels(group, group.Stories)...)
 	}
@@ -71,13 +69,7 @@ func storiesToModels(group Group, stories []Story) []StoryModel {
 func groupsFromModels(groupModels []GroupModel) []Group {
 	groups := make([]Group, len(groupModels))
 	for i, model := range groupModels {
-		groups[i] = Group{
-			ID:        model.ID,
-			Name:      model.Name,
-			ActType:   model.ActType,
-			StartTime: model.StartTime,
-			Stories:   storiesFromModelsPtr(model.Stories),
-		}
+		groups[i] = groupFromModel(model)
 	}
 	return groups
 }
@@ -100,11 +92,10 @@ func storiesFromModelsPtr(storyModels []*StoryModel) []Story {
 
 func groupFromModel(model GroupModel) Group {
 	return Group{
-		ID:        model.ID,
-		Name:      model.Name,
-		ActType:   model.ActType,
-		StartTime: model.StartTime,
-		Stories:   storiesFromModelsPtr(model.Stories),
+		ID:      model.ID,
+		Name:    model.Name,
+		ActType: model.ActType,
+		Stories: storiesFromModelsPtr(model.Stories),
 	}
 }
 

@@ -122,11 +122,10 @@ func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Gr
 			return nil, err
 		}
 		groups[i] = avg.Group{
-			ID:        data.ID,
-			Name:      data.Name,
-			ActType:   string(data.ActType),
-			StartTime: data.StartTime,
-			Stories:   stories,
+			ID:      data.ID,
+			Name:    data.Name,
+			ActType: string(data.ActType),
+			Stories: stories,
 		}
 	}
 	return groups, nil
