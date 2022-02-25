@@ -7,53 +7,67 @@ import GroupsActivityView from "@/views/GroupsActivityView.vue";
 import GroupsMiniView from "@/views/GroupsMiniView.vue";
 import GroupsOthersView from "@/views/GroupsOthersView.vue";
 import AvgStoriesView from "@/views/AvgStoriesView.vue";
+import AboutView from "@/views/AboutView.vue"
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "home",
     component: HomeView,
+    meta: {
+      title: "Home",
+    },
   },
   {
     path: "/avgs/mainline",
-    name: "mainline",
     component: GroupsMainlineView,
+    meta: {
+      title: "Mainline",
+    },
   },
   {
     path: "/avgs/activity",
-    name: "activity",
     component: GroupsActivityView,
+    meta: {
+      title: "Activity",
+    },
   },
   {
     path: "/avgs/mini",
-    name: "mini",
     component: GroupsMiniView,
+    meta: {
+      title: "Mini Activity",
+    },
   },
   {
     path: "/avgs/others",
-    name: "others",
     component: GroupsOthersView,
+    meta: {
+      title: "Others",
+    },
   },
   {
     path: "/avgs/stories/:storyID",
-    name: "story",
     component: AvgStoriesView,
     props: true,
+    meta: {
+      title: "Story",
+    },
   },
   {
     path: "/all",
-    name: "all",
     component: AllView,
+    meta: {
+      title: "All",
+    },
   },
   {
     path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+    component: AboutView,
+    meta: {
+      title: "About",
+    },
   },
 ];
 
