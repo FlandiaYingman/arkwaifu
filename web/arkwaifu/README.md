@@ -8,7 +8,13 @@ It's mainly driven by Vue.js and Vuetify.
 
 ## V0
 
+Features / Fixes: 
+
 - [x] Design the home page and the about page.
-- [ ] The first load takes too long time - probably because of the CDN (jsdelivr.net).
 - [ ] Remove the previous group and the next group in story page. Add them back in the future.
 - [ ] Change the title in navigation bar whenever page changes.
+- [ ] Add subtitle to each category in the navigation drawer to explain them. 
+
+Improvements: 
+
+- [ ] The first load takes too long time - probably because of the CDN (jsdelivr.net).
