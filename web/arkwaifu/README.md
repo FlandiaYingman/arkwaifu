@@ -1,24 +1,14 @@
-# arkwaifu
+# Arkwaifu Frontend
 
-## Project setup
-```
-npm install
-```
+This is the frontend of Arkwaifu project.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+It's mainly driven by Vue.js and Vuetify.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+# TODO
 
-### Lints and fixes files
-```
-npm run lint
-```
+## V0
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- [ ] Design the home page and the about page.
+- [ ] The first load takes too long time - probably because of the CDN (jsdelivr.net).
+- [ ] Remove the previous group and the next group in story page. Add them back in the future.
+- [ ] Change the title in navigation bar whenever page changes.
