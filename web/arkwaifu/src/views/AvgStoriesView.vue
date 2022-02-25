@@ -1,8 +1,8 @@
 <template>
   <v-container v-if="story">
-    <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show>
+    <!-- <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show> -->
     <group-show v-if="group" :groupID="group.id"></group-show>
-    <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show>
+    <!-- <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show> -->
     <br />
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
@@ -34,8 +34,8 @@ export default {
       story: null,
       groups: [],
       group: null,
-      prevGroup: null,
-      nextGroup: null,
+      // prevGroup: null,
+      // nextGroup: null,
     };
   },
   created() {
@@ -60,12 +60,12 @@ export default {
         .then(() => {
           let i = this.groups.findIndex((it) => it.id == this.story.groupID);
           this.group = this.groups[i];
-          if (i - 1 >= 0) {
-            this.prevGroup = this.groups[i - 1];
-          }
-          if (i + 1 < this.groups.length) {
-            this.nextGroup = this.groups[i + 1];
-          }
+          // if (i - 1 >= 0) {
+          //   this.prevGroup = this.groups[i - 1];
+          // }
+          // if (i + 1 < this.groups.length) {
+          //   this.nextGroup = this.groups[i + 1];
+          // }
         });
     },
   },
