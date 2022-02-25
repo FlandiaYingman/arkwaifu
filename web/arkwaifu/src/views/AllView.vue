@@ -57,8 +57,8 @@ export default {
   },
   methods: {
     async fetchImages() {
-      const response = await fetch("http://localhost:7080/api/v0/resources/images");
-      this.images = (await response.json()).map((it) => `http://localhost:7080/api/v0/resources/images/${it}`);
+      const response = await fetch(`${this.$API_URL}/api/v0/resources/images`);
+      this.images = (await response.json()).map((it) => `${this.$API_URL}/api/v0/resources/images/${it}`);
     },
   },
 };

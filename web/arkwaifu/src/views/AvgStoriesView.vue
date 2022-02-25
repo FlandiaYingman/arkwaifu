@@ -1,26 +1,22 @@
 <template>
   <v-container v-if="story">
-    <story-card :story="story"></story-card>
+    <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show>
+    <group-show v-if="group" :groupID="group.id"></group-show>
+    <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show>
     <br />
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
-      <v-col v-for="(image, i) in story.ImageResList" :key="`${image.ID}-${i}`" cols="3">
+      <v-col v-for="(image, i) in story.images" :key="`${image.ID}-${i}`" cols="3">
         <v-card>
-          <v-img
-            :src="`http://localhost:7080/api/v0/resources/images/${image}`"
-            class="transparent-background"
-          ></v-img>
+          <v-img :src="`${$API_URL}/api/v0/resources/images/${image}`" class="transparent-background"></v-img>
         </v-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" class="text-h5">Backgrounds</v-col>
-      <v-col v-for="(image, i) in story.BackgroundResList" :key="`${image.ID}-${i}`" cols="3">
+      <v-col v-for="(image, i) in story.backgrounds" :key="`${image.ID}-${i}`" cols="3">
         <v-card>
-          <v-img
-            :src="`http://localhost:7080/api/v0/resources/backgrounds/${image}`"
-            class="transparent-background"
-          ></v-img>
+          <v-img :src="`${$API_URL}/api/v0/resources/backgrounds/${image}`" class="transparent-background"></v-img>
         </v-card>
       </v-col>
     </v-row>
@@ -28,24 +24,49 @@
 </template>
 
 <script>
-import StoryCard from "@/components/StoryCard.vue";
+import GroupShow from "@/components/GroupShow.vue";
 export default {
   name: "AvgGroupsView",
-  components: { StoryCard },
-  props: ["storyName"],
+  components: { GroupShow },
+  props: ["storyID"],
   data() {
     return {
       story: null,
+      groups: [],
+      group: null,
+      prevGroup: null,
+      nextGroup: null,
     };
   },
   created() {
-    this.fetchStory();
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.fetchStory(this.storyID).then(() => this.fetchGroups());
+      }
+    );
+    this.fetchStory(this.storyID).then(() => this.fetchGroups());
   },
   methods: {
-    fetchStory() {
-      fetch(`http://localhost:7080/api/v0/stories/${this.storyName}`)
+    async fetchStory(storyID) {
+      return fetch(`${this.$API_URL}/api/v0/stories/${storyID}`)
         .then((resp) => resp.json())
-        .then((json) => (this.story = json));
+        .then((story) => (this.story = story));
+    },
+    async fetchGroups() {
+      return fetch(`${this.$API_URL}/api/v0/groups`)
+        .then((resp) => resp.json())
+        .then((group) => (this.groups = group))
+        .then(() => {
+          let i = this.groups.findIndex((it) => it.id == this.story.groupID);
+          this.group = this.groups[i];
+          if (i - 1 >= 0) {
+            this.prevGroup = this.groups[i - 1];
+          }
+          if (i + 1 < this.groups.length) {
+            this.nextGroup = this.groups[i + 1];
+          }
+        });
     },
   },
 };

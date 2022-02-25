@@ -2,7 +2,10 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AllView from "@/views/AllView.vue";
-import AvgGroupsView from "@/views/AvgGroupsView.vue";
+import GroupsMainlineView from "@/views/GroupsMainlineView.vue";
+import GroupsActivityView from "@/views/GroupsActivityView.vue";
+import GroupsMiniView from "@/views/GroupsMiniView.vue";
+import GroupsOthersView from "@/views/GroupsOthersView.vue";
 import AvgStoriesView from "@/views/AvgStoriesView.vue";
 
 Vue.use(VueRouter);
@@ -16,18 +19,25 @@ const routes = [
   {
     path: "/avgs/mainline",
     name: "mainline",
-    component: AvgGroupsView,
+    component: GroupsMainlineView,
   },
   {
     path: "/avgs/activity",
     name: "activity",
+    component: GroupsActivityView,
   },
   {
-    path: "/avgs/operator-record",
-    name: "operator-record",
+    path: "/avgs/mini",
+    name: "mini",
+    component: GroupsMiniView,
   },
   {
-    path: "/avgs/stories/:storyName",
+    path: "/avgs/others",
+    name: "others",
+    component: GroupsOthersView,
+  },
+  {
+    path: "/avgs/stories/:storyID",
     name: "story",
     component: AvgStoriesView,
     props: true,

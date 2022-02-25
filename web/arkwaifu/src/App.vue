@@ -33,11 +33,15 @@
           </v-list-item>
           <v-list-item to="/avgs/activity">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Activities</v-list-item-title>
+            <v-list-item-title>Activity</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/avgs/operator-record">
+          <v-list-item to="/avgs/mini">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Operator Records</v-list-item-title>
+            <v-list-item-title>Mini Activity</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/avgs/others">
+            <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
+            <v-list-item-title>Others</v-list-item-title>
           </v-list-item>
         </v-list-group>
 
