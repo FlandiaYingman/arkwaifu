@@ -68,7 +68,7 @@ func GetLatestResVersion() (string, error) {
 }
 
 func GetAvgGameData(resVersion string) ([]avg.Group, error) {
-	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
+	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_gamedata-*")
 	if err != nil {
 		return nil, err
 	}
@@ -92,25 +92,54 @@ func GetAvgResources(resVersion string, dest string) error {
 		return err
 	}
 
+	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_resources-*")
+	if err != nil {
+		return err
+	}
 	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
-	err = resource.GetRes(infos, dest)
+	err = resource.GetRes(infos, tmpDir)
 	if err != nil {
 		return err
 	}
 
-	err = os.Rename(filepath.Join(dest, "assets/torappu/dynamicassets/avg/images"), filepath.Join(dest, "images"))
+	rawDir := filepath.Join(dest, "raw")
+	err = os.MkdirAll(rawDir, 0755)
 	if err != nil {
 		return err
 	}
-	err = os.Rename(filepath.Join(dest, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(dest, "backgrounds"))
+	err = os.Rename(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
+	if err != nil {
+		return err
+	}
+	err = os.Rename(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
+	if err != nil {
+		return err
+	}
+	err = os.RemoveAll(tmpDir)
 	if err != nil {
 		return err
 	}
 
-	err = os.RemoveAll(filepath.Join(dest, "assets"))
+	webpDir := filepath.Join(dest, "webp")
+	err = os.MkdirAll(webpDir, 0755)
 	if err != nil {
 		return err
 	}
+	err = createWebpOfDir(rawDir, webpDir)
+	if err != nil {
+		return err
+	}
+
+	thumbnailDir := filepath.Join(dest, "thumbnail")
+	err = os.MkdirAll(thumbnailDir, 0755)
+	if err != nil {
+		return err
+	}
+	err = createThumbnailOfDir(webpDir, thumbnailDir)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

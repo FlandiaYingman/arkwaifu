@@ -5,7 +5,6 @@ import (
 	"arkwaifu/internal/app/config"
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -30,7 +29,7 @@ func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
 }
 
 func (s *Service) GetImages(ctx context.Context) ([]Resource, error) {
-	location, err := s.getImageLocation(ctx)
+	location, err := s.getImageLocation(ctx, Raw)
 	if err != nil {
 		return nil, err
 	}
@@ -51,15 +50,12 @@ func (s *Service) GetImages(ctx context.Context) ([]Resource, error) {
 	return resources, nil
 }
 
-func (s *Service) GetImageByName(ctx context.Context, name string) (*Resource, error) {
-	location, err := s.getImageLocation(ctx)
+func (s *Service) GetImageByName(ctx context.Context, name string, resType ResourceType) (*Resource, error) {
+	location, err := s.getImageLocation(ctx, resType)
 	if err != nil {
 		return nil, err
 	}
-	filename := name
-	if filepath.Ext(name) == "" {
-		filename = fmt.Sprintf("%s.png", name)
-	}
+	filename := resType.FileName(name)
 	info, err := os.Stat(filepath.Join(location, filename))
 	if err == nil {
 		return getResourceByFileInfo(location, info), nil
@@ -70,17 +66,17 @@ func (s *Service) GetImageByName(ctx context.Context, name string) (*Resource, e
 	return nil, err
 }
 
-func (s *Service) getImageLocation(ctx context.Context) (string, error) {
+func (s *Service) getImageLocation(ctx context.Context, resType ResourceType) (string, error) {
 	version, err := s.versionRepo.GetVersion(ctx)
 	if err != nil {
 		return "", err
 	}
-	location := filepath.Join(s.resourceLocation, version, "images")
+	location := filepath.Join(resType.Location(s.resourceLocation, version), "images")
 	return location, nil
 }
 
 func (s *Service) GetBackgrounds(ctx context.Context) ([]Resource, error) {
-	location, err := s.getBackgroundLocation(ctx)
+	location, err := s.getBackgroundLocation(ctx, Raw)
 	if err != nil {
 		return nil, err
 	}
@@ -101,15 +97,12 @@ func (s *Service) GetBackgrounds(ctx context.Context) ([]Resource, error) {
 	return resources, nil
 }
 
-func (s *Service) GetBackgroundByName(ctx context.Context, name string) (*Resource, error) {
-	location, err := s.getBackgroundLocation(ctx)
+func (s *Service) GetBackgroundByName(ctx context.Context, name string, resType ResourceType) (*Resource, error) {
+	location, err := s.getBackgroundLocation(ctx, resType)
 	if err != nil {
 		return nil, err
 	}
-	filename := name
-	if filepath.Ext(name) == "" {
-		filename = fmt.Sprintf("%s.png", name)
-	}
+	filename := resType.FileName(name)
 	info, err := os.Stat(filepath.Join(location, filename))
 	if err == nil {
 		return getResourceByFileInfo(location, info), nil
@@ -120,12 +113,12 @@ func (s *Service) GetBackgroundByName(ctx context.Context, name string) (*Resour
 	return nil, err
 }
 
-func (s *Service) getBackgroundLocation(ctx context.Context) (string, error) {
+func (s *Service) getBackgroundLocation(ctx context.Context, resType ResourceType) (string, error) {
 	version, err := s.versionRepo.GetVersion(ctx)
 	if err != nil {
 		return "", err
 	}
-	location := filepath.Join(s.resourceLocation, version, "backgrounds")
+	location := filepath.Join(resType.Location(s.resourceLocation, version), "backgrounds")
 	return location, nil
 }
 

@@ -6,6 +6,7 @@ require (
 	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/caarlos0/env/v6 v6.9.1
 	github.com/cavaliergopher/grab/v3 v3.0.1
+	github.com/chai2010/webp v1.1.1
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/gofiber/fiber/v2 v2.27.0
 	github.com/google/go-github/v42 v42.0.0
@@ -16,7 +17,9 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.0.22
 	github.com/uptrace/bun/driver/pgdriver v1.0.22
 	go.uber.org/fx v1.16.0
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/mod v0.5.1
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
 require (

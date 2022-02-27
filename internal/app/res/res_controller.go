@@ -27,8 +27,12 @@ func (c *Controller) GetImages(ctx *fiber.Ctx) error {
 	return ctx.JSON(imageNames)
 }
 
-func (c *Controller) GetImageByName(ctx *fiber.Ctx, name string) error {
-	image, err := c.service.GetImageByName(ctx.Context(), name)
+func (c *Controller) GetImageByName(ctx *fiber.Ctx, name string, resTypeStr string) error {
+	resType, err := ResTypeFromString(resTypeStr)
+	if err != nil {
+		return err
+	}
+	image, err := c.service.GetImageByName(ctx.Context(), name, resType)
 	if err != nil {
 		return err
 	}
@@ -53,8 +57,12 @@ func (c *Controller) GetBackgrounds(ctx *fiber.Ctx) error {
 	return ctx.JSON(imageNames)
 }
 
-func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string) error {
-	background, err := c.service.GetBackgroundByName(ctx.Context(), name)
+func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string, resTypeStr string) error {
+	resType, err := ResTypeFromString(resTypeStr)
+	if err != nil {
+		return err
+	}
+	background, err := c.service.GetBackgroundByName(ctx.Context(), name, resType)
 	if err != nil {
 		return err
 	}
@@ -70,10 +78,10 @@ func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string) error {
 func RegisterController(v0 *server.V0, c Controller) {
 	v0.Get("resources/images", c.GetImages)
 	v0.Get("resources/images/:imageName", func(ctx *fiber.Ctx) error {
-		return c.GetImageByName(ctx, ctx.Params("imageName"))
+		return c.GetImageByName(ctx, ctx.Params("imageName"), ctx.Query("resType"))
 	})
 	v0.Get("resources/backgrounds", c.GetBackgrounds)
 	v0.Get("resources/backgrounds/:backgroundName", func(ctx *fiber.Ctx) error {
-		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"))
+		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"), ctx.Query("resType"))
 	})
 }
