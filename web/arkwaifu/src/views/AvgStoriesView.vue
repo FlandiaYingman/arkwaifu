@@ -7,17 +7,13 @@
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
       <v-col v-for="(image, i) in story.images" :key="`${image.ID}-${i}`" cols="3">
-        <v-card>
-          <v-img :src="`${$API_URL}/api/v0/resources/images/${image}`" class="transparent-background"></v-img>
-        </v-card>
+          <resource-card :resName="image" resCategory="images"></resource-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" class="text-h5">Backgrounds</v-col>
       <v-col v-for="(image, i) in story.backgrounds" :key="`${image.ID}-${i}`" cols="3">
-        <v-card>
-          <v-img :src="`${$API_URL}/api/v0/resources/backgrounds/${image}`" class="transparent-background"></v-img>
-        </v-card>
+        <resource-card :resName="image" resCategory="backgrounds"></resource-card>
       </v-col>
     </v-row>
   </v-container>
@@ -25,9 +21,10 @@
 
 <script>
 import GroupShow from "@/components/GroupShow.vue";
+import ResourceCard from "@/components/ResourceCard.vue";
 export default {
   name: "AvgGroupsView",
-  components: { GroupShow },
+  components: { GroupShow, ResourceCard },
   props: ["storyID"],
   data() {
     return {
