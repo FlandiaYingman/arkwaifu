@@ -31,11 +31,6 @@
   background-size: 20px 20px, 20px 20px;
   box-shadow: none;
 }
-.overlay-text {
-  /* position: absolute; */
-  /* top: 0; */
-  /* left: 0; */
-}
 </style>
 
 <script>
