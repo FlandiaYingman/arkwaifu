@@ -6,40 +6,20 @@ import (
 	"github.com/chai2010/webp"
 	"golang.org/x/image/draw"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 	"image"
 	_ "image/png"
 	"io/fs"
 	"math"
 	"os"
 	"path/filepath"
-	"runtime"
 )
 
+const concurrency = 16
+
 func createThumbnailOfDir(dirPath string, destDirPath string) error {
-	goroutines := 2 * runtime.NumCPU()
-	q := make(chan string, goroutines)
-
-	eg, _ := errgroup.WithContext(context.Background())
-	for i := 0; i < goroutines; i++ {
-		eg.Go(func() error {
-			for imagePath := range q {
-				rel, _ := filepath.Rel(dirPath, imagePath)
-				join := filepath.Join(destDirPath, rel)
-
-				thumbPath := pathutil.ReplaceExt(join, ".webp")
-				err := os.MkdirAll(filepath.Dir(thumbPath), 0755)
-				if err != nil {
-					return err
-				}
-				err = createThumbnailOf(imagePath, thumbPath)
-				if err != nil {
-					return err
-				}
-			}
-			return nil
-		})
-	}
-
+	eg, ctx := errgroup.WithContext(context.Background())
+	sem := semaphore.NewWeighted(concurrency)
 	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -47,42 +27,38 @@ func createThumbnailOfDir(dirPath string, destDirPath string) error {
 		if entry.IsDir() {
 			return nil
 		}
-		q <- path
+		imagePath := path
+		err = sem.Acquire(ctx, 1)
+		if err != nil {
+			return err
+		}
+		eg.Go(func() error {
+			defer sem.Release(1)
+			rel, _ := filepath.Rel(dirPath, imagePath)
+			join := filepath.Join(destDirPath, rel)
+
+			thumbPath := pathutil.ReplaceExt(join, ".webp")
+			err := os.MkdirAll(filepath.Dir(thumbPath), 0755)
+			if err != nil {
+				return err
+			}
+			err = createThumbnailOf(imagePath, thumbPath)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 		return nil
 	})
-	close(q)
 	if err != nil {
 		_ = eg.Wait()
 		return err
 	}
-
 	return eg.Wait()
 }
 func createWebpOfDir(dirPath string, destDirPath string) error {
-	goroutines := 2 * runtime.NumCPU()
-	q := make(chan string, goroutines)
-
-	eg, _ := errgroup.WithContext(context.Background())
-	for i := 0; i < goroutines; i++ {
-		eg.Go(func() error {
-			for imagePath := range q {
-				rel, _ := filepath.Rel(dirPath, imagePath)
-				join := filepath.Join(destDirPath, rel)
-
-				webpPath := pathutil.ReplaceExt(join, ".webp")
-				err := os.MkdirAll(filepath.Dir(webpPath), 0755)
-				if err != nil {
-					return err
-				}
-				err = createWebpOf(imagePath, webpPath)
-				if err != nil {
-					return err
-				}
-			}
-			return nil
-		})
-	}
-
+	eg, ctx := errgroup.WithContext(context.Background())
+	sem := semaphore.NewWeighted(concurrency)
 	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -90,15 +66,33 @@ func createWebpOfDir(dirPath string, destDirPath string) error {
 		if entry.IsDir() {
 			return nil
 		}
-		q <- path
+		imagePath := path
+		err = sem.Acquire(ctx, 1)
+		if err != nil {
+			return err
+		}
+		eg.Go(func() error {
+			defer sem.Release(1)
+			rel, _ := filepath.Rel(dirPath, imagePath)
+			join := filepath.Join(destDirPath, rel)
+
+			thumbPath := pathutil.ReplaceExt(join, ".webp")
+			err := os.MkdirAll(filepath.Dir(thumbPath), 0755)
+			if err != nil {
+				return err
+			}
+			err = createWebpOf(imagePath, thumbPath)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 		return nil
 	})
-	close(q)
 	if err != nil {
 		_ = eg.Wait()
 		return err
 	}
-
 	return eg.Wait()
 }
 
