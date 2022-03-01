@@ -2,7 +2,6 @@ package resource
 
 import (
 	"bufio"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
@@ -15,7 +14,7 @@ const (
 )
 
 func unpackResources(src string, dst string) error {
-	//TODO: Change to a direct call of Python API.
+	// TODO: Change to a direct call of Python API.
 
 	// check extractor existence
 	_, err := os.Stat(extractorLocation)
@@ -23,12 +22,14 @@ func unpackResources(src string, dst string) error {
 		return err
 	}
 
-	install := exec.Command("pipenv", "install")
-	install.Dir = "./arkwaifu-extractor"
-	output, err := install.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("%w (%v), output:%q", err, install, output)
-	}
+	// Don't pipenv install, since it's done during building docker image
+
+	// install := exec.Command("pipenv", "install")
+	// install.Dir = "./arkwaifu-extractor"
+	// output, err := install.CombinedOutput()
+	// if err != nil {
+	// 	return fmt.Errorf("%w (%v), output:%q", err, install, output)
+	// }
 
 	srcAbs, err := filepath.Abs(src)
 	if err != nil {
@@ -39,32 +40,39 @@ func unpackResources(src string, dst string) error {
 		return err
 	}
 
-	cmd := exec.Command("pipenv", "run", "python", "main.py", "unpack", srcAbs, dstAbs)
-	cmd.Dir = "./arkwaifu-extractor"
+	cmd := exec.Command("pipenv", "run", "python", "-u", "main.py", "unpack", srcAbs, dstAbs)
+	cmd.Dir = extractorLocation
+	// cmd.Stdout = os.Stdout
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
 	}
+	scanner := bufio.NewScanner(stdout)
+	go func(scanner *bufio.Scanner) {
+		for scanner.Scan() {
+			t := scanner.Text()
+			split := strings.SplitN(t, "=>", 2)
+			if len(split) != 2 {
+				continue
+			}
+			srcFile := filepath.ToSlash(filepath.Clean(split[0]))
+			dstFile := filepath.ToSlash(filepath.Clean(split[1]))
+			log.WithFields(log.Fields{
+				"src": srcFile,
+				"dst": dstFile,
+			}).Infof("Resource unpacked.")
+		}
+	}(scanner)
+
 	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
-	scanner := bufio.NewScanner(stdout)
-
-	for scanner.Scan() {
-		t := scanner.Text()
-		split := strings.SplitN(t, "=>", 2)
-		if len(split) != 2 {
-			continue
-		}
-		srcFile := filepath.ToSlash(filepath.Clean(split[0]))
-		dstFile := filepath.ToSlash(filepath.Clean(split[1]))
-		log.WithFields(log.Fields{
-			"src": srcFile,
-			"dst": dstFile,
-		}).Infof("Resource unpacked.")
+	err = cmd.Wait()
+	if err != nil {
+		return err
 	}
 
 	return nil
