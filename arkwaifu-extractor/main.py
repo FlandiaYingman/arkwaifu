@@ -13,7 +13,7 @@ def list_assets(src: Path, filters: List[str]):
         env = UnityPy.load(str(src))
         for path, obj in env.container.items():
             if any(path.startswith(f) for f in filters):
-                print(f"{path}")
+                print(f"{path}", flush=True)
     else:
         for it in src.glob('**/*'):
             if it.is_file():
@@ -33,15 +33,15 @@ def unpack(src: Path, dst: Path, filters: List[str]):
                 if obj.type.name in ["Texture2D", "Sprite"]:
                     if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
                         data.image.save(dest)
-                        print(f"{path}=>{dest}")
+                        print(f"{path}=>{dest}", flush=True)
                     else:
-                        print(f"{path} type not supported", file=sys.stderr)
+                        print(f"{path} type not supported", file=sys.stderr, flush=True)
                 if obj.type.name in ["TextAsset"]:
                     with open(dest, "wb") as file:
                         file.write(bytes(data.script))
-                    print(f"{path}=>{dest}")
+                    print(f"{path}=>{dest}", flush=True)
     else:
-        print("Searching files...")
+        print("Searching files...", flush=True)
         with ProcessPoolExecutor() as executor:
             for it in src.glob('**/*'):
                 if it.is_file():
