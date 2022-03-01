@@ -3,6 +3,7 @@ package updateloop
 import (
 	"arkwaifu/internal/app/avg"
 	"arkwaifu/internal/app/config"
+	"arkwaifu/internal/app/util/fileutil"
 	"arkwaifu/internal/pkg/arkres/gamedata"
 	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
@@ -107,11 +108,11 @@ func GetAvgResources(resVersion string, dest string) error {
 	if err != nil {
 		return err
 	}
-	err = os.Rename(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
+	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
 	if err != nil {
 		return err
 	}
-	err = os.Rename(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
+	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
 	if err != nil {
 		return err
 	}
