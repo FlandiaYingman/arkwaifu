@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -18,6 +19,26 @@ const (
 // If exists, it returns the corresponded commit reference, otherwise, it returns an empty string.
 func FindCommitRef(resVersion string) (string, error) {
 	return findCommitByResVersion(githubArknightsGameDataOwner, githubArknightsGameDataRepo, resVersion)
+}
+
+// FindLatestCommitRef finds the latest gamedata update commit of CN server.
+func FindLatestCommitRef() (resVersion string, commitRef string, err error) {
+	message, commitRef, err := findLatestCommit(githubArknightsGameDataOwner, githubArknightsGameDataRepo)
+	if err != nil {
+		return "", "", err
+	}
+	_, _, resVersion = parseCommitMessage(message)
+	return resVersion, commitRef, nil
+}
+
+// parseCommitMessage parses the commit message of ArknightsGameData repo.
+func parseCommitMessage(message string) (server string, clientVersion string, resVersion string) {
+	r := regexp.MustCompile(`^\[(.*?) UPDATE] Client:(.*?) Data:(.*?)$`)
+	result := r.FindStringSubmatch(message)
+	if result == nil {
+		return "", "", ""
+	}
+	return result[1], result[2], result[3]
 }
 
 // Get downloads the Arknights gamedata from https://github.com/Kengxxiao/ArknightsGameData.
@@ -44,7 +65,9 @@ func Get(resVersion string, dataPath string, dest string) error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(zipball)
+	defer func(name string) {
+		_ = os.Remove(name)
+	}(zipball)
 
 	basename := filepath.Base(zipball)
 	purename := strings.TrimSuffix(basename, filepath.Ext(basename))
