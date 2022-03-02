@@ -21,6 +21,7 @@ This project is currently under development.
 - [x] Complete the frontend of ArkWaifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
   groups, and there are AVG stories under the AVG groups. The frontend shows all AVG resources under the user chosen
   group or story. Under the ALL category, the frontend simply shows all existing resources.
+- [ ] Dockerize ArkWaifu.
 - [ ] Make ArkWaifu go live!
 - [ ] Advertise ArkWaifu on Bilibili or somewhere...
 
