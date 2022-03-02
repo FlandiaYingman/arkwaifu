@@ -18,7 +18,7 @@ This project is currently under development.
   except for image resources).
 - [x] Complete the Resource part of ArkWaifu. The resource part handles the requests of static resources, like image
   files and background files.
-- [ ] Complete the frontend of ArkWaifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
+- [x] Complete the frontend of ArkWaifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
   groups, and there are AVG stories under the AVG groups. The frontend shows all AVG resources under the user chosen
   group or story. Under the ALL category, the frontend simply shows all existing resources.
 - [ ] Make ArkWaifu go live!
