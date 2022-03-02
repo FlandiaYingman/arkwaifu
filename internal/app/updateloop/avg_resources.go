@@ -1,25 +1,76 @@
 package updateloop
 
 import (
+	"arkwaifu/internal/app/util/fileutil"
 	"arkwaifu/internal/app/util/pathutil"
+	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
 	"github.com/chai2010/webp"
 	"golang.org/x/image/draw"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/semaphore"
 	"image"
-	_ "image/png"
+	_ "image/jpeg" // register jpeg codec
+	_ "image/png"  // register png codec
 	"io/fs"
 	"math"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
-const concurrency = 16
+func GetAvgResources(resVersion string, dest string) error {
+	infos, err := resource.GetResInfos(resVersion)
+	if err != nil {
+		return err
+	}
+
+	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_resources-*")
+	if err != nil {
+		return err
+	}
+	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
+	err = resource.GetRes(infos, tmpDir)
+	if err != nil {
+		return err
+	}
+
+	rawDir := filepath.Join(dest, "raw")
+	err = os.MkdirAll(rawDir, 0755)
+	if err != nil {
+		return err
+	}
+	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
+	if err != nil {
+		return err
+	}
+	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
+	if err != nil {
+		return err
+	}
+	err = os.RemoveAll(tmpDir)
+	if err != nil {
+		return err
+	}
+
+	thumbnailDir := filepath.Join(dest, "thumbnail")
+	err = os.MkdirAll(thumbnailDir, 0755)
+	if err != nil {
+		return err
+	}
+	err = createThumbnailOfDir(rawDir, thumbnailDir)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+const imgProcConcurrency = 16
 
 func createThumbnailOfDir(dirPath string, destDirPath string) error {
 	eg, ctx := errgroup.WithContext(context.Background())
-	sem := semaphore.NewWeighted(concurrency)
+	sem := semaphore.NewWeighted(imgProcConcurrency)
 	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -50,50 +101,14 @@ func createThumbnailOfDir(dirPath string, destDirPath string) error {
 		})
 		return nil
 	})
+	egErr := eg.Wait()
+	if egErr != nil {
+		return egErr
+	}
 	if err != nil {
-		_ = eg.Wait()
 		return err
 	}
-	return eg.Wait()
-}
-func createWebpOfDir(dirPath string, destDirPath string) error {
-	eg, ctx := errgroup.WithContext(context.Background())
-	sem := semaphore.NewWeighted(concurrency)
-	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		imagePath := path
-		err = sem.Acquire(ctx, 1)
-		if err != nil {
-			return err
-		}
-		eg.Go(func() error {
-			defer sem.Release(1)
-			rel, _ := filepath.Rel(dirPath, imagePath)
-			join := filepath.Join(destDirPath, rel)
-
-			thumbPath := pathutil.ReplaceExt(join, ".webp")
-			err := os.MkdirAll(filepath.Dir(thumbPath), 0755)
-			if err != nil {
-				return err
-			}
-			err = createWebpOf(imagePath, thumbPath)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-		return nil
-	})
-	if err != nil {
-		_ = eg.Wait()
-		return err
-	}
-	return eg.Wait()
+	return nil
 }
 
 func createThumbnailOf(imagePath string, destImagePath string) error {
@@ -103,14 +118,6 @@ func createThumbnailOf(imagePath string, destImagePath string) error {
 	}
 	imageData = resizeImage(imageData, 512, 512)
 	err = encodeImageToWebp(imageData, destImagePath)
-	return err
-}
-func createWebpOf(imagePath string, destImagePath string) error {
-	imageData, err := decodeImage(imagePath)
-	if err != nil {
-		return err
-	}
-	err = encodeImageToWebpLossless(imageData, destImagePath)
 	return err
 }
 
@@ -135,17 +142,6 @@ func encodeImageToWebp(imageData image.Image, destPath string) error {
 	defer thumbFile.Close()
 	err = webp.Encode(thumbFile, imageData, &webp.Options{
 		Quality: 85,
-	})
-	return err
-}
-func encodeImageToWebpLossless(imageData image.Image, destPath string) error {
-	thumbFile, err := os.Create(destPath)
-	if err != nil {
-		return err
-	}
-	defer thumbFile.Close()
-	err = webp.Encode(thumbFile, imageData, &webp.Options{
-		Lossless: true,
 	})
 	return err
 }

@@ -3,14 +3,11 @@ package updateloop
 import (
 	"arkwaifu/internal/app/avg"
 	"arkwaifu/internal/app/config"
-	"arkwaifu/internal/app/util/fileutil"
 	"arkwaifu/internal/pkg/arkres/gamedata"
 	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
-	log "github.com/sirupsen/logrus"
-	"os"
+	"github.com/sirupsen/logrus"
 	"path/filepath"
-	"regexp"
 )
 
 type Controller struct {
@@ -24,161 +21,92 @@ func NewController(avgService *avg.Service, conf *config.Config) *Controller {
 
 func (c *Controller) UpdateResources() error {
 	ctx := context.Background()
-	log.WithFields(log.Fields{}).Info("Attempt to update resources.")
-
-	latestResVersion, err := GetLatestResVersion()
+	resVersion, outOfDate, err := c.checkVersion(ctx)
 	if err != nil {
 		return err
 	}
-	currentResVersion, err := c.avgService.GetVersion(ctx)
-	if err != nil {
-		return err
-	}
+	if outOfDate {
+		log := logrus.WithFields(logrus.Fields{
+			"resVersion": resVersion,
+		})
 
-	// Test whether the resource is up-to-date.
-	logF := log.WithFields(log.Fields{
-		"latestResVersion":  latestResVersion,
-		"currentResVersion": currentResVersion,
-	})
-	if latestResVersion == currentResVersion {
-		logF.Info("Resources are up-to-date.")
-		return nil
-	} else {
-		logF.Info("Resource are out-of-date.")
-	}
+		resLocation := filepath.Join(c.resLocation, resVersion)
 
-	logF.Info("Get AVG gamedata.")
-	avgGameData, err := GetAvgGameData(latestResVersion)
-	if err != nil {
-		return err
-	}
+		log.Info("Getting gamedata...")
+		avgGameData, err := GetAvgGameData(resVersion)
+		if err != nil {
+			return err
+		}
 
-	resLocation := filepath.Join(c.resLocation, latestResVersion)
-	logF.Info("Get AVG resources")
-	err = GetAvgResources(latestResVersion, resLocation)
-	if err != nil {
-		return err
-	}
+		log.Info("Getting resources...")
+		err = GetAvgResources(resVersion, resLocation)
+		if err != nil {
+			return err
+		}
 
-	logF.Info("Set AVGs")
-	return c.avgService.SetAvgs(latestResVersion, avgGameData)
-}
+		log.Info("Setting AVG gamedata...")
+		err = c.avgService.SetAvgs(resVersion, avgGameData)
+		if err != nil {
+			return err
+		}
 
-func GetLatestResVersion() (string, error) {
-	return resource.GetResVersion()
-}
-
-func GetAvgGameData(resVersion string) ([]avg.Group, error) {
-	tempDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_gamedata-*")
-	if err != nil {
-		return nil, err
+		log.Info("Updated resources.")
 	}
-	defer func() { _ = os.RemoveAll(tempDir) }()
-
-	err = gamedata.Get(resVersion, "", tempDir)
-	if err != nil {
-		return nil, err
-	}
-	raw, err := gamedata.GetStoryReviewData(tempDir)
-	if err != nil {
-		return nil, err
-	}
-
-	return groupsFromRaw(raw, tempDir)
-}
-
-func GetAvgResources(resVersion string, dest string) error {
-	infos, err := resource.GetResInfos(resVersion)
-	if err != nil {
-		return err
-	}
-
-	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_resources-*")
-	if err != nil {
-		return err
-	}
-	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
-	err = resource.GetRes(infos, tmpDir)
-	if err != nil {
-		return err
-	}
-
-	rawDir := filepath.Join(dest, "raw")
-	err = os.MkdirAll(rawDir, 0755)
-	if err != nil {
-		return err
-	}
-	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
-	if err != nil {
-		return err
-	}
-	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
-	if err != nil {
-		return err
-	}
-	err = os.RemoveAll(tmpDir)
-	if err != nil {
-		return err
-	}
-
-	webpDir := filepath.Join(dest, "webp")
-	err = os.MkdirAll(webpDir, 0755)
-	if err != nil {
-		return err
-	}
-	err = createWebpOfDir(rawDir, webpDir)
-	if err != nil {
-		return err
-	}
-
-	thumbnailDir := filepath.Join(dest, "thumbnail")
-	err = os.MkdirAll(thumbnailDir, 0755)
-	if err != nil {
-		return err
-	}
-	err = createThumbnailOfDir(webpDir, thumbnailDir)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
-	groups := make([]avg.Group, len(raw))
-	for i, data := range raw {
-		stories, err := storiesFromRaw(data, gamedataDir)
-		if err != nil {
-			return nil, err
-		}
-		groups[i] = avg.Group{
-			ID:      data.ID,
-			Name:    data.Name,
-			ActType: string(data.ActType),
-			Stories: stories,
-		}
+func (c *Controller) checkVersion(ctx context.Context) (string, bool, error) {
+	log := logrus.WithFields(logrus.Fields{})
+	log.Info("Attempt to update resources.")
+
+	rResVersion, err := getLatestResourceResVersion()
+	if err != nil {
+		return "", false, err
 	}
-	return groups, nil
+	log.WithFields(logrus.Fields{
+		"rResVersion": rResVersion,
+	}).Info("Got resource resVersion.")
+
+	gResVersion, gCommitRef, err := getLatestGamedataResVersion()
+	if err != nil {
+		return "", false, err
+	}
+	log.WithFields(logrus.Fields{
+		"gResVersion": gResVersion,
+		"gCommitRef":  gCommitRef,
+	}).Info("Got gamedata resVersion and commitRef.")
+
+	if rResVersion != gResVersion {
+		log.WithFields(logrus.Fields{
+			"rResVersion": rResVersion,
+			"gResVersion": gResVersion,
+		}).Info("The remote resources are updating.")
+		return "", false, nil
+	}
+
+	remoteResVersion := rResVersion
+	localResVersion, err := c.avgService.GetVersion(ctx)
+	if err != nil {
+		return "", false, err
+	}
+
+	log = log.WithFields(logrus.Fields{
+		"remoteResVersion": remoteResVersion,
+		"localResVersion":  localResVersion,
+	})
+	// Test whether the resource is up-to-date.
+	if remoteResVersion == localResVersion {
+		log.Info("The local resources are up-to-date.")
+		return remoteResVersion, false, nil
+	}
+	log.Info("The local resources are out-of-date.")
+	return remoteResVersion, true, nil
 }
 
-func storiesFromRaw(data gamedata.StoryReviewData, gamedataDir string) ([]avg.Story, error) {
-	raws := data.InfoUnlockDatas
-	stories := make([]avg.Story, len(raws))
-	for i, raw := range raws {
-		text, err := gamedata.GetStoryText(gamedataDir, raw.StoryTxt)
-		if err != nil {
-			return nil, err
-		}
-		images, backgrounds := gamedata.GetResourcesFromStoryText(text)
-		stories[i] = avg.Story{
-			ID:          raw.StoryID,
-			Code:        raw.StoryCode,
-			Name:        raw.StoryName,
-			Tag:         string(raw.AvgTag),
-			Images:      images,
-			Backgrounds: backgrounds,
-			GroupID:     data.ID,
-		}
-	}
-	return stories, nil
+func getLatestResourceResVersion() (string, error) {
+	return resource.GetResVersion()
+}
+
+func getLatestGamedataResVersion() (string, string, error) {
+	return gamedata.FindLatestCommitRef()
 }
