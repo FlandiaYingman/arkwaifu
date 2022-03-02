@@ -5,7 +5,6 @@ import (
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/google/go-github/v42/github"
 	"github.com/mholt/archiver/v4"
-	"github.com/pkg/errors"
 	"io"
 	"net/url"
 	"os"
@@ -66,9 +65,9 @@ func extractZipball(zipball string, root string, files []string, dest string) er
 
 func findCommitByResVersion(owner string, repo string, resVersion string) (string, error) {
 	client := github.NewClient(nil)
-	page := 1
+	page := 0
 	perPage := 100
-	for true {
+	for page++; true; {
 		commits, _, err := client.Repositories.ListCommits(
 			context.Background(),
 			owner,
@@ -94,7 +93,6 @@ func findCommitByResVersion(owner string, repo string, resVersion string) (strin
 		if len(commits) == 0 {
 			break
 		}
-		page += 1
 	}
-	return "", errors.Errorf("commit by res version %v not found", resVersion)
+	return "", nil
 }

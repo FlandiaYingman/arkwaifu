@@ -1,6 +1,7 @@
 package gamedata
 
 import (
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"path"
@@ -13,6 +14,12 @@ const (
 	githubArknightsGameDataRepo  = "ArknightsGameData"
 )
 
+// FindCommitRef checks whether specified resource version exists or not.
+// If exists, it returns the corresponded commit reference, otherwise, it returns an empty string.
+func FindCommitRef(resVersion string) (string, error) {
+	return findCommitByResVersion(githubArknightsGameDataOwner, githubArknightsGameDataRepo, resVersion)
+}
+
 // Get downloads the Arknights gamedata from https://github.com/Kengxxiao/ArknightsGameData.
 //
 // Firstly, it downloads the repository archive from GitHub.
@@ -21,9 +28,12 @@ const (
 // For example, saying that path is "story/" and dest is "./arkwaifu/".
 // What Get does is to download the full gamedata archive and extract files in the archive under "zh_CN/gamedata/story/" into "./arkwaifu/story".
 func Get(resVersion string, dataPath string, dest string) error {
-	commitRef, err := findCommitByResVersion(githubArknightsGameDataOwner, githubArknightsGameDataRepo, resVersion)
+	commitRef, err := FindCommitRef(resVersion)
 	if err != nil {
 		return err
+	}
+	if commitRef == "" {
+		return errors.Errorf("commit by res version %v not found", resVersion)
 	}
 	link, err := getZipballLink(githubArknightsGameDataOwner, githubArknightsGameDataRepo, commitRef)
 	if err != nil {
