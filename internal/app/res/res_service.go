@@ -42,6 +42,7 @@ func (s *Service) GetImages(ctx context.Context) ([]Resource, error) {
 		info, err := entry.Info()
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
+				return nil, nil
 			}
 			return nil, err
 		}
@@ -89,6 +90,7 @@ func (s *Service) GetBackgrounds(ctx context.Context) ([]Resource, error) {
 		info, err := entry.Info()
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
+				return nil, nil
 			}
 			return nil, err
 		}
