@@ -5,6 +5,7 @@ import (
 	"arkwaifu/internal/app/config"
 	"context"
 	"github.com/gofiber/fiber/v2"
+	log "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 	"net"
 )
@@ -30,12 +31,13 @@ func run(app *fiber.App, config *config.Config, lc fx.Lifecycle) {
 			if err != nil {
 				return err
 			}
+
 			go func() {
-				if err := app.Listener(listener); err != nil {
-					panic(err)
+				err := app.Listener(listener)
+				if err != nil {
+					log.WithError(err).Panic("error occurs during app serve")
 				}
 			}()
-
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
