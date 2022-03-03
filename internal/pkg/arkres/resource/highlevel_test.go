@@ -1,8 +1,8 @@
 package resource
 
 import (
-	"arkwaifu/internal/app/test"
 	"fmt"
+	"github.com/flandiayingman/arkwaifu/internal/app/test"
 	"os"
 	"path/filepath"
 	"reflect"

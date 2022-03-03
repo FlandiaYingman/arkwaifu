@@ -1,7 +1,7 @@
 package avg
 
 import (
-	"arkwaifu/internal/app/server"
+	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
 )
 

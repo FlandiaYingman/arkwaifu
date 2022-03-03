@@ -1,8 +1,8 @@
 package avg
 
 import (
-	"arkwaifu/internal/app/infra"
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/uptrace/bun"
 )
 

@@ -1,8 +1,8 @@
 package updateloop
 
 import (
-	"arkwaifu/internal/app/avg"
-	"arkwaifu/internal/pkg/arkres/gamedata"
+	"github.com/flandiayingman/arkwaifu/internal/app/avg"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/gamedata"
 	"os"
 )
 

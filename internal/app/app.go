@@ -1,12 +1,12 @@
 package app
 
 import (
-	"arkwaifu/internal/app/avg"
-	"arkwaifu/internal/app/config"
-	"arkwaifu/internal/app/infra"
-	"arkwaifu/internal/app/res"
-	"arkwaifu/internal/app/server"
-	"arkwaifu/internal/app/updateloop"
+	"github.com/flandiayingman/arkwaifu/internal/app/avg"
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
+	"github.com/flandiayingman/arkwaifu/internal/app/infra"
+	"github.com/flandiayingman/arkwaifu/internal/app/res"
+	"github.com/flandiayingman/arkwaifu/internal/app/server"
+	"github.com/flandiayingman/arkwaifu/internal/app/updateloop"
 	"go.uber.org/fx"
 )
 

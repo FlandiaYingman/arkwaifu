@@ -1,11 +1,11 @@
 package updateloop
 
 import (
-	"arkwaifu/internal/app/avg"
-	"arkwaifu/internal/app/config"
-	"arkwaifu/internal/pkg/arkres/gamedata"
-	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/app/avg"
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/gamedata"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/resource"
 	"github.com/sirupsen/logrus"
 	"path/filepath"
 )

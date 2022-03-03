@@ -1,9 +1,9 @@
 package main
 
 import (
-	"arkwaifu/internal/app"
-	"arkwaifu/internal/app/config"
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/app"
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
 	"go.uber.org/fx"

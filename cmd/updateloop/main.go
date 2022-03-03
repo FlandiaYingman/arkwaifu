@@ -1,9 +1,9 @@
 package main
 
 import (
-	"arkwaifu/internal/app"
-	"arkwaifu/internal/app/updateloop"
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/app"
+	"github.com/flandiayingman/arkwaifu/internal/app/updateloop"
 	log "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 	"time"

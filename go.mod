@@ -1,4 +1,4 @@
-module arkwaifu
+module github.com/flandiayingman/arkwaifu
 
 go 1.17
 

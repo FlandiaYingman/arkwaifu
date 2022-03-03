@@ -1,9 +1,9 @@
 package infra
 
 import (
-	"arkwaifu/internal/app/config"
 	"context"
 	"database/sql"
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"

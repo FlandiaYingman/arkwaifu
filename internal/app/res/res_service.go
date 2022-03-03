@@ -1,10 +1,10 @@
 package res
 
 import (
-	"arkwaifu/internal/app/avg"
-	"arkwaifu/internal/app/config"
 	"context"
 	"errors"
+	"github.com/flandiayingman/arkwaifu/internal/app/avg"
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"os"
 	"path"
 	"path/filepath"

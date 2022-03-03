@@ -1,9 +1,9 @@
 package res
 
 import (
-	"arkwaifu/internal/app/server"
 	"fmt"
 	"github.com/ahmetb/go-linq/v3"
+	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
 )
 

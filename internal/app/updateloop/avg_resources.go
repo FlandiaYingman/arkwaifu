@@ -1,11 +1,11 @@
 package updateloop
 
 import (
-	"arkwaifu/internal/app/util/fileutil"
-	"arkwaifu/internal/app/util/pathutil"
-	"arkwaifu/internal/pkg/arkres/resource"
 	"context"
 	"github.com/chai2010/webp"
+	"github.com/flandiayingman/arkwaifu/internal/app/util/fileutil"
+	"github.com/flandiayingman/arkwaifu/internal/app/util/pathutil"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/resource"
 	"golang.org/x/image/draw"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/semaphore"
