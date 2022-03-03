@@ -1,10 +1,10 @@
 name: "Docker Image CI: updateloop"
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+#  push:
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
   release:
     types: [ released ]
 
