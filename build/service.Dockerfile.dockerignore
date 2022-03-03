@@ -1,0 +1,16 @@
+# Whitelist
+*
+
+# Docker Files
+!Dockerfile
+!.dockerignore
+
+# Project Files
+!go.mod
+!go.sum
+!cmd/**
+!internal/**
+
+# IDE & Editor Configs
+**/.idea
+**/.vscode

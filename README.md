@@ -1,7 +1,7 @@
 # ArkWaifu (arkwaifu)
 
-![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu)
-![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu)
+![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
+![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu?style=flat-square)
 
 A website providing AVG art resources of Arknights.
 
