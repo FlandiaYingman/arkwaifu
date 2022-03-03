@@ -1,10 +1,10 @@
-name: "Docker Image CI: service"
+name: "Docker Image CI: updateloop"
 
 on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ master  ]
 
 jobs:
 
@@ -34,8 +34,8 @@ jobs:
 #         # List of cache export destinations for buildx (e.g., user/app:cache, type=local,dest=path/to/dir)
 #         cache-to: # optional
         # Path to the Dockerfile
-        file: "build/service.Dockerfile"
+        file: "build/updateloop.Dockerfile"
         # Push is a shorthand for --output=type=registry
         push: true
         # List of tags
-        tags: "ghcr.io/flandiayingman/arkwaifu/service:latest"
+        tags: "ghcr.io/flandiayingman/arkwaifu/updateloop:latest"
