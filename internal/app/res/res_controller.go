@@ -5,6 +5,7 @@ import (
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 type Controller struct {
@@ -78,10 +79,10 @@ func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string, resTypeStr
 func RegisterController(v0 *server.V0, c Controller) {
 	v0.Get("resources/images", c.GetImages)
 	v0.Get("resources/images/:imageName", func(ctx *fiber.Ctx) error {
-		return c.GetImageByName(ctx, ctx.Params("imageName"), ctx.Query("resType"))
+		return c.GetImageByName(ctx, utils.CopyString(ctx.Params("imageName")), utils.CopyString(ctx.Query("resType")))
 	})
 	v0.Get("resources/backgrounds", c.GetBackgrounds)
 	v0.Get("resources/backgrounds/:backgroundName", func(ctx *fiber.Ctx) error {
-		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"), ctx.Query("resType"))
+		return c.GetBackgroundByName(ctx, utils.CopyString(ctx.Params("backgroundName")), utils.CopyString(ctx.Query("resType")))
 	})
 }

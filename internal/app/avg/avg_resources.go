@@ -3,6 +3,7 @@ package avg
 import (
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 type Controller struct {
@@ -22,7 +23,7 @@ func (c *Controller) GetGroups(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) GetGroupByID(ctx *fiber.Ctx) error {
-	groupID := ctx.Params("groupID")
+	groupID := utils.CopyString(ctx.Params("groupID"))
 	group, err := c.service.GetGroupByID(ctx.Context(), groupID)
 	if err != nil {
 		return err
@@ -39,7 +40,7 @@ func (c *Controller) GetStories(ctx *fiber.Ctx) error {
 }
 
 func (c *Controller) GetStoryByID(ctx *fiber.Ctx) error {
-	storyID := ctx.Params("storyID")
+	storyID := utils.CopyString(ctx.Params("storyID"))
 	story, err := c.service.GetStoryByID(ctx.Context(), storyID)
 	if err != nil {
 		return err
