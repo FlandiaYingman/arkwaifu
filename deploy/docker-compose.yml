@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+
+  frontend:
+    image: ghcr.io/flandiayingman/arkwaifu/frontend:latest
+    ports:
+      - "7081:80"
+
+  service:
+    image: ghcr.io/flandiayingman/arkwaifu/service:latest
+    ports:
+      - "7080:7080"
+    volumes:
+      - type: bind
+        source: ./arkwaifu_resource
+        target: /var/arkwaifu_resource
+    environment:
+      - POSTGRES_DSN
+      - RESOURCE_LOCATION
+
+  updateloop:
+    image: ghcr.io/flandiayingman/arkwaifu/updateloop:latest
+    volumes:
+      - type: bind
+        source: ./arkwaifu_resource
+        target: /var/arkwaifu_resource
+    environment:
+      - POSTGRES_DSN
+      - RESOURCE_LOCATION
+
