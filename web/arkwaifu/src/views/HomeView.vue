@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col></v-col>
+      <v-col><img src="@/assets/logo_phantom.png"/></v-col>
       <v-col class="text-h3" cols="12"> Welcom to Arkwaifu! </v-col>
       <v-col class="text-subtitle-1" cols="12">
         Arkwaifu provides the art resources get from Arknights. <br />
