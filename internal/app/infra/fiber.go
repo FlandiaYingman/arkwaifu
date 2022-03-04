@@ -11,6 +11,7 @@ func ProvideFiber() *fiber.App {
 		AppName:      "Ark Waifu",
 		ReadTimeout:  time.Second * 20,
 		WriteTimeout: time.Second * 20,
+		Immutable:    true,
 	})
 	app.Use(compress.New(compress.Config{
 		Level: compress.LevelBestSpeed,
