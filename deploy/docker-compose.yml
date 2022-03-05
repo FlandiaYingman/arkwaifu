@@ -16,7 +16,8 @@ services:
         target: /var/arkwaifu_resource
     environment:
       - POSTGRES_DSN
-      - RESOURCE_LOCATION
+      - "RESOURCE_LOCATION=/var/arkwaifu_resource"
+    network_mode: host
 
   updateloop:
     image: ghcr.io/flandiayingman/arkwaifu/updateloop:latest
@@ -26,5 +27,6 @@ services:
         target: /var/arkwaifu_resource
     environment:
       - POSTGRES_DSN
-      - RESOURCE_LOCATION
+      - "RESOURCE_LOCATION=/var/arkwaifu_resource"
+    network_mode: host
 
