@@ -16,8 +16,9 @@ services:
         target: /var/arkwaifu_resource
     environment:
       - POSTGRES_DSN
-      - "RESOURCE_LOCATION=/var/arkwaifu_resource"
-    network_mode: host
+      - RESOURCE_LOCATION=/var/arkwaifu_resource
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   updateloop:
     image: ghcr.io/flandiayingman/arkwaifu/updateloop:latest
@@ -27,6 +28,7 @@ services:
         target: /var/arkwaifu_resource
     environment:
       - POSTGRES_DSN
-      - "RESOURCE_LOCATION=/var/arkwaifu_resource"
-    network_mode: host
+      - RESOURCE_LOCATION=/var/arkwaifu_resource
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
