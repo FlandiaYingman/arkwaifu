@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="text-caption">{{ this.resCategory }}/{{ this.resName }}</div>
-    <v-card :href="this.resURL" target="_blank">
-      <v-img :src="`${this.resURL}?resType=thumbnail`" class="transparent-background"></v-img>
+    <v-card :href="this.assetURL" target="_blank">
+      <v-img :src="`${this.assetURL}?resType=thumbnail`" class="transparent-background"></v-img>
     </v-card>
   </div>
 </template>
@@ -39,8 +39,22 @@ export default {
   props: ["resName", "resCategory"],
   data() {
     return {
-      resURL: `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`,
+      assetURL: "",
     };
   },
+  watch: {
+    $props: {
+      handler() {
+        this.updateAssetURL()
+      },
+      deep: true,
+      immediate: true,
+    }
+  },
+  methods: {
+    updateAssetURL() {
+      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`
+    }
+  }
 };
 </script>
