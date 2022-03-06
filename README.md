@@ -9,7 +9,9 @@
 
 A website providing AVG art resources of Arknights.
 
-This project is currently under development.
+<del>This project is currently under development.</del>
+
+This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc/) (https://arkwaifu.cc/)! 🎉
 
 # TODOs V1 #
 
