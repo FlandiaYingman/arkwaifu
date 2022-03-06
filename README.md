@@ -13,30 +13,30 @@ This project is currently under development.
 
 # TODOs V1 #
 
-- [ ] Advertise ArkWaifu on Bilibili or somewhere...
-- [ ] Create a statistic module to show how many times the website is requested.
+- [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
+- [ ] <del>Create a statistic module to show how many times the website is requested.</del>
 - [ ] //...
 
 # Design
 
-For the design documentation, view at [here (DESIGN.md)](DESIGN.md).
+For the design documentation, view [here (DESIGN.md)](DESIGN.md).
 
 # Acknowledgements
 
-Thanks to Galvin Gao! He helped me a lot with the front-end development and in choosing frameworks. I really appreciate
-the "getting hand dirty" methodology very much.
+Thanks to [Galvin Gao](https://github.com/GalvinGao)! He helped me a lot in the front-end development and choosing
+frameworks. I really appreciate the "getting hand dirty" methodology very much.
 
-Thanks to Penguin Statistics! The prototype of this project has referenced and is inspired by Penguin
-Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
+Thanks to [Penguin Statistics](https://penguin-stats.io/)! The prototype of this project referenced and is inspired by
+Penguin Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
 
-Thanks to my friend Lily! She drew the fascinating Phantom logo of this project.
+Thanks to my friend Lily! She drew the fascinating [Phantom logo](assets/arkwaifu_phantom.png) of this project.
 
 # License
 
 The source code of this project is licensed under the [MIT License](LICENSE).
 
-The assets of this project is licensed
-under [Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
+The assets of this project is licensed under
+[Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
 
 This project utilizes resources and other works from the game Arknights. The copyright of such works belongs to the
 provider of the game, Shanghai Hypergryph Network Technology Co., Ltd.
