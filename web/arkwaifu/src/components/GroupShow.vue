@@ -7,7 +7,7 @@
         :key="`${story.id}-${i}`"
         cols="auto"
       >
-        <story-card :story="story" />
+        <story-card :story="story" :current="currentStoryID == story.id" />
       </v-col>
       <v-col cols="auto" v-if="limited">
         <v-card>
@@ -25,7 +25,7 @@
 import StoryCard from "./StoryCard.vue";
 export default {
   name: "group-show",
-  props: ["groupID", "limited"],
+  props: ["groupID", "limited", "currentStoryID"],
   components: { StoryCard },
   data: () => ({ group: null }),
   created() {

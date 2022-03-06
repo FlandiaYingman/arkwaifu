@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="story">
     <!-- <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show> -->
-    <group-show v-if="group" :groupID="group.id"></group-show>
+    <group-show v-if="group" :groupID="group.id" :currentStoryID="story.id"></group-show>
     <!-- <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show> -->
     <br />
     <v-row>
