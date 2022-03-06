@@ -1,9 +1,11 @@
 package updateloop
 
 import (
+	"github.com/ahmetb/go-linq/v3"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/gamedata"
 	"os"
+	"strings"
 )
 
 func GetAvgGameData(resVersion string) ([]avg.Group, error) {
@@ -51,6 +53,12 @@ func storiesFromRaw(data gamedata.StoryReviewData, gamedataDir string) ([]avg.St
 			return nil, err
 		}
 		images, backgrounds := gamedata.GetResourcesFromStoryText(text)
+		linq.From(images).
+			Select(func(i interface{}) interface{} { return strings.ToLower(i.(string)) }).
+			ToSlice(&images)
+		linq.From(backgrounds).
+			Select(func(i interface{}) interface{} { return strings.ToLower(i.(string)) }).
+			ToSlice(&backgrounds)
 		stories[i] = avg.Story{
 			ID:          raw.StoryID,
 			Code:        raw.StoryCode,

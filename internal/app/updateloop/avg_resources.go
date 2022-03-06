@@ -17,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 func GetAvgResources(resVersion string, dest string) error {
@@ -49,6 +50,19 @@ func GetAvgResources(resVersion string, dest string) error {
 		return err
 	}
 	err = os.RemoveAll(tmpDir)
+	if err != nil {
+		return err
+	}
+
+	err = filepath.WalkDir(rawDir, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		return os.Rename(path, filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path))))
+	})
 	if err != nil {
 		return err
 	}
