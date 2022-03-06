@@ -28,17 +28,17 @@
               <v-list-item-subtitle>Group Resources</v-list-item-subtitle>
             </v-list-item-content>
           </template>
-          <v-list-item to="/avgs/mainline">
+          <v-list-item to="/avgs/main_themes">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Mainline</v-list-item-title>
+            <v-list-item-title>Main Themes</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/avgs/activity">
+          <v-list-item to="/avgs/major_events">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Activity</v-list-item-title>
+            <v-list-item-title>Major Events</v-list-item-title>
           </v-list-item>
-          <v-list-item to="/avgs/mini">
+          <v-list-item to="/avgs/vignettes">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Mini Activity</v-list-item-title>
+            <v-list-item-title>Vignettes</v-list-item-title>
           </v-list-item>
           <v-list-item to="/avgs/others">
             <v-list-item-icon><v-icon></v-icon></v-list-item-icon>

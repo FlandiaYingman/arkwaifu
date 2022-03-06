@@ -1,11 +1,11 @@
 <template>
-  <GroupsPage type="MINI_STORY" />
+  <GroupsPage type="ACTIVITY_STORY" />
 </template>
 
 <script>
 import GroupsPage from "@/components/GroupsPage.vue";
 export default {
-  name: "GroupsMiniView",
+  name: "GroupsMajorEventsView",
   components: {GroupsPage},
 };
 </script>

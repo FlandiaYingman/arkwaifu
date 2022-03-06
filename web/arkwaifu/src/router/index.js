@@ -2,9 +2,9 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AllView from "@/views/AllView.vue";
-import GroupsMainlineView from "@/views/GroupsMainlineView.vue";
-import GroupsActivityView from "@/views/GroupsActivityView.vue";
-import GroupsMiniView from "@/views/GroupsMiniView.vue";
+import GroupsMainThemeView from "@/views/GroupsMainThemesView.vue";
+import GroupsMajorEventsView from "@/views/GroupsMajorEventsView.vue";
+import GroupsVegnettesView from "@/views/GroupsVignettesView.vue";
 import GroupsOthersView from "@/views/GroupsOthersView.vue";
 import AvgStoriesView from "@/views/AvgStoriesView.vue";
 import AboutView from "@/views/AboutView.vue"
@@ -20,24 +20,24 @@ const routes = [
     },
   },
   {
-    path: "/avgs/mainline",
-    component: GroupsMainlineView,
+    path: "/avgs/main_themes",
+    component: GroupsMainThemeView,
     meta: {
-      title: "Mainline",
+      title: "Main Themes",
     },
   },
   {
-    path: "/avgs/activity",
-    component: GroupsActivityView,
+    path: "/avgs/major_events",
+    component: GroupsMajorEventsView,
     meta: {
-      title: "Activity",
+      title: "Major Events",
     },
   },
   {
-    path: "/avgs/mini",
-    component: GroupsMiniView,
+    path: "/avgs/vignettes",
+    component: GroupsVegnettesView,
     meta: {
-      title: "Mini Activity",
+      title: "Vignettes",
     },
   },
   {

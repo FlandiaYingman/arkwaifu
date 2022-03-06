@@ -5,7 +5,7 @@
 <script>
 import GroupsPage from "@/components/GroupsPage.vue";
 export default {
-  name: "GroupsMainlineView",
+  name: "GroupsMainThemesView",
   components: {GroupsPage},
 };
 </script>
