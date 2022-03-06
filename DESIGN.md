@@ -1,4 +1,36 @@
+<!--suppress ALL -->
+<img src="assets/arkwaifu_phantom@0.25x.png" alt="logo" align="right" height="224" width="224"/>
+
 # App Design #
+
+## Backend
+
+### Concepts
+
+- **Assets**: graphics or audio assets of the game, such as background pictures or character illustrations; strictly
+  speaking, gamedata is a part of the assets, but generally, in the ArkWaifu context, it's not.
+- **Resources**: Same as *asset*; used before ArkWaifu version 0.1.0.
+- **Gamedata; Data**: the gamedata (text) of the game, such as story scripts or operator tables.
+- **AVG**: the sum of all stories in the game; one can say AVG assets and AVG gamedata, but seldom story assets or story
+  gamedata.
+- **Story**: an individual story in the game; e.g., the story before 1-7, the story after 1-7, a personal story in a
+  Vignette.
+- **Story Group; Group**: a logical group for stories; for the Main Themes, they are the Episodes like *Burning Run* (
+  Episode 04) etc.; for the Events, they are the Events themselves, like *Under Tides* or *Children of Ursus* etc.; for
+  Operator Records, they are also the Operator Records themselves (note: 2 records of 1 operator are counted as 2
+  groups; 2 stories of 1 record are counted as 1 group).
+
+#### Assets
+
+- **Image**: often refer to the `image` category in AVG assets.
+- **Background**: often refer to the `background` category in AVG assets.
+
+### Update Loop (updateloop) ###
+
+The duty of updateloop module is to keep assets and gamedata up-to-date.
+
+Whenever the game updates, updateloop pull the latest assets and gamedata, and push then into the local storage (for
+assets) and database (for gamedata).
 
 ## Frontend
 
@@ -54,35 +86,3 @@ I haven't figured out how does it show image and background resources... Just si
 ### All
 
 Same to AVGs. Just simply show thumbnails...
-
-## Backend
-
-### Update Loop ###
-
-1. Check whether there's a newer version of Arknights periodically.
-2. If there is, download and parse the updated part.
-3. Save the data into database and resource into local storage.
-
-### AVG ###
-
-TODO
-
-#### Group
-
-TODO
-
-#### Story
-
-TODO
-
-### Resource ###
-
-There are two kinds of resource - image and background.
-
-#### Image
-
-TODO
-
-#### Background
-
-TODO

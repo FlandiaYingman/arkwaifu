@@ -11,28 +11,15 @@ A website providing AVG art resources of Arknights.
 
 This project is currently under development.
 
-# TODOs V0 #
-
-- [x] Follow the package style guideline. While I'm currently working on making this app running, therefore this project
-  isn't following the package style
-  guideline (https://github.com/danceyoung/paper-code/blob/master/package-style-guideline/packagestyleguideline.md)
-- [x] Complete the *updateloop*. The updateloop updates the resources and gamedata continuously; it ensures the data is
-  always up-to-date.
-- [x] Complete the AVG part of ArkWaifu. In brief, the AVG part handles the requests related to gamedata (i.e., anything
-  except for image resources).
-- [x] Complete the Resource part of ArkWaifu. The resource part handles the requests of static resources, like image
-  files and background files.
-- [x] Complete the frontend of ArkWaifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
-  groups, and there are AVG stories under the AVG groups. The frontend shows all AVG resources under the user chosen
-  group or story. Under the ALL category, the frontend simply shows all existing resources.
-- [x] Dockerize ArkWaifu with CI (GitHub actions).
-- [x] Make ArkWaifu go live!
-
 # TODOs V1 #
 
 - [ ] Advertise ArkWaifu on Bilibili or somewhere...
 - [ ] Create a statistic module to show how many times the website is requested.
 - [ ] //...
+
+# Design
+
+For the design documentation, view at [here (DESIGN.md)](DESIGN.md).
 
 # Acknowledgements
 
@@ -56,4 +43,21 @@ provider of the game, Shanghai Hypergryph Network Technology Co., Ltd.
 
 Some initial template source code of this project is inspired by
 the [backend v3](https://github.com/penguin-statistics/backend-next) of [Penguin Statistics](https://penguin-stats.io/),
-which is licensed under the [MIT License](https://github.com/penguin-statistics/backend-next/blob/dev/LICENSE). 
+which is licensed under the [MIT License](https://github.com/penguin-statistics/backend-next/blob/dev/LICENSE).
+
+# [x] TODOs V0 #
+
+- [x] Follow the package style guideline. While I'm currently working on making this app running, therefore this project
+  isn't following the package style
+  guideline (https://github.com/danceyoung/paper-code/blob/master/package-style-guideline/packagestyleguideline.md)
+- [x] Complete the *updateloop*. The updateloop updates the resources and gamedata continuously; it ensures the data is
+  always up-to-date.
+- [x] Complete the AVG part of ArkWaifu. In brief, the AVG part handles the requests related to gamedata (i.e., anything
+  except for image resources).
+- [x] Complete the Resource part of ArkWaifu. The resource part handles the requests of static resources, like image
+  files and background files.
+- [x] Complete the frontend of ArkWaifu. There should be a sidebar with categories: AVGs or ALL. The AVGs shows all AVG
+  groups, and there are AVG stories under the AVG groups. The frontend shows all AVG resources under the user chosen
+  group or story. Under the ALL category, the frontend simply shows all existing resources.
+- [x] Dockerize ArkWaifu with CI (GitHub actions).
+- [x] Make ArkWaifu go live!
