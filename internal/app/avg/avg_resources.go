@@ -3,6 +3,8 @@ package avg
 import (
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"time"
 )
 
 type Controller struct {
@@ -48,8 +50,13 @@ func (c *Controller) GetStoryByID(ctx *fiber.Ctx) error {
 }
 
 func RegisterController(v0 *server.V0, c Controller) {
-	v0.Get("groups", c.GetGroups)
-	v0.Get("groups/:groupID", c.GetGroupByID)
-	v0.Get("stories", c.GetStories)
-	v0.Get("stories/:storyID", c.GetStoryByID)
+	router := v0.
+		Use(cache.New(cache.Config{
+			Expiration:   5 * time.Minute,
+			CacheControl: true,
+		}))
+	router.Get("groups", c.GetGroups)
+	router.Get("groups/:groupID", c.GetGroupByID)
+	router.Get("stories", c.GetStories)
+	router.Get("stories/:storyID", c.GetStoryByID)
 }

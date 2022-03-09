@@ -5,6 +5,9 @@ import (
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"time"
 )
 
 type Controller struct {
@@ -76,12 +79,21 @@ func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string, resTypeStr
 }
 
 func RegisterController(v0 *server.V0, c Controller) {
-	v0.Get("resources/images", c.GetImages)
-	v0.Get("resources/images/:imageName", func(ctx *fiber.Ctx) error {
+	router := v0.
+		Group("resources").
+		Use(cache.New(cache.Config{
+			Expiration:   24 * time.Hour,
+			CacheControl: true,
+		})).
+		Use(compress.New(compress.Config{
+			Level: compress.LevelBestSpeed,
+		}))
+	router.Get("images", c.GetImages)
+	router.Get("images/:imageName", func(ctx *fiber.Ctx) error {
 		return c.GetImageByName(ctx, ctx.Params("imageName"), ctx.Query("resType"))
 	})
-	v0.Get("resources/backgrounds", c.GetBackgrounds)
-	v0.Get("resources/backgrounds/:backgroundName", func(ctx *fiber.Ctx) error {
+	router.Get("backgrounds", c.GetBackgrounds)
+	router.Get("backgrounds/:backgroundName", func(ctx *fiber.Ctx) error {
 		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"), ctx.Query("resType"))
 	})
 }
