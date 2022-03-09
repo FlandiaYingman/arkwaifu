@@ -30,7 +30,7 @@ func GetAvgResources(resVersion string, dest string) error {
 	if err != nil {
 		return err
 	}
-	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/"))
+	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/(imgs|bg)"))
 	err = resource.GetRes(infos, tmpDir)
 	if err != nil {
 		return err
