@@ -20,9 +20,9 @@ FROM python:3.10-alpine AS deploy
 
 WORKDIR /app
 COPY --from=builder /app/updateloop ./updateloop
-COPY --from=builder /app/arkwaifu-extractor ./arkwaifu-extractor
+COPY --from=builder /app/tools/extractor ./tools/extractor
 
-WORKDIR /app/arkwaifu-extractor
+WORKDIR /app/tools/extractor
 RUN apk update && \
     apk add --no-cache gcc g++ libc-dev zlib-dev jpeg-dev && \
     apk add --no-cache libstdc++ libjpeg

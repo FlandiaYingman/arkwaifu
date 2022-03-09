@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	extractorLocation = "./arkwaifu-extractor"
+	extractorLocation = "./tools/extractor"
 )
 
 func unpackResources(src string, dst string) error {

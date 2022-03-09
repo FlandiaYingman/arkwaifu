@@ -8,7 +8,7 @@
 # Project Files
 !go.mod
 !go.sum
-!arkwaifu-extractor/**
+!tools/extractor/**
 !cmd/**
 !internal/**
 
