@@ -12,11 +12,12 @@ import (
 
 type Controller struct {
 	resLocation string
+	forceUpdate bool
 	avgService  *avg.Service
 }
 
 func NewController(avgService *avg.Service, conf *config.Config) *Controller {
-	return &Controller{conf.ResourceLocation, avgService}
+	return &Controller{conf.ResourceLocation, conf.ForceUpdate, avgService}
 }
 
 func (c *Controller) UpdateResources() error {
@@ -25,7 +26,11 @@ func (c *Controller) UpdateResources() error {
 	if err != nil {
 		return err
 	}
-	if outOfDate {
+	if outOfDate || c.forceUpdate {
+		if c.forceUpdate {
+			logrus.Info("Though the local resources are up-to-date, a force update is required.")
+		}
+
 		log := logrus.WithFields(logrus.Fields{
 			"resVersion": resVersion,
 		})
@@ -50,6 +55,7 @@ func (c *Controller) UpdateResources() error {
 			return err
 		}
 
+		c.forceUpdate = false
 		log.Info("Updated resources.")
 	}
 	return nil
