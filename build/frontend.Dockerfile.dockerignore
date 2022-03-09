@@ -2,7 +2,7 @@
 *
 
 # Docker Files
-!build/
+!build/**
 
 # Project Files
 !web/arkwaifu/public/

@@ -2,8 +2,7 @@
 *
 
 # Docker Files
-!Dockerfile
-!.dockerignore
+!build/**
 
 # Project Files
 !go.mod
