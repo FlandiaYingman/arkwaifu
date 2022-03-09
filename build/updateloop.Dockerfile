@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # updateloop.Dockerfile is used for build the updateloop part of ArkWaifu. It contains the updateloop part, therefore
-# python is needed. The image size is only 28.79 MiB for reference (built on 2022/03/03).
+# python is needed.
 
 FROM golang:1.17-alpine AS builder
 WORKDIR /app

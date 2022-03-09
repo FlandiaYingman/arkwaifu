@@ -22,15 +22,6 @@ func unpackResources(src string, dst string) error {
 		return err
 	}
 
-	// Don't pipenv install, since it's done during building docker image
-
-	// install := exec.Command("pipenv", "install")
-	// install.Dir = "./arkwaifu-extractor"
-	// output, err := install.CombinedOutput()
-	// if err != nil {
-	// 	return fmt.Errorf("%w (%v), output:%q", err, install, output)
-	// }
-
 	srcAbs, err := filepath.Abs(src)
 	if err != nil {
 		return err
