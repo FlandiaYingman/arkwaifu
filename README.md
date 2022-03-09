@@ -15,6 +15,12 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 
 # TODOs V1 #
 
+- [ ] Beautify the frontend.
+- [ ] List assets which aren't included in AVGs. e.g., assets appeared in mode *Integrated Strategies*.
+- [x] Use cache to speed up website (backend).
+- [ ] Use cache to speed up website (frontend).
+- [ ] Pull only differences every update loop.
+- [ ] Rewrite controller interface.
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
 - [ ] <del>Create a statistic module to show how many times the website is requested.</del>
 - [ ] //...
@@ -25,23 +31,23 @@ For the design documentation, view [here (DESIGN.md)](DESIGN.md).
 
 # Acknowledgements
 
-Thanks to [Galvin Gao](https://github.com/GalvinGao)! He helped me a lot in the front-end development and choosing
-frameworks. I really appreciate the "getting hand dirty" methodology very much.
+Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)! He helped me a lot in the front-end development and
+choosing frameworks. I really appreciate the "getting hand dirty" methodology very much.
+
+Thanks to my friend Lily! She drew the fascinating [Phantom logo](assets/arkwaifu_phantom.png) of this project.
 
 Thanks to [Penguin Statistics](https://penguin-stats.io/)! The prototype of this project referenced and is inspired by
 Penguin Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
-
-Thanks to my friend Lily! She drew the fascinating [Phantom logo](assets/arkwaifu_phantom.png) of this project.
 
 # License
 
 The source code of this project is licensed under the [MIT License](LICENSE).
 
-The assets of this project is licensed under
+The assets of this project are licensed under
 [Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
 
 This project utilizes resources and other works from the game Arknights. The copyright of such works belongs to the
-provider of the game, Shanghai Hypergryph Network Technology Co., Ltd.
+provider of the game, 上海鹰角网络科技有限公司 (Shanghai Hypergryph Network Technology Co., Ltd).
 
 Some initial template source code of this project is inspired by
 the [backend v3](https://github.com/penguin-statistics/backend-next) of [Penguin Statistics](https://penguin-stats.io/),
