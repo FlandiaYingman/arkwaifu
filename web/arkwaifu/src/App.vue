@@ -1,12 +1,7 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" permanant app width="288">
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title class="text-h4">ArkWaifu</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-      <v-divider />
+    <v-navigation-drawer v-model="drawer" width="288" permanant app>
+      <v-img src="@/assets/logo_phantom.png" width="128" height="128" class="mx-4" />
 
       <v-list nav>
         <v-subheader>NAVIGATION</v-subheader>
@@ -24,25 +19,39 @@
         <v-list-group link prepend-icon="mdi-television">
           <template #activator>
             <v-list-item-content>
-              <v-list-item-title>AVGs</v-list-item-title>
-              <v-list-item-subtitle>Group Resources</v-list-item-subtitle>
+              <v-list-item-title>AVG</v-list-item-title>
+              <v-list-item-subtitle>Sort by Stories</v-list-item-subtitle>
             </v-list-item-content>
           </template>
           <v-list-item to="/avgs/main_themes">
-            <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Main Themes</v-list-item-title>
+            <v-list-item-icon><v-icon>mdi-cube</v-icon></v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Main Themes</v-list-item-title>
+              <v-list-item-subtitle>Main Stories</v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
           <v-list-item to="/avgs/major_events">
-            <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Major Events</v-list-item-title>
+            <v-list-item-icon><v-icon>mdi-music-accidental-sharp</v-icon></v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Major Events</v-list-item-title>
+              <v-list-item-subtitle>Intermezzi & Side Stories</v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
           <v-list-item to="/avgs/vignettes">
-            <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Vignettes</v-list-item-title>
+            <v-list-item-icon><v-icon>mdi-music-accidental-flat</v-icon></v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Vignettes</v-list-item-title>
+              <v-list-item-subtitle>Story Collections</v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
           <v-list-item to="/avgs/others">
-            <v-list-item-icon><v-icon></v-icon></v-list-item-icon>
-            <v-list-item-title>Others</v-list-item-title>
+            <v-list-item-icon>
+              <v-icon>mdi-music-rest-quarter</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>Others</v-list-item-title>
+              <v-list-item-subtitle>Operator Records</v-list-item-subtitle>
+            </v-list-item-content>
           </v-list-item>
         </v-list-group>
 
@@ -52,7 +61,6 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>All</v-list-item-title>
-            <v-list-item-subtitle>All Resources</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -62,7 +70,7 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>About</v-list-item-title>
-            </v-list-item-content>
+          </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
