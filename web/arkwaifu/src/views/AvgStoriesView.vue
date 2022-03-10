@@ -6,16 +6,25 @@
     <br />
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
-      <v-col v-for="(image, i) in story.images" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
+      <v-col v-for="(image, i) in distinct ? _.uniq(story.images) : story.images" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
         <resource-card :resName="image" resCategory="images"></resource-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" class="text-h5">Backgrounds</v-col>
-      <v-col v-for="(image, i) in story.backgrounds" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
+      <v-col v-for="(image, i) in distinct ? _.uniq(story.backgrounds) : story.backgrounds" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
         <resource-card :resName="image" resCategory="backgrounds"></resource-card>
       </v-col>
     </v-row>
+    <v-tooltip left>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn fab large fixed bottom right color="primary" @click="distinct = !distinct" v-bind="attrs" v-on="on">
+          <v-icon v-if="!distinct">mdi-fingerprint-off</v-icon>
+          <v-icon v-else>mdi-fingerprint</v-icon>
+        </v-btn>
+      </template>
+      <span class="text-caption">Distinct: {{ distinct ? "ON" : "OFF" }}</span>
+    </v-tooltip>
   </v-container>
 </template>
 
@@ -31,6 +40,7 @@ export default {
       story: null,
       groups: [],
       group: null,
+      distinct: false,
       // prevGroup: null,
       // nextGroup: null,
     };
