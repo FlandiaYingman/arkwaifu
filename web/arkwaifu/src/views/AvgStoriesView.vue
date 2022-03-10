@@ -1,18 +1,18 @@
 <template>
-  <v-container v-if="story">
+  <v-container class="px-8" v-if="story">
     <!-- <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show> -->
     <group-show v-if="group" :groupID="group.id" :currentStoryID="story.id"></group-show>
     <!-- <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show> -->
     <br />
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
-      <v-col v-for="(image, i) in story.images" :key="`${image.ID}-${i}`" cols="3">
-          <resource-card :resName="image" resCategory="images"></resource-card>
+      <v-col v-for="(image, i) in story.images" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
+        <resource-card :resName="image" resCategory="images"></resource-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" class="text-h5">Backgrounds</v-col>
-      <v-col v-for="(image, i) in story.backgrounds" :key="`${image.ID}-${i}`" cols="3">
+      <v-col v-for="(image, i) in story.backgrounds" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
         <resource-card :resName="image" resCategory="backgrounds"></resource-card>
       </v-col>
     </v-row>

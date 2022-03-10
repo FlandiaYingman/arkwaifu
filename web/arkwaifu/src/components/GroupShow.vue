@@ -5,7 +5,9 @@
       <v-col
         v-for="(story, i) in !limited ? group.stories : group.stories.slice(0, 3)"
         :key="`${story.id}-${i}`"
-        cols="auto"
+        cols="6"
+        sm="3"
+        lg="2"
       >
         <story-card :story="story" :current="currentStoryID == story.id" />
       </v-col>

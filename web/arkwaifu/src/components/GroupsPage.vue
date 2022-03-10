@@ -1,8 +1,8 @@
 <template>
-  <v-container>
+  <v-container class="px-8">
     <v-row v-for="group in groups" :key="group.id">
       <v-col cols="12">{{ group.name }}</v-col>
-      <v-col v-for="(story, i) in group.stories" :key="`${story.id}-${i}`" cols="auto">
+      <v-col v-for="(story, i) in group.stories" :key="`${story.id}-${i}`" cols="6" sm="3" lg="2">
         <story-card :story="story" />
       </v-col>
     </v-row>

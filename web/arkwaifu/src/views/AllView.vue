@@ -1,13 +1,13 @@
 <template>
-  <v-container fluid>
+  <v-container class="px-8">
     <v-row>
-      <v-col v-for="image in images" :key="image" cols="3">
+      <v-col v-for="image in images" :key="image" cols="6" sm="3" lg="2">
         <resource-card :resName="image" resCategory="images"></resource-card>
       </v-col>
       <v-spacer />
     </v-row>
     <v-row>
-      <v-col v-for="background in backgrounds" :key="background" cols="3">
+      <v-col v-for="background in backgrounds" :key="background" cols="6" sm="3" lg="2">
         <resource-card :resName="background" resCategory="backgrounds"></resource-card>
       </v-col>
       <v-spacer />

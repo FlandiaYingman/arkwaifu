@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="px-8">
     <v-row>
       <v-col></v-col>
       <v-col class="text-h3" cols="12"> About Arkwaifu </v-col>

@@ -45,16 +45,16 @@ export default {
   watch: {
     $props: {
       handler() {
-        this.updateAssetURL()
+        this.updateAssetURL();
       },
       deep: true,
       immediate: true,
-    }
+    },
   },
   methods: {
     updateAssetURL() {
-      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`
-    }
-  }
+      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`;
+    },
+  },
 };
 </script>

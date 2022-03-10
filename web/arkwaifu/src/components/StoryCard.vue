@@ -3,8 +3,8 @@
     <v-card-title>{{ story.name }}</v-card-title>
     <v-card-subtitle>
       {{ story.code ? `${story.code} ` : "" }}{{ story.tag }}
-      <br />
-      {{ story.id }}
+      <br v-if="!$vuetify.breakpoint.mobile" />
+      {{ !$vuetify.breakpoint.mobile ? story.id : "" }}
     </v-card-subtitle>
   </v-card>
 </template>
