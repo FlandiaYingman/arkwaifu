@@ -1,6 +1,6 @@
 import argparse
 import sys
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import List
 
