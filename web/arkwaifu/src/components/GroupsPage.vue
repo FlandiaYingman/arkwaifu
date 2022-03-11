@@ -16,15 +16,13 @@ export default {
   components: { StoryCard },
   props: ["type"],
   data() {
-    return {
-      groups: [],
-    };
+    return {};
   },
-  created() {
-    fetch(`${this.$API_URL}/api/v0/groups`)
-      .then((resp) => resp.json())
-      .then((groups) => groups.filter((it) => it.actType == this.type))
-      .then((groups) => (this.groups = groups));
+  computed: {
+    groups() {
+      const groups = this.$store.state.avg.groups;
+      return groups.filter((el) => el.actType == this.type);
+    },
   },
 };
 </script>

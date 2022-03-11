@@ -29,17 +29,13 @@ export default {
   name: "group-show",
   props: ["groupID", "limited", "currentStoryID"],
   components: { StoryCard },
-  data: () => ({ group: null }),
-  created() {
-    fetch(`${this.$API_URL}/api/v0/groups/${this.groupID}`)
-      .then((resp) => resp.json())
-      .then((json) => (this.group = json));
+  data: () => {
+    return {};
   },
-  watch: {
-    groupID: function () {
-      fetch(`${this.$API_URL}/api/v0/groups/${this.groupID}`)
-        .then((resp) => resp.json())
-        .then((json) => (this.group = json));
+  computed: {
+    group() {
+      const group = this.$store.getters.groupByID(this.groupID);
+      return group;
     },
   },
 };

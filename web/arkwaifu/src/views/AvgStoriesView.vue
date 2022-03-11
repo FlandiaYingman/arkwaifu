@@ -6,13 +6,25 @@
     <br />
     <v-row>
       <v-col cols="12" class="text-h5">Images</v-col>
-      <v-col v-for="(image, i) in distinct ? _.uniq(story.images) : story.images" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
+      <v-col
+        v-for="(image, i) in distinct ? _.uniq(story.images) : story.images"
+        :key="`${image.ID}-${i}`"
+        cols="6"
+        sm="3"
+        lg="2"
+      >
         <resource-card :resName="image" resCategory="images"></resource-card>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" class="text-h5">Backgrounds</v-col>
-      <v-col v-for="(image, i) in distinct ? _.uniq(story.backgrounds) : story.backgrounds" :key="`${image.ID}-${i}`" cols="6" sm="3" lg="2">
+      <v-col
+        v-for="(image, i) in distinct ? _.uniq(story.backgrounds) : story.backgrounds"
+        :key="`${image.ID}-${i}`"
+        cols="6"
+        sm="3"
+        lg="2"
+      >
         <resource-card :resName="image" resCategory="backgrounds"></resource-card>
       </v-col>
     </v-row>
@@ -37,43 +49,21 @@ export default {
   props: ["storyID"],
   data() {
     return {
-      story: null,
-      groups: [],
-      group: null,
       distinct: false,
-      // prevGroup: null,
-      // nextGroup: null,
     };
   },
-  created() {
-    this.$watch(
-      () => this.$route.params,
-      () => {
-        this.fetchStory(this.storyID).then(() => this.fetchGroups());
-      }
-    );
-    this.fetchStory(this.storyID).then(() => this.fetchGroups());
-  },
-  methods: {
-    async fetchStory(storyID) {
-      return fetch(`${this.$API_URL}/api/v0/stories/${storyID}`)
-        .then((resp) => resp.json())
-        .then((story) => (this.story = story));
+  computed: {
+    groups() {
+      const groups = this.$store.state.avg.groups;
+      return groups;
     },
-    async fetchGroups() {
-      return fetch(`${this.$API_URL}/api/v0/groups`)
-        .then((resp) => resp.json())
-        .then((group) => (this.groups = group))
-        .then(() => {
-          let i = this.groups.findIndex((it) => it.id == this.story.groupID);
-          this.group = this.groups[i];
-          // if (i - 1 >= 0) {
-          //   this.prevGroup = this.groups[i - 1];
-          // }
-          // if (i + 1 < this.groups.length) {
-          //   this.nextGroup = this.groups[i + 1];
-          // }
-        });
+    group() {
+      const group = this.$store.getters.groupByID(this.story.groupID);
+      return group;
+    },
+    story() {
+      const story = this.$store.getters.storyByID(this.storyID);
+      return story;
     },
   },
 };
