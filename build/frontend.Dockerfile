@@ -6,11 +6,11 @@
 FROM node:17-alpine AS builder
 WORKDIR /app
 
-COPY ./web/arkwaifu/package.json ./web/arkwaifu/package-lock.json ./
-RUN npm install
+COPY ./web/arkwaifu/package.json ./web/arkwaifu/yarn.lock ./
+RUN yarn install
 
 COPY ./web/arkwaifu ./
-RUN npm run build
+RUN yarn build
 
 
 FROM nginx:alpine AS deploy
