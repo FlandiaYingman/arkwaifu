@@ -31,7 +31,7 @@ func unpackResources(src string, dst string) error {
 		return err
 	}
 
-	cmd := exec.Command("pipenv", "run", "python", "-u", "main.py", "unpack", srcAbs, dstAbs)
+	cmd := exec.Command("python", "-u", "main.py", "unpack", srcAbs, dstAbs)
 	cmd.Dir = extractorLocation
 	// cmd.Stdout = os.Stdout
 
