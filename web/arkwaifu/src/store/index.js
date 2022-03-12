@@ -40,6 +40,34 @@ const store = new Vuex.Store({
         },
       },
     },
+    assets: {
+      state: {
+        images: [],
+        backgrounds: [],
+      },
+      actions: {
+        async updateAll({ dispatch }) {
+          dispatch('updateImages');
+          dispatch('updateBackgrounds');
+        },
+        async updateImages(context) {
+          return fetch(`${API_URL}/api/v0/resources/images`)
+            .then((resp) => resp.json())
+            .then((images) => {
+              const { state } = context;
+              state.images = images;
+            });
+        },
+        async updateBackgrounds(context) {
+          return fetch(`${API_URL}/api/v0/resources/backgrounds`)
+            .then((resp) => resp.json())
+            .then((backgrounds) => {
+              const { state } = context;
+              state.backgrounds = backgrounds;
+            });
+        },
+      },
+    },
   },
 });
 

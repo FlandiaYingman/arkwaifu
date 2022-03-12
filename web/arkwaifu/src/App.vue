@@ -73,6 +73,19 @@
 
         <v-list-item
           link
+          to="/non_avgs"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-television-off</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Non-AVG</v-list-item-title>
+            <v-list-item-subtitle>Besides AVG</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item
+          link
           to="/all"
         >
           <v-list-item-icon>

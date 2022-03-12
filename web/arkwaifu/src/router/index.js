@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import AllView from '@/views/AllView.vue';
+import NonAvgView from '@/views/NonAvgView.vue';
 import GroupsMainThemeView from '@/views/GroupsMainThemesView.vue';
 import GroupsMajorEventsView from '@/views/GroupsMajorEventsView.vue';
 import GroupsVegnettesView from '@/views/GroupsVignettesView.vue';
@@ -53,6 +54,13 @@ const routes = [
     props: true,
     meta: {
       title: 'Story',
+    },
+  },
+  {
+    path: '/non_avgs',
+    component: NonAvgView,
+    meta: {
+      title: 'Non-AVG',
     },
   },
   {
