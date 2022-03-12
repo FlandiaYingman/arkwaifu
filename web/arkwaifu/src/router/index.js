@@ -7,7 +7,7 @@ import GroupsMajorEventsView from "@/views/GroupsMajorEventsView.vue";
 import GroupsVegnettesView from "@/views/GroupsVignettesView.vue";
 import GroupsOthersView from "@/views/GroupsOthersView.vue";
 import AvgStoriesView from "@/views/AvgStoriesView.vue";
-import AboutView from "@/views/AboutView.vue"
+import AboutView from "@/views/AboutView.vue";
 
 Vue.use(VueRouter);
 

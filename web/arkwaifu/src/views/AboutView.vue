@@ -8,9 +8,10 @@
         there's probably nothing to say in "about" :D.
       </v-col>
       <v-col class="text-body-1" cols="12">
-        However, if you are still instrested about Arkwaifu, please go to the Github repo (
-        <a href="https://github.com/FlandiaYingman/arkwaifu" target="_blank">
-          https://github.com/FlandiaYingman/arkwaifu</a
+        However, if you are still instrested about Arkwaifu, please go to the Github repo (<a
+          href="https://github.com/FlandiaYingman/arkwaifu"
+          target="_blank"
+          >https://github.com/FlandiaYingman/arkwaifu</a
         >). Any kinds of issue or pull requests are welcome. Thanks!
       </v-col>
     </v-row>
