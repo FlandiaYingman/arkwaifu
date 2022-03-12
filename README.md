@@ -16,9 +16,9 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 # TODOs V1 #
 
 - [x] Beautify the frontend. (Partially Done)
-- [ ] List assets which aren't included in AVGs. e.g., assets appeared in mode *Integrated Strategies*.
+- [x] List assets which aren't included in AVGs. e.g., assets appeared in mode *Integrated Strategies*.
 - [x] Use cache to speed up website (backend).
-- [ ] Use cache to speed up website (frontend).
+- [x] Use cache to speed up website (frontend).
 - [ ] Pull only differences every update loop.
 - [ ] Rewrite controller interface.
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
