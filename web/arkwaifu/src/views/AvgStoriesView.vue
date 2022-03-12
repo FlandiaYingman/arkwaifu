@@ -89,7 +89,7 @@ export default {
   },
   data() {
     return {
-      distinct: false,
+      distinct: true,
     };
   },
   computed: {
