@@ -47,14 +47,14 @@
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/avgs/major_events">
-            <v-list-item-icon><v-icon>mdi-music-accidental-sharp</v-icon></v-list-item-icon>
+            <v-list-item-icon><v-icon>mdi-music-clef-treble</v-icon></v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>Major Events</v-list-item-title>
               <v-list-item-subtitle>Intermezzi & Side Stories</v-list-item-subtitle>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/avgs/vignettes">
-            <v-list-item-icon><v-icon>mdi-music-accidental-flat</v-icon></v-list-item-icon>
+            <v-list-item-icon><v-icon>mdi-music-clef-bass</v-icon></v-list-item-icon>
             <v-list-item-content>
               <v-list-item-title>Vignettes</v-list-item-title>
               <v-list-item-subtitle>Story Collections</v-list-item-subtitle>
