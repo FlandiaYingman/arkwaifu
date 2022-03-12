@@ -51,12 +51,12 @@ func (s *Service) GetImages(ctx context.Context) ([]Resource, error) {
 	return resources, nil
 }
 
-func (s *Service) GetImageByName(ctx context.Context, name string, resType ResourceType) (*Resource, error) {
-	location, err := s.getImageLocation(ctx, resType)
+func (s *Service) GetImageByName(ctx context.Context, name string, variant Variant) (*Resource, error) {
+	location, err := s.getImageLocation(ctx, variant)
 	if err != nil {
 		return nil, err
 	}
-	filename := resType.FileName(name)
+	filename := variant.FileName(name)
 	info, err := os.Stat(filepath.Join(location, filename))
 	if err == nil {
 		return getResourceByFileInfo(location, info), nil
@@ -67,12 +67,12 @@ func (s *Service) GetImageByName(ctx context.Context, name string, resType Resou
 	return nil, err
 }
 
-func (s *Service) getImageLocation(ctx context.Context, resType ResourceType) (string, error) {
+func (s *Service) getImageLocation(ctx context.Context, variant Variant) (string, error) {
 	version, err := s.versionRepo.GetVersion(ctx)
 	if err != nil {
 		return "", err
 	}
-	location := filepath.Join(resType.Location(s.resourceLocation, version), "images")
+	location := filepath.Join(variant.Location(s.resourceLocation, version), "images")
 	return location, nil
 }
 
@@ -99,12 +99,12 @@ func (s *Service) GetBackgrounds(ctx context.Context) ([]Resource, error) {
 	return resources, nil
 }
 
-func (s *Service) GetBackgroundByName(ctx context.Context, name string, resType ResourceType) (*Resource, error) {
-	location, err := s.getBackgroundLocation(ctx, resType)
+func (s *Service) GetBackgroundByName(ctx context.Context, name string, variant Variant) (*Resource, error) {
+	location, err := s.getBackgroundLocation(ctx, variant)
 	if err != nil {
 		return nil, err
 	}
-	filename := resType.FileName(name)
+	filename := variant.FileName(name)
 	info, err := os.Stat(filepath.Join(location, filename))
 	if err == nil {
 		return getResourceByFileInfo(location, info), nil
@@ -115,12 +115,12 @@ func (s *Service) GetBackgroundByName(ctx context.Context, name string, resType 
 	return nil, err
 }
 
-func (s *Service) getBackgroundLocation(ctx context.Context, resType ResourceType) (string, error) {
+func (s *Service) getBackgroundLocation(ctx context.Context, variant Variant) (string, error) {
 	version, err := s.versionRepo.GetVersion(ctx)
 	if err != nil {
 		return "", err
 	}
-	location := filepath.Join(resType.Location(s.resourceLocation, version), "backgrounds")
+	location := filepath.Join(variant.Location(s.resourceLocation, version), "backgrounds")
 	return location, nil
 }
 

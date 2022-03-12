@@ -30,12 +30,12 @@ func (c *Controller) GetImages(ctx *fiber.Ctx) error {
 	return ctx.JSON(imageNames)
 }
 
-func (c *Controller) GetImageByName(ctx *fiber.Ctx, name string, resTypeStr string) error {
-	resType, err := ResTypeFromString(resTypeStr)
+func (c *Controller) GetImageByName(ctx *fiber.Ctx, name string, variantStr string) error {
+	variant, err := VariantFromString(variantStr)
 	if err != nil {
 		return err
 	}
-	image, err := c.service.GetImageByName(ctx.Context(), name, resType)
+	image, err := c.service.GetImageByName(ctx.Context(), name, variant)
 	if err != nil {
 		return err
 	}
@@ -60,12 +60,12 @@ func (c *Controller) GetBackgrounds(ctx *fiber.Ctx) error {
 	return ctx.JSON(imageNames)
 }
 
-func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string, resTypeStr string) error {
-	resType, err := ResTypeFromString(resTypeStr)
+func (c *Controller) GetBackgroundByName(ctx *fiber.Ctx, name string, variantStr string) error {
+	variant, err := VariantFromString(variantStr)
 	if err != nil {
 		return err
 	}
-	background, err := c.service.GetBackgroundByName(ctx.Context(), name, resType)
+	background, err := c.service.GetBackgroundByName(ctx.Context(), name, variant)
 	if err != nil {
 		return err
 	}
@@ -89,11 +89,11 @@ func RegisterController(v0 *server.V0, c Controller) {
 			Level: compress.LevelBestSpeed,
 		}))
 	router.Get("images", c.GetImages)
-	router.Get("images/:imageName", func(ctx *fiber.Ctx) error {
-		return c.GetImageByName(ctx, ctx.Params("imageName"), ctx.Query("resType"))
+	router.Get("images/:variant/:imageName", func(ctx *fiber.Ctx) error {
+		return c.GetImageByName(ctx, ctx.Params("imageName"), ctx.Params("variant"))
 	})
 	router.Get("backgrounds", c.GetBackgrounds)
-	router.Get("backgrounds/:backgroundName", func(ctx *fiber.Ctx) error {
-		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"), ctx.Query("resType"))
+	router.Get("backgrounds/:variant/:backgroundName", func(ctx *fiber.Ctx) error {
+		return c.GetBackgroundByName(ctx, ctx.Params("backgroundName"), ctx.Params("variant"))
 	})
 }
