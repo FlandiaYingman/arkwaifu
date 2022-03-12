@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	backgroundRegexp = regexp.MustCompile(`\[Background\(.*?image="(.*?)".*?\)]`)
-	imageRegexp      = regexp.MustCompile(`\[Image\(.*?image="(.*?)".*?\)]`)
+	imageRegexp      = regexp.MustCompile(`(?i)\[Image\(.*?image="(.*?)".*?\)]`)
+	backgroundRegexp = regexp.MustCompile(`(?i)\[Background\(.*?image="(.*?)".*?\)]`)
 )
 
 func GetStoryReviewData(gamedata string) ([]StoryReviewData, error) {
