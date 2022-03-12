@@ -11,7 +11,7 @@
         class="text-h3"
         cols="12"
       >
-        Welcom to Arkwaifu!
+        Welcome to Arkwaifu!
       </v-col>
       <v-col
         class="text-subtitle-1"
