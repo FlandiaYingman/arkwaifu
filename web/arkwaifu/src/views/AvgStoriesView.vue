@@ -1,11 +1,23 @@
 <template>
-  <v-container class="px-8" v-if="story">
+  <v-container
+    v-if="story"
+    class="px-8"
+  >
     <!-- <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show> -->
-    <group-show v-if="group" :groupID="group.id" :currentStoryID="story.id"></group-show>
+    <group-show
+      v-if="group"
+      :group-i-d="group.id"
+      :current-story-i-d="story.id"
+    />
     <!-- <group-show v-if="nextGroup" :groupID="nextGroup.id" limited="true"></group-show> -->
-    <br />
+    <br>
     <v-row>
-      <v-col cols="12" class="text-h5">Images</v-col>
+      <v-col
+        cols="12"
+        class="text-h5"
+      >
+        Images
+      </v-col>
       <v-col
         v-for="(image, i) in distinct ? _.uniq(story.images) : story.images"
         :key="`${image.ID}-${i}`"
@@ -13,11 +25,19 @@
         sm="3"
         lg="2"
       >
-        <resource-card :resName="image" resCategory="images"></resource-card>
+        <resource-card
+          :res-name="image"
+          res-category="images"
+        />
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" class="text-h5">Backgrounds</v-col>
+      <v-col
+        cols="12"
+        class="text-h5"
+      >
+        Backgrounds
+      </v-col>
       <v-col
         v-for="(image, i) in distinct ? _.uniq(story.backgrounds) : story.backgrounds"
         :key="`${image.ID}-${i}`"
@@ -25,14 +45,31 @@
         sm="3"
         lg="2"
       >
-        <resource-card :resName="image" resCategory="backgrounds"></resource-card>
+        <resource-card
+          :res-name="image"
+          res-category="backgrounds"
+        />
       </v-col>
     </v-row>
     <v-tooltip left>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn fab large fixed bottom right color="primary" @click="distinct = !distinct" v-bind="attrs" v-on="on">
-          <v-icon v-if="!distinct">mdi-fingerprint-off</v-icon>
-          <v-icon v-else>mdi-fingerprint</v-icon>
+      <template #activator="{ on, attrs }">
+        <v-btn
+          fab
+          large
+          fixed
+          bottom
+          right
+          color="primary"
+          v-bind="attrs"
+          @click="distinct = !distinct"
+          v-on="on"
+        >
+          <v-icon v-if="!distinct">
+            mdi-fingerprint-off
+          </v-icon>
+          <v-icon v-else>
+            mdi-fingerprint
+          </v-icon>
         </v-btn>
       </template>
       <span class="text-caption">Distinct: {{ distinct ? "ON" : "OFF" }}</span>
@@ -41,12 +78,15 @@
 </template>
 
 <script>
-import GroupShow from "@/components/GroupShow.vue";
-import ResourceCard from "@/components/ResourceCard.vue";
+import GroupShow from '@/components/GroupShow.vue';
+import ResourceCard from '@/components/ResourceCard.vue';
+
 export default {
-  name: "AvgGroupsView",
+  name: 'AvgGroupsView',
   components: { GroupShow, ResourceCard },
-  props: ["storyID"],
+  props: {
+    storyID: String(),
+  },
   data() {
     return {
       distinct: false,
@@ -54,7 +94,7 @@ export default {
   },
   computed: {
     groups() {
-      const groups = this.$store.state.avg.groups;
+      const { groups } = this.$store.state.avg;
       return groups;
     },
     group() {

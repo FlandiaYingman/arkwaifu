@@ -1,78 +1,78 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import AllView from "@/views/AllView.vue";
-import GroupsMainThemeView from "@/views/GroupsMainThemesView.vue";
-import GroupsMajorEventsView from "@/views/GroupsMajorEventsView.vue";
-import GroupsVegnettesView from "@/views/GroupsVignettesView.vue";
-import GroupsOthersView from "@/views/GroupsOthersView.vue";
-import AvgStoriesView from "@/views/AvgStoriesView.vue";
-import AboutView from "@/views/AboutView.vue";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import AllView from '@/views/AllView.vue';
+import GroupsMainThemeView from '@/views/GroupsMainThemesView.vue';
+import GroupsMajorEventsView from '@/views/GroupsMajorEventsView.vue';
+import GroupsVegnettesView from '@/views/GroupsVignettesView.vue';
+import GroupsOthersView from '@/views/GroupsOthersView.vue';
+import AvgStoriesView from '@/views/AvgStoriesView.vue';
+import AboutView from '@/views/AboutView.vue';
+import HomeView from '../views/HomeView.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: '/',
     component: HomeView,
     meta: {
-      title: "Home",
+      title: 'Home',
     },
   },
   {
-    path: "/avgs/main_themes",
+    path: '/avgs/main_themes',
     component: GroupsMainThemeView,
     meta: {
-      title: "Main Themes",
+      title: 'Main Themes',
     },
   },
   {
-    path: "/avgs/major_events",
+    path: '/avgs/major_events',
     component: GroupsMajorEventsView,
     meta: {
-      title: "Major Events",
+      title: 'Major Events',
     },
   },
   {
-    path: "/avgs/vignettes",
+    path: '/avgs/vignettes',
     component: GroupsVegnettesView,
     meta: {
-      title: "Vignettes",
+      title: 'Vignettes',
     },
   },
   {
-    path: "/avgs/others",
+    path: '/avgs/others',
     component: GroupsOthersView,
     meta: {
-      title: "Others",
+      title: 'Others',
     },
   },
   {
-    path: "/avgs/stories/:storyID",
+    path: '/avgs/stories/:storyID',
     component: AvgStoriesView,
     props: true,
     meta: {
-      title: "Story",
+      title: 'Story',
     },
   },
   {
-    path: "/all",
+    path: '/all',
     component: AllView,
     meta: {
-      title: "All",
+      title: 'All',
     },
   },
   {
-    path: "/about",
+    path: '/about',
     component: AboutView,
     meta: {
-      title: "About",
+      title: 'About',
     },
   },
 ];
 
 const router = new VueRouter({
-  mode: "history",
+  mode: 'history',
   base: process.env.BASE_URL,
   routes,
 });

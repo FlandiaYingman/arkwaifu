@@ -1,13 +1,29 @@
 <template>
   <v-container class="px-8">
     <v-row>
-      <v-col><img src="@/assets/logo_phantom.png" /></v-col>
-      <v-col class="text-h3" cols="12"> Welcom to Arkwaifu! </v-col>
-      <v-col class="text-subtitle-1" cols="12">
-        Arkwaifu provides the art resources get from Arknights. <br />
+      <v-col>
+        <img
+          src="/logo_phantom.png"
+          alt=""
+        >
+      </v-col>
+      <v-col
+        class="text-h3"
+        cols="12"
+      >
+        Welcom to Arkwaifu!
+      </v-col>
+      <v-col
+        class="text-subtitle-1"
+        cols="12"
+      >
+        Arkwaifu provides the art resources get from Arknights. <br>
         Currently, only the resources that appear in AVG are available...
       </v-col>
-      <v-col class="text-subtitle-1" cols="12">
+      <v-col
+        class="text-subtitle-1"
+        cols="12"
+      >
         Find the resource using the navigation drawer on the left. Enjoy it!
       </v-col>
     </v-row>
@@ -16,7 +32,7 @@
 
 <script>
 export default {
-  name: "HomeView",
+  name: 'HomeView',
   components: {},
 };
 </script>

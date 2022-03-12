@@ -1,22 +1,38 @@
 <template>
   <v-app>
-    <v-navigation-drawer v-model="drawer" width="288" permanant app>
-      <v-img src="@/assets/logo_phantom.png" width="128" height="128" class="mx-4" />
+    <v-navigation-drawer
+      v-model="drawer"
+      width="288"
+      permanant
+      app
+    >
+      <v-img
+        src="/logo_phantom.png"
+        width="128"
+        height="128"
+        class="mx-4"
+      />
 
       <v-list nav>
         <v-subheader>NAVIGATION</v-subheader>
 
-        <v-list-item link to="/">
+        <v-list-item
+          link
+          to="/"
+        >
           <v-list-item-icon>
             <v-icon>mdi-home</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>Home</v-list-item-title>
-            <router-link to="/home"></router-link>
+            <router-link to="/home" />
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-group link prepend-icon="mdi-television">
+        <v-list-group
+          link
+          prepend-icon="mdi-television"
+        >
           <template #activator>
             <v-list-item-content>
               <v-list-item-title>AVG</v-list-item-title>
@@ -55,7 +71,10 @@
           </v-list-item>
         </v-list-group>
 
-        <v-list-item link to="/all">
+        <v-list-item
+          link
+          to="/all"
+        >
           <v-list-item-icon>
             <v-icon>mdi-all-inclusive</v-icon>
           </v-list-item-icon>
@@ -64,7 +83,10 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link to="/about">
+        <v-list-item
+          link
+          to="/about"
+        >
           <v-list-item-icon>
             <v-icon>mdi-information</v-icon>
           </v-list-item-icon>
@@ -81,19 +103,19 @@
     </v-app-bar>
 
     <v-main>
-      <router-view> </router-view>
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
 export default {
-  name: "App",
+  name: 'App',
 
   components: {},
 
   data: () => ({
-    title: "",
+    title: '',
     drawer: null,
   }),
   watch: {

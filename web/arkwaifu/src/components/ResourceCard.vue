@@ -1,11 +1,48 @@
 <template>
   <div>
-    <div class="text-caption">{{ this.resCategory }}/{{ this.resName }}</div>
-    <v-card :href="this.assetURL" target="_blank">
-      <v-img :src="`${this.assetURL}?resType=thumbnail`" class="transparent-background"></v-img>
+    <div class="text-caption">
+      {{ resCategory }}/{{ resName }}
+    </div>
+    <v-card
+      :href="assetURL"
+      target="_blank"
+    >
+      <v-img
+        :src="`${assetURL}?resType=thumbnail`"
+        class="transparent-background"
+      />
     </v-card>
   </div>
 </template>
+
+<script>
+export default {
+  name: 'ResourceCard',
+  props: {
+    resName: String(),
+    resCategory: String(),
+  },
+  data() {
+    return {
+      assetURL: '',
+    };
+  },
+  watch: {
+    $props: {
+      handler() {
+        this.updateAssetURL();
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
+  methods: {
+    updateAssetURL() {
+      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`;
+    },
+  },
+};
+</script>
 
 <style scoped>
 .transparent-background {
@@ -32,29 +69,3 @@
   box-shadow: none;
 }
 </style>
-
-<script>
-export default {
-  name: "ResourceCard",
-  props: ["resName", "resCategory"],
-  data() {
-    return {
-      assetURL: "",
-    };
-  },
-  watch: {
-    $props: {
-      handler() {
-        this.updateAssetURL();
-      },
-      deep: true,
-      immediate: true,
-    },
-  },
-  methods: {
-    updateAssetURL() {
-      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`;
-    },
-  },
-};
-</script>

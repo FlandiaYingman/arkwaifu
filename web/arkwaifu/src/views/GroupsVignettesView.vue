@@ -3,9 +3,10 @@
 </template>
 
 <script>
-import GroupsPage from "@/components/GroupsPage.vue";
+import GroupsPage from '@/components/GroupsPage.vue';
+
 export default {
-  name: "GroupsVignettesView",
-  components: {GroupsPage},
+  name: 'GroupsVignettesView',
+  components: { GroupsPage },
 };
 </script>
