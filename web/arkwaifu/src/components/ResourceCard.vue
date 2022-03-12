@@ -8,7 +8,7 @@
       target="_blank"
     >
       <v-img
-        :src="`${assetURL}?resType=thumbnail`"
+        :src="assetThumbnailURL"
         class="transparent-background"
       />
     </v-card>
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import API_URL from '@/api';
+
 export default {
   name: 'ResourceCard',
   props: {
@@ -24,21 +26,14 @@ export default {
   },
   data() {
     return {
-      assetURL: '',
     };
   },
-  watch: {
-    $props: {
-      handler() {
-        this.updateAssetURL();
-      },
-      deep: true,
-      immediate: true,
+  computed: {
+    assetThumbnailURL() {
+      return `${API_URL}/api/v0/resources/${this.resCategory}/thumbnail/${this.resName}`;
     },
-  },
-  methods: {
-    updateAssetURL() {
-      this.assetURL = `${this.$API_URL}/api/v0/resources/${this.resCategory}/${this.resName}`;
+    assetURL() {
+      return `${API_URL}/api/v0/resources/${this.resCategory}/raw/${this.resName}`;
     },
   },
 };
