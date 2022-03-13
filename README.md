@@ -20,6 +20,7 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 - [x] Use cache to speed up website (backend).
 - [x] Use cache to speed up website (frontend).
 - [x] Pull only differences every update loop.
+- [ ] I18N 🌏! Add Chinese support.
 - [ ] Rewrite controller interface.
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
 - [ ] <del>Create a statistic module to show how many times the website is requested.</del>
