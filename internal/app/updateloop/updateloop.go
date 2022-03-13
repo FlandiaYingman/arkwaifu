@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/gamedata"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/resource"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/asset"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/data"
 	"github.com/sirupsen/logrus"
 	"path/filepath"
 )
@@ -22,35 +22,37 @@ func NewController(avgService *avg.Service, conf *config.Config) *Controller {
 
 func (c *Controller) UpdateResources() error {
 	ctx := context.Background()
-	resVersion, outOfDate, err := c.checkVersion(ctx)
+	localResVer, remoteResVer, err := c.checkVersion(ctx)
 	if err != nil {
 		return err
 	}
-	if outOfDate || c.forceUpdate {
-		if c.forceUpdate {
-			logrus.Info("Though the local resources are up-to-date, a force update is required.")
-		}
+	if c.forceUpdate {
+		localResVer = ""
+		logrus.Info("Because a force updated is specified, set the local resVersion to empty.")
+	}
 
+	if localResVer != remoteResVer {
 		log := logrus.WithFields(logrus.Fields{
-			"resVersion": resVersion,
+			"localResVer":  localResVer,
+			"remoteResVer": remoteResVer,
 		})
 
-		resLocation := filepath.Join(c.resLocation, resVersion)
+		resLocation := filepath.Join(c.resLocation, remoteResVer)
 
 		log.Info("Getting gamedata...")
-		avgGameData, err := GetAvgGameData(resVersion)
+		avgGameData, err := GetAvgGameData(remoteResVer)
 		if err != nil {
 			return err
 		}
 
 		log.Info("Getting resources...")
-		err = GetAvgResources(resVersion, resLocation)
+		err = GetAvgResources(ctx, localResVer, remoteResVer, resLocation)
 		if err != nil {
 			return err
 		}
 
 		log.Info("Setting AVG gamedata...")
-		err = c.avgService.SetAvgs(resVersion, avgGameData)
+		err = c.avgService.SetAvgs(remoteResVer, avgGameData)
 		if err != nil {
 			return err
 		}
@@ -61,13 +63,13 @@ func (c *Controller) UpdateResources() error {
 	return nil
 }
 
-func (c *Controller) checkVersion(ctx context.Context) (string, bool, error) {
+func (c *Controller) checkVersion(ctx context.Context) (string, string, error) {
 	log := logrus.WithFields(logrus.Fields{})
 	log.Info("Attempt to update resources.")
 
 	rResVersion, err := getLatestResourceResVersion()
 	if err != nil {
-		return "", false, err
+		return "", "", err
 	}
 	log.WithFields(logrus.Fields{
 		"rResVersion": rResVersion,
@@ -75,7 +77,7 @@ func (c *Controller) checkVersion(ctx context.Context) (string, bool, error) {
 
 	gResVersion, gCommitRef, err := getLatestGamedataResVersion()
 	if err != nil {
-		return "", false, err
+		return "", "", err
 	}
 	log.WithFields(logrus.Fields{
 		"gResVersion": gResVersion,
@@ -87,13 +89,13 @@ func (c *Controller) checkVersion(ctx context.Context) (string, bool, error) {
 			"rResVersion": rResVersion,
 			"gResVersion": gResVersion,
 		}).Info("The remote resources are updating.")
-		return "", false, nil
+		return "", "", nil
 	}
 
 	remoteResVersion := rResVersion
 	localResVersion, err := c.avgService.GetVersion(ctx)
 	if err != nil {
-		return "", false, err
+		return "", "", err
 	}
 
 	log = log.WithFields(logrus.Fields{
@@ -103,16 +105,16 @@ func (c *Controller) checkVersion(ctx context.Context) (string, bool, error) {
 	// Test whether the resource is up-to-date.
 	if remoteResVersion == localResVersion {
 		log.Info("The local resources are up-to-date.")
-		return remoteResVersion, false, nil
+	} else {
+		log.Info("The local resources are out-of-date.")
 	}
-	log.Info("The local resources are out-of-date.")
-	return remoteResVersion, true, nil
+	return localResVersion, remoteResVersion, nil
 }
 
 func getLatestResourceResVersion() (string, error) {
-	return resource.GetResVersion()
+	return asset.GetLatestResVersion()
 }
 
 func getLatestGamedataResVersion() (string, string, error) {
-	return gamedata.FindLatestCommitRef()
+	return data.FindLatestCommitRef()
 }

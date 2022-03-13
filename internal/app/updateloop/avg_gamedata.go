@@ -3,7 +3,7 @@ package updateloop
 import (
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/gamedata"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/data"
 	"os"
 	"strings"
 )
@@ -15,11 +15,11 @@ func GetAvgGameData(resVersion string) ([]avg.Group, error) {
 	}
 	defer func() { _ = os.RemoveAll(tempDir) }()
 
-	err = gamedata.Get(resVersion, "", tempDir)
+	err = data.Get(resVersion, "", tempDir)
 	if err != nil {
 		return nil, err
 	}
-	raw, err := gamedata.GetStoryReviewData(tempDir)
+	raw, err := data.GetStoryReviewData(tempDir)
 	if err != nil {
 		return nil, err
 	}
@@ -27,32 +27,32 @@ func GetAvgGameData(resVersion string) ([]avg.Group, error) {
 	return groupsFromRaw(raw, tempDir)
 }
 
-func groupsFromRaw(raw []gamedata.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
+func groupsFromRaw(raw []data.StoryReviewData, gamedataDir string) ([]avg.Group, error) {
 	groups := make([]avg.Group, len(raw))
-	for i, data := range raw {
-		stories, err := storiesFromRaw(data, gamedataDir)
+	for i, storyData := range raw {
+		stories, err := storiesFromRaw(storyData, gamedataDir)
 		if err != nil {
 			return nil, err
 		}
 		groups[i] = avg.Group{
-			ID:      data.ID,
-			Name:    data.Name,
-			ActType: string(data.ActType),
+			ID:      storyData.ID,
+			Name:    storyData.Name,
+			ActType: string(storyData.ActType),
 			Stories: stories,
 		}
 	}
 	return groups, nil
 }
 
-func storiesFromRaw(data gamedata.StoryReviewData, gamedataDir string) ([]avg.Story, error) {
-	raws := data.InfoUnlockDatas
+func storiesFromRaw(reviewData data.StoryReviewData, gamedataDir string) ([]avg.Story, error) {
+	raws := reviewData.InfoUnlockDatas
 	stories := make([]avg.Story, len(raws))
 	for i, raw := range raws {
-		text, err := gamedata.GetStoryText(gamedataDir, raw.StoryTxt)
+		text, err := data.GetStoryText(gamedataDir, raw.StoryTxt)
 		if err != nil {
 			return nil, err
 		}
-		images, backgrounds := gamedata.GetResourcesFromStoryText(text)
+		images, backgrounds := data.GetResourcesFromStoryText(text)
 		linq.From(images).
 			Select(func(i interface{}) interface{} { return strings.ToLower(i.(string)) }).
 			ToSlice(&images)
@@ -66,7 +66,7 @@ func storiesFromRaw(data gamedata.StoryReviewData, gamedataDir string) ([]avg.St
 			Tag:         string(raw.AvgTag),
 			Images:      images,
 			Backgrounds: backgrounds,
-			GroupID:     data.ID,
+			GroupID:     reviewData.ID,
 		}
 	}
 	return stories, nil

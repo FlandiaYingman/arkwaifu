@@ -6,8 +6,13 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
+// MoveAllFileContent moves all files from srcDir to dstDir recursively.
+// Only files' name and their content are guaranteed same.
+// If the existing files and the moving files have the same path, the existing files will be overridden.
+// This prevents os.Rename to panic "invalid cross-device link".
 func MoveAllFileContent(srcDir string, dstDir string) error {
 	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
 		if err != nil {
@@ -31,6 +36,15 @@ func MoveAllFileContent(srcDir string, dstDir string) error {
 		}
 
 		return nil
+	})
+}
+
+func LowercaseAll(dir string) error {
+	return filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		return os.Rename(path, filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path))))
 	})
 }
 
@@ -66,15 +80,18 @@ func CopyFileContent(src string, dst string) error {
 }
 
 func MoveFileContent(src string, dst string) error {
-	err := CopyFileContent(src, dst)
+	err := os.Rename(src, dst)
 	if err != nil {
-		return err
-	}
+		err := CopyFileContent(src, dst)
+		if err != nil {
+			return err
+		}
 
-	// if copy was successful, remove src
-	err = os.Remove(src)
-	if err != nil {
-		return fmt.Errorf("couldn't remove src %s: %w", src, err)
+		// if copy was successful, remove src
+		err = os.Remove(src)
+		if err != nil {
+			return fmt.Errorf("couldn't remove src %s: %w", src, err)
+		}
 	}
 
 	return nil

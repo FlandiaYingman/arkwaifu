@@ -1,7 +1,9 @@
-package resource
+package res
 
 import (
 	"bufio"
+	"context"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
@@ -13,27 +15,24 @@ const (
 	extractorLocation = "./tools/extractor"
 )
 
-func unpackResources(src string, dst string) error {
-	// TODO: Change to a direct call of Python API.
-
-	// check extractor existence
-	_, err := os.Stat(extractorLocation)
+// TODO: Change to a direct call of Python API.
+func unpack(ctx context.Context, src string, dst string) error {
+	err := preCheck()
 	if err != nil {
 		return err
 	}
 
 	srcAbs, err := filepath.Abs(src)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	dstAbs, err := filepath.Abs(dst)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
-	cmd := exec.Command("python", "-u", "main.py", "unpack", srcAbs, dstAbs)
+	cmd := exec.CommandContext(ctx, "python", "-u", "main.py", "unpack", srcAbs, dstAbs)
 	cmd.Dir = extractorLocation
-	// cmd.Stdout = os.Stdout
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -52,19 +51,28 @@ func unpackResources(src string, dst string) error {
 			log.WithFields(log.Fields{
 				"src": srcFile,
 				"dst": dstFile,
-			}).Infof("Resource unpacked.")
+			}).Infof("unpacked resource")
 		}
 	}(scanner)
 
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
+	return nil
+}
+
+func unpackPreCheck() error {
+	// check extractor existence
+	_, err := os.Stat(extractorLocation)
+	if err != nil {
+		return errors.Wrap(err, "extractor doesn't exist")
+	}
 	return nil
 }

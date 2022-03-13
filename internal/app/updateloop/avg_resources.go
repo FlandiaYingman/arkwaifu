@@ -3,9 +3,9 @@ package updateloop
 import (
 	"context"
 	"github.com/chai2010/webp"
-	"github.com/flandiayingman/arkwaifu/internal/app/util/fileutil"
-	"github.com/flandiayingman/arkwaifu/internal/app/util/pathutil"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/resource"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/asset"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"golang.org/x/image/draw"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/semaphore"
@@ -17,67 +17,74 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 )
 
-func GetAvgResources(resVersion string, dest string) error {
-	infos, err := resource.GetResInfos(resVersion)
+func GetAvgResources(ctx context.Context, oldResVer string, newResVer string, dst string) error {
+	assetsRegexp := regexp.MustCompile("^avg/(imgs|bg)")
+
+	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
 	if err != nil {
 		return err
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
+	if oldResVer == "" {
+		err := asset.Get(ctx, newResVer, tmpDir, assetsRegexp)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := asset.Update(ctx, oldResVer, newResVer, dst, assetsRegexp)
+		if err != nil {
+			return err
+		}
 	}
 
-	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-avg_resources-*")
-	if err != nil {
-		return err
-	}
-	infos = resource.FilterResInfosRegexp(infos, regexp.MustCompile("^avg/(imgs|bg)"))
-	err = resource.GetRes(infos, tmpDir)
-	if err != nil {
-		return err
-	}
-
-	rawDir := filepath.Join(dest, "raw")
+	rawDir := filepath.Join(dst, "raw")
 	err = os.MkdirAll(rawDir, 0755)
 	if err != nil {
 		return err
 	}
-	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/images"), filepath.Join(rawDir, "images"))
-	if err != nil {
-		return err
-	}
-	err = fileutil.MoveAllFileContent(filepath.Join(tmpDir, "assets/torappu/dynamicassets/avg/backgrounds"), filepath.Join(rawDir, "backgrounds"))
-	if err != nil {
-		return err
-	}
-	err = os.RemoveAll(tmpDir)
+	err = processRaw(tmpDir, rawDir)
 	if err != nil {
 		return err
 	}
 
-	err = filepath.WalkDir(rawDir, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-		return os.Rename(path, filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path))))
-	})
-	if err != nil {
-		return err
-	}
-
-	thumbnailDir := filepath.Join(dest, "thumbnail")
+	thumbnailDir := filepath.Join(dst, "thumbnail")
 	err = os.MkdirAll(thumbnailDir, 0755)
 	if err != nil {
 		return err
 	}
-	err = createThumbnailOfDir(rawDir, thumbnailDir)
+	err = processThumbnail(rawDir, thumbnailDir)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+const (
+	imagesPath      = "assets/torappu/dynamicassets/avg/images"
+	backgroundsPath = "assets/torappu/dynamicassets/avg/backgrounds"
+)
+
+func processRaw(src, dst string) error {
+	var err error
+	err = fileutil.MoveAllFileContent(filepath.Join(src, imagesPath), filepath.Join(dst, "images"))
+	if err != nil {
+		return err
+	}
+	err = fileutil.MoveAllFileContent(filepath.Join(src, backgroundsPath), filepath.Join(dst, "backgrounds"))
+	if err != nil {
+		return err
+	}
+	err = fileutil.LowercaseAll(dst)
+	return err
+}
+func processThumbnail(src, dst string) error {
+	return createThumbnailOfDir(src, dst)
 }
 
 const imgProcConcurrency = 16
@@ -124,7 +131,6 @@ func createThumbnailOfDir(dirPath string, destDirPath string) error {
 	}
 	return nil
 }
-
 func createThumbnailOf(imagePath string, destImagePath string) error {
 	imageData, err := decodeImage(imagePath)
 	if err != nil {
@@ -134,7 +140,6 @@ func createThumbnailOf(imagePath string, destImagePath string) error {
 	err = encodeImageToWebp(imageData, destImagePath)
 	return err
 }
-
 func decodeImage(imagePath string) (image.Image, error) {
 	imageFile, err := os.Open(imagePath)
 	if err != nil {
@@ -147,7 +152,6 @@ func decodeImage(imagePath string) (image.Image, error) {
 	}
 	return imageObj, nil
 }
-
 func encodeImageToWebp(imageData image.Image, destPath string) error {
 	thumbFile, err := os.Create(destPath)
 	if err != nil {
@@ -159,7 +163,6 @@ func encodeImageToWebp(imageData image.Image, destPath string) error {
 	})
 	return err
 }
-
 func resizeImage(imageData image.Image, maxWidth int, maxHeight int) *image.RGBA {
 	width := imageData.Bounds().Dx()
 	height := imageData.Bounds().Dy()

@@ -1,4 +1,4 @@
-package gamedata
+package data
 
 import (
 	"encoding/json"
