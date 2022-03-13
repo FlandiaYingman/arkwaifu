@@ -7,7 +7,7 @@
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
 ![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu?style=flat-square)
 
-A website providing AVG art resources of Arknights.
+A website showing all Arknights assets (including AVG images and backgrounds currently).
 
 <del>This project is currently under development.</del>
 
@@ -19,7 +19,7 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 - [x] List assets which aren't included in AVGs. e.g., assets appeared in mode *Integrated Strategies*.
 - [x] Use cache to speed up website (backend).
 - [x] Use cache to speed up website (frontend).
-- [ ] Pull only differences every update loop.
+- [x] Pull only differences every update loop.
 - [ ] Rewrite controller interface.
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
 - [ ] <del>Create a statistic module to show how many times the website is requested.</del>
