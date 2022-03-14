@@ -78,33 +78,33 @@
 </template>
 
 <script>
-import GroupShow from '@/components/GroupShow.vue';
-import ResourceCard from '@/components/ResourceCard.vue';
+import GroupShow from '@/components/GroupShow.vue'
+import ResourceCard from '@/components/ResourceCard.vue'
 
 export default {
   name: 'AvgGroupsView',
   components: { GroupShow, ResourceCard },
   props: {
-    storyID: String(),
+    storyID: String()
   },
-  data() {
+  data () {
     return {
-      distinct: true,
-    };
+      distinct: true
+    }
   },
   computed: {
-    groups() {
-      const { groups } = this.$store.state.avg;
-      return groups;
+    groups () {
+      const { groups } = this.$store.state.avg
+      return groups
     },
-    group() {
-      const group = this.$store.getters.groupByID(this.story.groupID);
-      return group;
+    group () {
+      const group = this.$store.getters.groupByID(this.story.groupID)
+      return group
     },
-    story() {
-      const story = this.$store.getters.storyByID(this.storyID);
-      return story;
-    },
-  },
-};
+    story () {
+      const story = this.$store.getters.storyByID(this.storyID)
+      return story
+    }
+  }
+}
 </script>

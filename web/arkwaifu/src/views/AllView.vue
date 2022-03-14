@@ -34,36 +34,36 @@
 </template>
 
 <script>
-import ResourceCard from '@/components/ResourceCard.vue';
+import ResourceCard from '@/components/ResourceCard.vue'
 
 export default {
   name: 'HomeView',
   components: { ResourceCard },
-  data() {
+  data () {
     return {
       images: [],
-      backgrounds: [],
-    };
+      backgrounds: []
+    }
   },
-  created() {
+  created () {
     this.$watch(
       () => this.$route.params,
       () => {
-        this.fetchImages();
-        this.fetchBackgrounds();
+        this.fetchImages()
+        this.fetchBackgrounds()
       },
-      { immediate: true },
-    );
+      { immediate: true }
+    )
   },
   methods: {
-    async fetchImages() {
-      const response = await fetch(`${this.$API_URL}/api/v0/resources/images`);
-      this.images = await response.json();
+    async fetchImages () {
+      const response = await fetch(`${this.$API_URL}/api/v0/resources/images`)
+      this.images = await response.json()
     },
-    async fetchBackgrounds() {
-      const response = await fetch(`${this.$API_URL}/api/v0/resources/backgrounds`);
-      this.backgrounds = await response.json();
-    },
-  },
-};
+    async fetchBackgrounds () {
+      const response = await fetch(`${this.$API_URL}/api/v0/resources/backgrounds`)
+      this.backgrounds = await response.json()
+    }
+  }
+}
 </script>

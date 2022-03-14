@@ -21,22 +21,22 @@
 </template>
 
 <script>
-import StoryCard from './StoryCard.vue';
+import StoryCard from './StoryCard.vue'
 
 export default {
   name: 'GroupsPage',
   components: { StoryCard },
   props: {
-    type: String(),
+    type: String()
   },
-  data() {
-    return {};
+  data () {
+    return {}
   },
   computed: {
-    groups() {
-      const { groups } = this.$store.state.avg;
-      return groups.filter((el) => el.actType === this.type);
-    },
-  },
-};
+    groups () {
+      const { groups } = this.$store.state.avg
+      return groups.filter((el) => el.actType === this.type)
+    }
+  }
+}
 </script>

@@ -16,27 +16,27 @@
 </template>
 
 <script>
-import API_URL from '@/api';
+import API_URL from '@/api'
 
 export default {
   name: 'ResourceCard',
   props: {
     resName: String(),
-    resCategory: String(),
+    resCategory: String()
   },
-  data() {
+  data () {
     return {
-    };
+    }
   },
   computed: {
-    assetThumbnailURL() {
-      return `${API_URL}/api/v0/resources/${this.resCategory}/thumbnail/${this.resName}`;
+    assetThumbnailURL () {
+      return `${API_URL}/api/v0/resources/${this.resCategory}/thumbnail/${this.resName}`
     },
-    assetURL() {
-      return `${API_URL}/api/v0/resources/${this.resCategory}/raw/${this.resName}`;
-    },
-  },
-};
+    assetURL () {
+      return `${API_URL}/api/v0/resources/${this.resCategory}/raw/${this.resName}`
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -48,8 +48,7 @@ export default {
       transparent 75%,
       rgba(0, 0, 0, 0.25) 75%,
       rgba(0, 0, 0, 0.25) 0
-    ),
-    linear-gradient(
+    ), linear-gradient(
       45deg,
       rgba(0, 0, 0, 0.25) 25%,
       transparent 25%,
@@ -57,7 +56,7 @@ export default {
       rgba(0, 0, 0, 0.25) 75%,
       rgba(0, 0, 0, 0.25) 0
     );
-  background-position: 0px 0, 10px 10px;
+  background-position: 0 0, 10px 10px;
   background-origin: padding-box, padding-box;
   background-clip: border-box, border-box;
   background-size: 20px 20px, 20px 20px;

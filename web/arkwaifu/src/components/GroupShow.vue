@@ -15,7 +15,7 @@
       >
         <story-card
           :story="story"
-          :current="currentStoryID == story.id"
+          :current="currentStoryID === story.id"
         />
       </v-col>
       <v-col
@@ -34,7 +34,7 @@
   </v-container>
 </template>
 <script>
-import StoryCard from './StoryCard.vue';
+import StoryCard from './StoryCard.vue'
 
 export default {
   name: 'GroupShow',
@@ -42,14 +42,14 @@ export default {
   props: {
     groupID: String(),
     currentStoryID: String(),
-    limited: Boolean,
+    limited: Boolean
   },
   data: () => ({}),
   computed: {
-    group() {
-      const group = this.$store.getters.groupByID(this.groupID);
-      return group;
-    },
-  },
-};
+    group () {
+      const group = this.$store.getters.groupByID(this.groupID)
+      return group
+    }
+  }
+}
 </script>

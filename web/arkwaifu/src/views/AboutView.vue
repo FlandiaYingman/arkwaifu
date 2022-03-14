@@ -20,7 +20,7 @@
         class="text-body-1"
         cols="12"
       >
-        However, if you are still instrested about Arkwaifu, please go to the
+        However, if you are still interested about Arkwaifu, please go to the
         Github repo (<a
           href="https://github.com/FlandiaYingman/arkwaifu"
           target="_blank"

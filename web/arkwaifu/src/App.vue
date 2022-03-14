@@ -129,15 +129,15 @@ export default {
 
   data: () => ({
     title: '',
-    drawer: null,
+    drawer: null
   }),
   watch: {
     $route: {
-      handler(to) {
-        this.title = to.meta.title;
+      handler (to) {
+        this.title = to.meta.title
       },
-      immediate: true,
-    },
-  },
-};
+      immediate: true
+    }
+  }
+}
 </script>

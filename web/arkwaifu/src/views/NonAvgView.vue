@@ -46,39 +46,39 @@
 </template>
 
 <script>
-import _ from 'lodash';
-import ResourceCard from '@/components/ResourceCard.vue';
+import _ from 'lodash'
+import ResourceCard from '@/components/ResourceCard.vue'
 
 export default {
   name: 'NonAvgView',
   components: { ResourceCard },
-  data() {
+  data () {
     return {
-    };
+    }
   },
   computed: {
-    avgImages() {
-      let images = [];
-      images = _.flatMap(this.$store.state.avg.stories, (el) => el.images);
-      images = _.uniq(images);
-      return images;
+    avgImages () {
+      let images = []
+      images = _.flatMap(this.$store.state.avg.stories, (el) => el.images)
+      images = _.uniq(images)
+      return images
     },
-    avgBackgrounds() {
-      let backgrounds = [];
-      backgrounds = _.flatMap(this.$store.state.avg.stories, (el) => el.backgrounds);
-      backgrounds = _.uniq(backgrounds);
-      return backgrounds;
+    avgBackgrounds () {
+      let backgrounds = []
+      backgrounds = _.flatMap(this.$store.state.avg.stories, (el) => el.backgrounds)
+      backgrounds = _.uniq(backgrounds)
+      return backgrounds
     },
-    nonAvgImages() {
-      const { images } = this.$store.state.assets;
-      const { avgImages } = this;
-      return images.filter((el) => !avgImages.includes(el));
+    nonAvgImages () {
+      const { images } = this.$store.state.assets
+      const { avgImages } = this
+      return images.filter((el) => !avgImages.includes(el))
     },
-    nonAvgBackgrounds() {
-      const { backgrounds } = this.$store.state.assets;
-      const { avgBackgrounds } = this;
-      return backgrounds.filter((el) => !avgBackgrounds.includes(el));
-    },
-  },
-};
+    nonAvgBackgrounds () {
+      const { backgrounds } = this.$store.state.assets
+      const { avgBackgrounds } = this
+      return backgrounds.filter((el) => !avgBackgrounds.includes(el))
+    }
+  }
+}
 </script>
