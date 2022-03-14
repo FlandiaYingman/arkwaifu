@@ -4,6 +4,7 @@ import router from '@/router'
 import lodash from 'lodash'
 import App from '@/App.vue'
 import store from './store'
+import i18n from '@/i18n'
 import API_URL from './api'
 
 Object.defineProperty(Vue.prototype, '$API_URL', { value: API_URL })
@@ -13,6 +14,7 @@ new Vue({
   vuetify,
   router,
   store,
+  i18n,
   created () {
     store.dispatch('updateAll')
   },

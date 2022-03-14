@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
@@ -14,6 +15,7 @@
     "lodash": "^4.17.21",
     "roboto-fontface": "*",
     "vue": "^2.6.14",
+    "vue-i18n": "^8.26.3",
     "vue-router": "^3.5.1",
     "vuetify": "^2.6.4",
     "vuex": "^3.6.2"
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@intlify/vue-i18n-loader": "^1.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
@@ -35,6 +38,7 @@
     "eslint-plugin-vuejs-accessibility": "^1.1.0",
     "sass": "^1.49.9",
     "sass-loader": "^12.6.0",
+    "vue-cli-plugin-i18n": "~2.3.1",
     "vue-cli-plugin-meta": "~0.1.1",
     "vue-cli-plugin-vuetify": "~2.4.7",
     "vue-template-compiler": "^2.6.14",
@@ -46,7 +50,7 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/essential",
+      "plugin:vue/recommended",
       "@vue/standard"
     ],
     "parserOptions": {

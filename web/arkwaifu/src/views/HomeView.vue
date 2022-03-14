@@ -1,32 +1,18 @@
 <template>
   <v-container class="px-8">
-    <v-row>
-      <v-col>
-        <img
-          src="/logo_phantom.png"
-          alt=""
-        >
-      </v-col>
-      <v-col
-        class="text-h3"
-        cols="12"
-      >
-        Welcome to Arkwaifu!
-      </v-col>
-      <v-col
-        class="text-subtitle-1"
-        cols="12"
-      >
-        Arkwaifu provides the art resources get from Arknights. <br>
-        Currently, only the resources that appear in AVG are available...
-      </v-col>
-      <v-col
-        class="text-subtitle-1"
-        cols="12"
-      >
-        Find the resource using the navigation drawer on the left. Enjoy it!
-      </v-col>
-    </v-row>
+    <img
+      src="/logo_phantom.png"
+      alt=""
+    >
+    <p class="text-h3">
+      {{ $t("title") }}
+    </p>
+    <p class="text-subtitle-1">
+      {{ $t("description") }}
+    </p>
+    <p class="text-subtitle-1">
+      {{ $t("prompt") }}
+    </p>
   </v-container>
 </template>
 
@@ -36,3 +22,18 @@ export default {
   components: {}
 }
 </script>
+
+<i18n>
+{
+  "en": {
+    "title": "Welcome to Arkwaifu!",
+    "description": "Arkwaifu provides the art resources get from Arknights. ",
+    "prompt": "Find the resource using the navigation drawer on the left. Enjoy it!"
+  },
+  "zh": {
+    "title": "欢迎来到 Arkwaifu！",
+    "description": "Arkwaifu 提供从《明日方舟》中获取的美术资源。",
+    "prompt": "用左边的导航栏开始寻找资源。玩的开心！"
+  }
+}
+</i18n>
