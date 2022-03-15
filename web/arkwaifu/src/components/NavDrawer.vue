@@ -14,7 +14,9 @@
     />
 
     <v-list nav>
-      <v-subheader>{{ $t("navigation") }}</v-subheader>
+      <v-subheader>
+        {{ $t("header") }}
+      </v-subheader>
 
       <v-list-item
         link
@@ -24,8 +26,9 @@
           <v-icon>mdi-home</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>{{ $t('home.title') }}</v-list-item-title>
-          <router-link to="/home" />
+          <v-list-item-title>
+            {{ $t("home.title") }}
+          </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
@@ -35,8 +38,12 @@
       >
         <template #activator>
           <v-list-item-content>
-            <v-list-item-title>{{ $t('avg.title') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('avg.subtitle') }}</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ $t("avg.title") }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ $t("avg.subtitle") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </template>
         <v-list-item to="/avgs/main_themes">
@@ -44,8 +51,12 @@
             <v-icon>mdi-cube</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>{{ $t('avg.mainThemes.title') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('avg.mainThemes.subtitle') }}</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ $t("avg.mainThemes.title") }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ $t("avg.mainThemes.subtitle") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/avgs/major_events">
@@ -53,8 +64,12 @@
             <v-icon>mdi-music-clef-treble</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>{{ $t('avg.majorEvents.title') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('avg.majorEvents.subtitle') }}</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ $t("avg.majorEvents.title") }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ $t("avg.majorEvents.subtitle") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/avgs/vignettes">
@@ -62,8 +77,12 @@
             <v-icon>mdi-music-clef-bass</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>{{ $t('avg.vignettes.title') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('avg.vignettes.subtitle') }}</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ $t("avg.vignettes.title") }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ $t("avg.vignettes.subtitle") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
         <v-list-item to="/avgs/others">
@@ -71,8 +90,12 @@
             <v-icon>mdi-music-rest-quarter</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title>{{ $t('avg.others.title') }}</v-list-item-title>
-            <v-list-item-subtitle>{{ $t('avg.others.subtitle') }}</v-list-item-subtitle>
+            <v-list-item-title>
+              {{ $t("avg.others.title") }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ $t("avg.others.subtitle") }}
+            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
@@ -85,8 +108,12 @@
           <v-icon>mdi-television-off</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>{{ $t('nonAvg.title') }}</v-list-item-title>
-          <v-list-item-subtitle>{{ $t('nonAvg.subtitle') }}</v-list-item-subtitle>
+          <v-list-item-title>
+            {{ $t("nonAvg.title") }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t("nonAvg.subtitle") }}
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
 
@@ -98,7 +125,12 @@
           <v-icon>mdi-all-inclusive</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>{{ $t('all.title') }}</v-list-item-title>
+          <v-list-item-title>
+            {{ $t("all.title") }}
+          </v-list-item-title>
+          <v-list-item-subtitle>
+            {{ $t("all.subtitle") }}
+          </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
 
@@ -110,7 +142,9 @@
           <v-icon>mdi-information</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>{{ $t('about.title') }}</v-list-item-title>
+          <v-list-item-title>
+            {{ $t("about.title") }}
+          </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -158,7 +192,8 @@ export default {
       "subtitle": "Besides AVG"
     },
     "all": {
-      "title": "All"
+      "title": "All Assets",
+      "subtitle": "May take a long time! "
     },
     "about": {
       "title": "About"
@@ -194,12 +229,12 @@ export default {
       "subtitle": "剧情以外的资源"
     },
     "all": {
-      "title": "全部"
+      "title": "全部资源",
+      "subtitle": "小心！加载时间较长"
     },
     "about": {
       "title": "关于"
     }
   }
-
 }
 </i18n>

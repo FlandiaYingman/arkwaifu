@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <NavigationDrawer v-model="drawer" />
+    <nav-drawer v-model="drawer" />
 
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer" />
@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import NavigationDrawer from '@/NavigationDrawer'
+import NavDrawer from '@/components/NavDrawer'
 
 export default {
   name: 'App',
 
-  components: { NavigationDrawer },
+  components: { NavDrawer },
 
   data: () => ({
     title: '',
