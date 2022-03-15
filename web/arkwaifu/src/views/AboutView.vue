@@ -1,7 +1,6 @@
 <template>
-  <v-container class="px-8">
+  <v-container>
     <v-row>
-      <v-col />
       <v-col
         class="text-h3"
         cols="12"

@@ -7,7 +7,7 @@
       <v-toolbar-title>{{ title }}</v-toolbar-title>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="ma-8">
       <router-view />
     </v-main>
   </v-app>

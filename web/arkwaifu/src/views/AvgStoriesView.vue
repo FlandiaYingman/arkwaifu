@@ -1,7 +1,6 @@
 <template>
   <v-container
     v-if="story"
-    class="px-8"
   >
     <!-- <group-show v-if="prevGroup" :groupID="prevGroup.id" limited="true"></group-show> -->
     <group-show
