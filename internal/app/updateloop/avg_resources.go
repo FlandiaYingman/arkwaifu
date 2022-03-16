@@ -149,7 +149,7 @@ func createThumbnailOf(imagePath string, destImagePath string) error {
 	if err != nil {
 		return err
 	}
-	imageData = resizeImage(imageData, 512, 512)
+	imageData = resizeImage(imageData, 224, 224)
 	err = encodeImageToWebp(imageData, destImagePath)
 	return err
 }
