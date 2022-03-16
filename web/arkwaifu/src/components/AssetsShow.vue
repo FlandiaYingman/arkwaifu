@@ -40,17 +40,29 @@
         />
       </v-col>
     </v-row>
+    <fab-button
+      v-model="distinct"
+      icon-on="mdi-fingerprint"
+      icon-off="mdi-fingerprint-off"
+      :caption-on="$t('distinctOn')"
+      :caption-off="$t('distinctOff')"
+    />
   </v-container>
 </template>
 <script>
 import AssetCard from '@/components/AssetCard'
 import _ from 'lodash'
+import FabButton from '@/components/FabButton'
 export default {
-  components: { AssetCard },
+  components: { AssetCard, FabButton },
   props: {
     images: Array,
-    backgrounds: Array,
-    distinct: Boolean
+    backgrounds: Array
+  },
+  data () {
+    return {
+      distinct: true
+    }
   },
   computed: {
     imagesData () {
@@ -71,16 +83,17 @@ export default {
 }
 </script>
 
-<i18n>
-{
+<i18n>{
   "en": {
     "images": "Images",
-    "backgrounds": "Backgrounds"
+    "backgrounds": "Backgrounds",
+    "distinctOn": "Distinct: ON",
+    "distinctOff": "Distinct: Off"
   },
   "zh": {
     "images": "图片",
-    "backgrounds": "背景"
+    "backgrounds": "背景",
+    "distinctOn": "显示重复：关",
+    "distinctOff": "显示重复：开"
   }
-
-}
-</i18n>
+}</i18n>
