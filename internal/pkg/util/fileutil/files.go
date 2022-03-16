@@ -44,7 +44,11 @@ func LowercaseAll(dir string) error {
 		if err != nil {
 			return err
 		}
-		return os.Rename(path, filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path))))
+		lowerPath := filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path)))
+		if path != lowerPath {
+			return os.Rename(path, lowerPath)
+		}
+		return nil
 	})
 }
 
