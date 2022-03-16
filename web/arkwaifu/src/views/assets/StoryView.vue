@@ -11,17 +11,23 @@
       :backgrounds="story.backgrounds"
       :distinct="distinct"
     />
-    <DistinctButton v-model="distinct" />
+    <fab-button
+      v-model="distinct"
+      icon-on="mdi-fingerprint"
+      icon-off="mdi-fingerprint-off"
+      :caption-on="$t('distinctOn')"
+      :caption-off="$t('distinctOff')"
+    />
   </v-container>
 </template>
 
 <script>
 import GroupShow from '@/components/GroupShow.vue'
-import DistinctButton from '@/components/DistinctButton'
+import FabButton from '@/components/FabButton'
 import AssetsShow from '@/components/AssetsShow'
 
 export default {
-  components: { AssetsShow, DistinctButton, GroupShow },
+  components: { AssetsShow, FabButton, GroupShow },
   props: {
     storyID: String()
   },
@@ -38,3 +44,14 @@ export default {
   }
 }
 </script>
+
+<i18n>{
+  "en": {
+    "distinctOn": "Distinct: ON",
+    "distinctOff": "Distinct: Off"
+  },
+  "zh": {
+    "distinctOn": "显示重复：关",
+    "distinctOff": "显示重复：开"
+  }
+}</i18n>

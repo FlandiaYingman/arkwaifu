@@ -12,21 +12,32 @@
         @click="dataValue = !dataValue"
         v-on="on"
       >
-        <v-icon v-if="!dataValue">
-          mdi-fingerprint-off
-        </v-icon>
-        <v-icon v-else>
-          mdi-fingerprint
-        </v-icon>
+        <v-icon>{{ dataValue ? iconOn : iconOff }}</v-icon>
       </v-btn>
     </template>
-    <span class="text-caption">Distinct: {{ dataValue ? "ON" : "OFF" }}</span>
+    <span class="text-caption">{{ dataValue ? captionOn : captionOff }}</span>
   </v-tooltip>
 </template>
 <script>
 export default {
   name: 'DistinctButton',
   props: {
+    iconOn: {
+      type: String,
+      default: ''
+    },
+    iconOff: {
+      type: String,
+      default: ''
+    },
+    captionOn: {
+      type: String,
+      default: ''
+    },
+    captionOff: {
+      type: String,
+      default: ''
+    },
     value: Boolean
   },
   data () {
