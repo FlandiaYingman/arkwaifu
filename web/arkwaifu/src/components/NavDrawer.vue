@@ -4,7 +4,7 @@
     permanant
     app
     :value="value"
-    @input="$emit('input', $event.target.value)"
+    @input="$emit('input', $event )"
   >
     <v-img
       src="/logo_phantom.png"

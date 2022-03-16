@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import API_URL from '@/api'
+import _ from 'lodash'
 
 Vue.use(Vuex)
 
@@ -9,7 +10,8 @@ const store = new Vuex.Store({
     avg: {
       state: {
         groups: [],
-        stories: []
+        stories: [],
+        groupsTypeMap: {}
       },
       getters: {
         groupByID: (state) => (id) => state.groups.find((el) => el.id === id),
@@ -28,10 +30,13 @@ const store = new Vuex.Store({
           dispatch('updateGroups')
           dispatch('updateStories')
         },
-        async updateGroups ({ commit }) {
+        async updateGroups (store) {
           return fetch(`${API_URL}/api/v0/groups`)
             .then((resp) => resp.json())
-            .then((groups) => commit('setGroups', groups))
+            .then((groups) => {
+              store.state.groups = groups
+              store.state.groupsTypeMap = _.groupBy(groups, el => el.actType)
+            })
         },
         async updateStories ({ commit }) {
           return fetch(`${API_URL}/api/v0/stories`)

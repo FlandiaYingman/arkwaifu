@@ -15,7 +15,7 @@
       >
         <story-card
           :story="story"
-          :current="currentStoryID === story.id"
+          :current="currentStoryId === story.id"
         />
       </v-col>
       <v-col
@@ -40,14 +40,14 @@ export default {
   name: 'GroupShow',
   components: { StoryCard },
   props: {
-    groupID: String(),
-    currentStoryID: String(),
+    groupId: String(),
+    currentStoryId: String(),
     limited: Boolean
   },
   data: () => ({}),
   computed: {
     group () {
-      const group = this.$store.getters.groupByID(this.groupID)
+      const group = this.$store.getters.groupByID(this.groupId)
       return group
     }
   }

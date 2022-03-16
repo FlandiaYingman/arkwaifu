@@ -1,26 +1,15 @@
 <template>
-  <v-app>
-    <nav-drawer v-model="drawer" />
-
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click="drawer = !drawer" />
-      <v-toolbar-title>{{ title }}</v-toolbar-title>
-    </v-app-bar>
-
-    <v-main class="ma-8">
-      <router-view />
-    </v-main>
-  </v-app>
+  <main-layout>
+    <router-view />
+  </main-layout>
 </template>
 
 <script>
-import NavDrawer from '@/components/NavDrawer'
 
+import MainLayout from '@/layouts/MainLayout'
 export default {
   name: 'App',
-
-  components: { NavDrawer },
-
+  components: { MainLayout },
   data: () => ({
     title: '',
     drawer: null

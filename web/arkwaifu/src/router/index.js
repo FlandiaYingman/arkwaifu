@@ -1,14 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import AllView from '@/views/AllView.vue'
-import NonAvgView from '@/views/NonAvgView.vue'
-import GroupsMainThemeView from '@/views/GroupsMainThemesView.vue'
-import GroupsMajorEventsView from '@/views/GroupsMajorEventsView.vue'
-import GroupsVignettesView from '@/views/GroupsVignettesView.vue'
-import GroupsOthersView from '@/views/GroupsOthersView.vue'
-import AvgStoriesView from '@/views/AvgStoriesView.vue'
 import AboutView from '@/views/AboutView.vue'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '@/views/HomeView.vue'
+import GroupsView from '@/views/assets/GroupsView'
+import StoryView from '@/views/assets/StoryView'
+import NonAvgView from '@/views/assets/NonAvgAssetsView'
+import AllAssetsView from '@/views/assets/AllAssetsView'
 
 Vue.use(VueRouter)
 
@@ -22,35 +19,47 @@ const routes = [
   },
   {
     path: '/avgs/main_themes',
-    component: GroupsMainThemeView,
+    component: GroupsView,
     meta: {
       title: 'Main Themes'
+    },
+    props: {
+      type: 'MAIN_STORY'
     }
   },
   {
     path: '/avgs/major_events',
-    component: GroupsMajorEventsView,
+    component: GroupsView,
     meta: {
       title: 'Major Events'
+    },
+    props: {
+      type: 'ACTIVITY_STORY'
     }
   },
   {
     path: '/avgs/vignettes',
-    component: GroupsVignettesView,
+    component: GroupsView,
     meta: {
       title: 'Vignettes'
+    },
+    props: {
+      type: 'MINI_STORY'
     }
   },
   {
     path: '/avgs/others',
-    component: GroupsOthersView,
+    component: GroupsView,
     meta: {
       title: 'Others'
+    },
+    props: {
+      type: 'NONE'
     }
   },
   {
     path: '/avgs/stories/:storyID',
-    component: AvgStoriesView,
+    component: StoryView,
     props: true,
     meta: {
       title: 'Story'
@@ -65,7 +74,7 @@ const routes = [
   },
   {
     path: '/all',
-    component: AllView,
+    component: AllAssetsView,
     meta: {
       title: 'All'
     }
