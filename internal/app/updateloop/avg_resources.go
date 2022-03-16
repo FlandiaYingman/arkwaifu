@@ -19,7 +19,7 @@ import (
 	"regexp"
 )
 
-func GetAvgResources(ctx context.Context, oldResVer string, newResVer string, dst string) error {
+func GetAvgResources(ctx context.Context, oldResVer string, newResVer string, src string, dst string) error {
 	assetsRegexp := regexp.MustCompile("^avg/(imgs|bg)")
 
 	tmpDir, err := os.MkdirTemp("", "arkwaifu-updateloop-*")
@@ -31,12 +31,12 @@ func GetAvgResources(ctx context.Context, oldResVer string, newResVer string, ds
 	}()
 
 	if oldResVer == "" {
-		err := asset.Get(ctx, newResVer, tmpDir, assetsRegexp)
+		err = asset.Get(ctx, newResVer, tmpDir, assetsRegexp)
 		if err != nil {
 			return err
 		}
 	} else {
-		err := asset.Update(ctx, oldResVer, newResVer, dst, assetsRegexp)
+		err = asset.Update(ctx, oldResVer, newResVer, tmpDir, assetsRegexp)
 		if err != nil {
 			return err
 		}
@@ -62,6 +62,13 @@ func GetAvgResources(ctx context.Context, oldResVer string, newResVer string, ds
 		return err
 	}
 
+	if oldResVer != "" {
+		err = fileutil.MoveAllFileContent(src, dst)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -72,13 +79,19 @@ const (
 
 func processRaw(src, dst string) error {
 	var err error
-	err = fileutil.MoveAllFileContent(filepath.Join(src, imagesPath), filepath.Join(dst, "images"))
-	if err != nil {
-		return err
+	imagesPath := filepath.Join(src, imagesPath)
+	if _, err := os.Stat(imagesPath); err == nil {
+		err = fileutil.MoveAllFileContent(imagesPath, filepath.Join(dst, "images"))
+		if err != nil {
+			return err
+		}
 	}
-	err = fileutil.MoveAllFileContent(filepath.Join(src, backgroundsPath), filepath.Join(dst, "backgrounds"))
-	if err != nil {
-		return err
+	backgroundsPath := filepath.Join(src, backgroundsPath)
+	if _, err := os.Stat(backgroundsPath); err == nil {
+		err = fileutil.MoveAllFileContent(backgroundsPath, filepath.Join(dst, "backgrounds"))
+		if err != nil {
+			return err
+		}
 	}
 	err = fileutil.LowercaseAll(dst)
 	return err

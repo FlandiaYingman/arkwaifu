@@ -37,7 +37,8 @@ func (c *Controller) UpdateResources() error {
 			"remoteResVer": remoteResVer,
 		})
 
-		resLocation := filepath.Join(c.resLocation, remoteResVer)
+		oldResVer := filepath.Join(c.resLocation, localResVer)
+		newResVer := filepath.Join(c.resLocation, remoteResVer)
 
 		log.Info("Getting gamedata...")
 		avgGameData, err := GetAvgGameData(remoteResVer)
@@ -46,7 +47,7 @@ func (c *Controller) UpdateResources() error {
 		}
 
 		log.Info("Getting resources...")
-		err = GetAvgResources(ctx, localResVer, remoteResVer, resLocation)
+		err = GetAvgResources(ctx, localResVer, remoteResVer, oldResVer, newResVer)
 		if err != nil {
 			return err
 		}
