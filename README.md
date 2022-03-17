@@ -21,6 +21,9 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 - [x] Use cache to speed up website (frontend).
 - [x] Pull only differences every update loop.
 - [x] I18N 🌏! Add Chinese support.
+- [ ] Extract gamedata directly from resources.
+- [ ] Provide API to manually update resources.
+- [ ] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN)
 - [ ] Rewrite controller interface.
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
 - [ ] <del>Create a statistic module to show how many times the website is requested.</del>
