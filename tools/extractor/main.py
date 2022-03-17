@@ -1,4 +1,5 @@
 import argparse
+import functools
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -7,6 +8,11 @@ from typing import List
 import PIL.Image
 import UnityPy
 
+# flush every line to prevent blocking outputs
+# noinspection PyShadowingBuiltins
+print = functools.partial(print)
+
+# initialize PIL to preload supported formats
 PIL.Image.preinit()
 PIL.Image.init()
 
@@ -16,15 +22,22 @@ def list_assets(src: Path, filters: List[str]):
         env = UnityPy.load(str(src))
         for path, obj in env.container.items():
             if any(path.startswith(f) for f in filters):
-                print(f"{path}", flush=True)
+                print(f"{path}")
     else:
         for it in src.glob('**/*'):
             if it.is_file():
                 list_assets(it, filters)
 
 
-def unpack(src: Path, dst: Path, filters: List[str]):
-    if src.is_file():
+def unpack(src: Path, dst: Path, filters: List[str], workers=None):
+    if src.is_dir():
+        print(f"searching files in {src}...")
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            for it in src.glob('**/*'):
+                if it.is_file():
+                    print(f"found {it} in {src}...")
+                    executor.submit(unpack, it, dst, filters)
+    elif src.is_file():
         env = UnityPy.load(str(src))
         for path, obj in env.container.items():
             if any(path.startswith(f) for f in filters):
@@ -34,19 +47,15 @@ def unpack(src: Path, dst: Path, filters: List[str]):
                 if obj.type.name in ["Texture2D", "Sprite"]:
                     if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
                         data.image.save(dest)
-                        print(f"{path}=>{dest}", flush=True)
+                        print(f"{path}=>{dest}")
                     else:
-                        print(f"{path} type not supported", file=sys.stderr, flush=True)
+                        print(f"type of {path} is not supported", file=sys.stderr)
                 if obj.type.name in ["TextAsset"]:
                     with open(dest, "wb") as file:
                         file.write(bytes(data.script))
-                    print(f"{path}=>{dest}", flush=True)
+                    print(f"{path}=>{dest}")
     else:
-        print("Searching files...", flush=True)
-        with ProcessPoolExecutor() as executor:
-            for it in src.glob('**/*'):
-                if it.is_file():
-                    executor.submit(unpack, it, dst, filters)
+        print(f"WARN: {src} is not dir neither file; is skipped")
 
 
 def main():
@@ -76,6 +85,10 @@ def main():
         "dst",
         help="Path to destination directory."
     )
+    unpack_parser.add_argument(
+        "-w", "--workers", nargs="?", default=None,
+        help="Specify the concurrency workers count."
+    )
     parser.add_argument(
         "-f", "--filter", nargs="+", default=[""],
         help="Specify a path prefix. Only process the assets which match the prefix."
@@ -87,7 +100,7 @@ def main():
                 list_assets(Path(src), filters=args.filter)
         case "unpack":
             for src in args.src:
-                unpack(Path(src), Path(args.dst), filters=args.filter)
+                unpack(Path(src), Path(args.dst), filters=args.filter, workers=int(args.workers) if args.workers else None)
 
 
 if __name__ == '__main__':
