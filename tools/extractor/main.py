@@ -7,6 +7,9 @@ from typing import List
 import PIL.Image
 import UnityPy
 
+PIL.Image.preinit()
+PIL.Image.init()
+
 
 def list_assets(src: Path, filters: List[str]):
     if src.is_file():
@@ -21,8 +24,6 @@ def list_assets(src: Path, filters: List[str]):
 
 
 def unpack(src: Path, dst: Path, filters: List[str]):
-    PIL.Image.preinit()
-    PIL.Image.init()
     if src.is_file():
         env = UnityPy.load(str(src))
         for path, obj in env.container.items():
