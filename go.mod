@@ -9,13 +9,13 @@ require (
 	github.com/chai2010/webp v1.1.1
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/gofiber/fiber/v2 v2.24.0
-	github.com/google/go-github/v42 v42.0.0
 	github.com/mholt/archiver/v4 v4.0.0-alpha.5
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/uptrace/bun v1.1.1
 	github.com/uptrace/bun/dialect/pgdialect v1.1.1
 	github.com/uptrace/bun/driver/pgdriver v1.1.1
+	go.mongodb.org/mongo-driver v1.8.4
 	go.uber.org/fx v1.17.0
 	golang.org/x/image v0.0.0-20220302094943-723b81ca9867
 	golang.org/x/mod v0.5.1
@@ -25,8 +25,9 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect

@@ -85,7 +85,19 @@ func GetRes(ctx context.Context, infos []Info, dst string) error {
 		_ = os.RemoveAll(tmpUnpack)
 	}()
 
+	tmpDecrypt, err := decryptRes(ctx, tmpUnpack)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDecrypt)
+	}()
+
 	err = fileutil.MoveAllFileContent(tmpUnpack, dst)
+	if err != nil {
+		return err
+	}
+	err = fileutil.MoveAllFileContent(tmpDecrypt, dst)
 	if err != nil {
 		return err
 	}
@@ -127,6 +139,17 @@ func unpackRes(ctx context.Context, tmpUnzip string) (string, error) {
 		return "", err
 	}
 	err = unpack(ctx, tmpUnzip, tmp)
+	if err != nil {
+		return "", err
+	}
+	return tmp, nil
+}
+func decryptRes(ctx context.Context, tmpUnpack string) (string, error) {
+	tmp, err := os.MkdirTemp("", "arkwaifu-arkres-decrypt-*")
+	if err != nil {
+		return "", err
+	}
+	err = decrypt(ctx, tmpUnpack, tmp)
 	if err != nil {
 		return "", err
 	}

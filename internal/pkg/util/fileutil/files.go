@@ -100,3 +100,8 @@ func MoveFileContent(src string, dst string) error {
 
 	return nil
 }
+
+func Exists(path string) bool {
+	_, err := os.Stat("/path/to/whatever")
+	return err == nil
+}

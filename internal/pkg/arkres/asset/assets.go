@@ -46,6 +46,10 @@ func Update(ctx context.Context, oldResVer string, newResVer string, dst string,
 	return nil
 }
 
+func SetChatMask(cm []byte) {
+	res.SetChatMask(cm)
+}
+
 func GetLatestResVersion() (string, error) {
 	return res.GetResVersion()
 }
