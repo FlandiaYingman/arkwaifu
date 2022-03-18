@@ -1,13 +1,46 @@
-package res
+package arkres
 
 import (
 	"context"
+	"encoding/base64"
+	"github.com/caarlos0/env/v6"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"os"
 	"regexp"
 	"strings"
 )
+
+func init() {
+	conf := struct {
+		ExtractorLocation *string `env:"ARKRES_EXTRACTOR_LOCATION"`
+		ChatMask          *string `env:"ARKRES_CHAT_MASK"`
+	}{
+		ExtractorLocation: nil,
+		ChatMask:          nil,
+	}
+	err := env.Parse(&conf)
+	if err != nil {
+		logrus.WithError(err).Warn("parsing environment variables")
+		return
+	}
+
+	if conf.ExtractorLocation != nil {
+		extractorLocation = *conf.ExtractorLocation
+	}
+	if conf.ChatMask != nil {
+		bytesChatMask, err := base64.StdEncoding.DecodeString(*conf.ChatMask)
+		if err != nil {
+			logrus.
+				WithError(err).
+				WithField("conf", conf).
+				Warn("setting chat mask")
+			return
+		}
+		SetChatMask(bytesChatMask)
+	}
+}
 
 type Info struct {
 	Name       string
@@ -105,7 +138,12 @@ func GetRes(ctx context.Context, infos []Info, dst string) error {
 	return nil
 }
 func preCheck() error {
-	err := unpackPreCheck()
+	var err error
+	err = unpackPreCheck()
+	if err != nil {
+		return err
+	}
+	err = decryptPreCheck()
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,6 @@ require (
 	github.com/caarlos0/env/v6 v6.9.1
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/chai2010/webp v1.1.1
-	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/gofiber/fiber/v2 v2.24.0
 	github.com/mholt/archiver/v4 v4.0.0-alpha.5
 	github.com/pkg/errors v0.9.1

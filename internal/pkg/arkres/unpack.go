@@ -1,4 +1,4 @@
-package res
+package arkres
 
 import (
 	"bufio"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const (
+var (
 	extractorLocation = "./tools/extractor"
 )
 

@@ -1,4 +1,4 @@
-package res
+package arkres
 
 import (
 	"encoding/json"

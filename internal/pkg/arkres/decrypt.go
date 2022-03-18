@@ -1,4 +1,4 @@
-package res
+package arkres
 
 import (
 	"context"
@@ -22,11 +22,20 @@ const (
 )
 
 var (
-	chatMask = make([]byte, 32)
+	chatMask []byte
 )
 
-func SetChatMask(cm []byte) {
-	copy(chatMask, cm)
+// decryptPreCheck checks whether chatMask is set.
+func decryptPreCheck() error {
+	if chatMask == nil {
+		return errors.Errorf("chatMask is not set")
+	}
+	return nil
+}
+
+func setChatMask(newChatMask []byte) {
+	chatMask = make([]byte, len(newChatMask))
+	copy(chatMask, newChatMask)
 }
 
 func decrypt(ctx context.Context, srcDir string, dstDir string) error {
@@ -59,9 +68,6 @@ func decryptFile(srcPath string, srcDir string, dstDir string) error {
 	hasMagicOffset, _ := filepath.Match("**/levels/**", filepath.ToSlash(srcPath))
 	hasMagicOffset = !hasMagicOffset
 
-	if filepath.Base(srcPath) == "story_review_table.bytes" {
-		print("!!")
-	}
 	srcContent, err := os.ReadFile(srcPath)
 	if err != nil {
 		return errors.WithStack(err)

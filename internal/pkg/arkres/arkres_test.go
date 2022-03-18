@@ -1,4 +1,4 @@
-package asset
+package arkres
 
 import (
 	"context"
@@ -16,8 +16,6 @@ func TestGet(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	SetChatMask([]byte("UITpAi82pHAWwnzqHRMCwPonJLIB3WCl"))
-
 	dir := t.TempDir()
 	err := Get(ctx, "21-12-31-15-44-39-814f71", dir, filterRegexp)
 	if err != nil {
@@ -34,8 +32,6 @@ func TestGet(t *testing.T) {
 func TestGetUpdate(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
-
-	SetChatMask([]byte("UITpAi82pHAWwnzqHRMCwPonJLIB3WCl"))
 
 	dirGet := t.TempDir()
 	err := Get(ctx, "21-12-31-15-44-39-814f71", dirGet, filterRegexp)
