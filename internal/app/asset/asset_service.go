@@ -15,9 +15,8 @@ type Service struct {
 }
 
 type Asset struct {
-	ID      string  `json:"id"`
-	Variant Variant `json:"variant"`
-	Kind    Kind    `json:"kind"`
+	ID   string `json:"id"`
+	Kind Kind   `json:"kind"`
 }
 
 func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
@@ -27,19 +26,8 @@ func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
 	}
 }
 
-func (s *Service) GetAssets(variant *Variant, kind *Kind) ([]Asset, error) {
+func (s *Service) GetAssets(variant Variant, kind *Kind) ([]Asset, error) {
 	var assets []Asset
-	if variant == nil {
-		for _, v := range Variants {
-			vAssets, err := s.GetAssets(&v, kind)
-			if err != nil {
-				return nil, err
-			}
-
-			assets = append(assets, vAssets...)
-		}
-		return assets, nil
-	}
 	if kind == nil {
 		for _, k := range Kinds {
 			kAssets, err := s.GetAssets(variant, &k)
@@ -51,7 +39,7 @@ func (s *Service) GetAssets(variant *Variant, kind *Kind) ([]Asset, error) {
 		}
 		return assets, nil
 	}
-	dirPath := filepath.Join(s.resourceLocation, "static", string(*variant), string(*kind))
+	dirPath := filepath.Join(s.resourceLocation, "static", string(variant), string(*kind))
 	dir, err := os.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
@@ -62,9 +50,8 @@ func (s *Service) GetAssets(variant *Variant, kind *Kind) ([]Asset, error) {
 		name := i.(os.DirEntry).Name()
 		name = strings.TrimSuffix(name, filepath.Ext(name))
 		return Asset{
-			ID:      name,
-			Variant: *variant,
-			Kind:    *kind,
+			ID:   strings.ToLower(name),
+			Kind: *kind,
 		}
 	}).ToSlice(&result)
 	return result, nil

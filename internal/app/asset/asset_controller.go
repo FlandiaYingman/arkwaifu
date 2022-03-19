@@ -16,20 +16,12 @@ func NewController(service *Service) Controller {
 	return Controller{service}
 }
 
-func (c *Controller) GetAssets(ctx *fiber.Ctx) error {
-	assets, err := c.service.GetAssets(nil, nil)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(assets)
-}
-
 func (c *Controller) GetAssetsByV(ctx *fiber.Ctx, variantStr string) error {
 	variant, err := ParseVariant(variantStr)
 	if err != nil {
 		return err
 	}
-	assets, err := c.service.GetAssets(&variant, nil)
+	assets, err := c.service.GetAssets(variant, nil)
 	if err != nil {
 		return err
 	}
@@ -45,7 +37,7 @@ func (c *Controller) GetAssetsByVK(ctx *fiber.Ctx, variantStr string, kindStr st
 	if err != nil {
 		return err
 	}
-	assets, err := c.service.GetAssets(&variant, &kind)
+	assets, err := c.service.GetAssets(variant, &kind)
 	if err != nil {
 		return err
 	}
@@ -78,10 +70,6 @@ func RegisterController(v0 *server.V0, c Controller) {
 		Use(compress.New(compress.Config{
 			Level: compress.LevelBestSpeed,
 		}))
-
-	router.Get("", func(ctx *fiber.Ctx) error {
-		return c.GetAssets(ctx)
-	})
 	router.Get(":variant", func(ctx *fiber.Ctx) error {
 		return c.GetAssetsByV(ctx, ctx.Params("variant"))
 	})
