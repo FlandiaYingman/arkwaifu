@@ -5,20 +5,25 @@
 </template>
 <script>
 import AssetsShow from '@/components/AssetsShow'
+import fp from 'lodash/fp'
 import _ from 'lodash'
+
 export default {
   components: { AssetsShow },
   computed: {
     avgAssets () {
-      let assets = []
-      assets = _.flatMap(this.$store.state.avg.stories, (el) => el.assets)
-      assets = _.uniq(assets)
+      const stories = this.$store.state.avg.stories
+      const assets = fp.flow(
+        fp.flatMap(it => it.assets),
+        fp.uniqWith(_.isEqual)
+      )(stories)
       return assets
     },
     nonAvgAssets () {
-      const { assets } = this.$store.state.assets
-      const { avgAssets } = this
-      return assets.filter((el) => !avgAssets.includes(el))
+      const allAssets = this.$store.state.assets.assets
+      const avgAssets = this.avgAssets
+      const nonAvgAssets = allAssets.filter(allEl => !avgAssets.find(avgEl => _.isEqual(allEl, avgEl)))
+      return nonAvgAssets
     }
   }
 }

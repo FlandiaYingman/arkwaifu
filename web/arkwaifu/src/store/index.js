@@ -9,21 +9,13 @@ const store = new Vuex.Store({
   modules: {
     avg: {
       state: {
-        groups: [],
-        stories: [],
+        groups: null,
+        stories: null,
         groupsTypeMap: {}
       },
       getters: {
         groupByID: (state) => (id) => state.groups.find((el) => el.id === id),
         storyByID: (state) => (id) => state.stories.find((el) => el.id === id)
-      },
-      mutations: {
-        setGroups (state, payload) {
-          state.groups = payload
-        },
-        setStories (state, payload) {
-          state.stories = payload
-        }
       },
       actions: {
         async updateAll ({ dispatch }) {
@@ -34,42 +26,37 @@ const store = new Vuex.Store({
           return fetch(`${API_URL}/api/v0/groups`)
             .then((resp) => resp.json())
             .then((groups) => {
-              store.state.groups = groups
+              store.state.groups = groups.map(el => Object.freeze(el))
               store.state.groupsTypeMap = _.groupBy(groups, el => el.actType)
             })
         },
-        async updateStories ({ commit }) {
+        async updateStories ({ state }) {
           return fetch(`${API_URL}/api/v0/stories`)
             .then((resp) => resp.json())
-            .then((stories) => commit('setStories', stories))
+            .then((stories) => (state.stories = stories.map(el => Object.freeze(el))))
         }
       }
     },
     assets: {
       state: {
-        images: [],
-        backgrounds: []
+        assets: []
+      },
+      getters: {
+        images: state => {
+          return state.assets.filter(el => el.kind === 'images')
+        },
+        backgrounds: state => {
+          return state.assets.filter(el => el.kind === 'backgrounds')
+        }
       },
       actions: {
         async updateAll ({ dispatch }) {
-          dispatch('updateImages')
-          dispatch('updateBackgrounds')
+          dispatch('updateAssets')
         },
-        async updateImages (context) {
-          return fetch(`${API_URL}/api/v0/assets/img/images`)
+        async updateAssets ({ state }) {
+          return fetch(`${API_URL}/api/v0/assets/img`)
             .then((resp) => resp.json())
-            .then((images) => {
-              const { state } = context
-              state.images = images
-            })
-        },
-        async updateBackgrounds (context) {
-          return fetch(`${API_URL}/api/v0/assets/img/backgrounds`)
-            .then((resp) => resp.json())
-            .then((backgrounds) => {
-              const { state } = context
-              state.backgrounds = backgrounds
-            })
+            .then((assets) => (state.assets = assets.map(el => Object.freeze(el))))
         }
       }
     }
