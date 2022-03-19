@@ -7,8 +7,7 @@
     />
     <assets-show
       v-if="story"
-      :images="story.images"
-      :backgrounds="story.backgrounds"
+      :assets="story.assets"
       :distinct="distinct"
     />
   </v-container>

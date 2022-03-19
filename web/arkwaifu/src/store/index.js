@@ -56,7 +56,7 @@ const store = new Vuex.Store({
           dispatch('updateBackgrounds')
         },
         async updateImages (context) {
-          return fetch(`${API_URL}/api/v0/resources/images`)
+          return fetch(`${API_URL}/api/v0/assets/img/images`)
             .then((resp) => resp.json())
             .then((images) => {
               const { state } = context
@@ -64,7 +64,7 @@ const store = new Vuex.Store({
             })
         },
         async updateBackgrounds (context) {
-          return fetch(`${API_URL}/api/v0/resources/backgrounds`)
+          return fetch(`${API_URL}/api/v0/assets/img/backgrounds`)
             .then((resp) => resp.json())
             .then((backgrounds) => {
               const { state } = context

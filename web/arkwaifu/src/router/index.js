@@ -24,7 +24,7 @@ const routes = [
       title: 'Main Themes'
     },
     props: {
-      type: 'MAIN_STORY'
+      type: 'MAINLINE'
     }
   },
   {
@@ -34,7 +34,7 @@ const routes = [
       title: 'Major Events'
     },
     props: {
-      type: 'ACTIVITY_STORY'
+      type: 'ACTIVITY'
     }
   },
   {
@@ -44,7 +44,7 @@ const routes = [
       title: 'Vignettes'
     },
     props: {
-      type: 'MINI_STORY'
+      type: 'MINI_ACTIVITY'
     }
   },
   {

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="text-caption">
-      {{ resCategory }}/{{ resName }}
+      {{ kindAbbr }}/{{ assetId }}
     </div>
     <v-card
       :href="assetURL"
@@ -21,8 +21,8 @@ import API_URL from '@/api'
 export default {
   name: 'ResourceCard',
   props: {
-    resName: String(),
-    resCategory: String()
+    assetId: String(),
+    assetKind: String()
   },
   data () {
     return {
@@ -30,10 +30,20 @@ export default {
   },
   computed: {
     assetThumbnailURL () {
-      return `${API_URL}/api/v0/resources/${this.resCategory}/thumbnail/${this.resName}`
+      return `${API_URL}/api/v0/assets/timg/${this.assetKind}/${this.assetId}`
     },
     assetURL () {
-      return `${API_URL}/api/v0/resources/${this.resCategory}/raw/${this.resName}`
+      return `${API_URL}/api/v0/assets/img/${this.assetKind}/${this.assetId}`
+    },
+    kindAbbr () {
+      switch (this.assetKind) {
+        case 'images':
+          return 'img'
+        case 'backgrounds':
+          return 'bg'
+        default:
+          return ''
+      }
     }
   }
 }

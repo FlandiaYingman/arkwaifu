@@ -1,42 +1,25 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row
+      v-for="kind in assetKinds"
+      :key="kind"
+    >
       <v-col
         cols="12"
         class="text-h5"
       >
-        {{ $t("images") }}
+        {{ $t(kind) }}
       </v-col>
       <v-col
-        v-for="(image, i) in imagesData"
-        :key="`${image.ID}-${i}`"
+        v-for="(asset, i) in assetsMap[kind]"
+        :key="`${asset.id}-${i}`"
         cols="6"
         sm="3"
         lg="2"
       >
         <asset-card
-          :res-name="image"
-          res-category="images"
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col
-        cols="12"
-        class="text-h5"
-      >
-        {{ $t("backgrounds") }}
-      </v-col>
-      <v-col
-        v-for="(image, i) in backgroundsData"
-        :key=" `${image.ID}-${i}`"
-        cols="6"
-        sm="3"
-        lg="2"
-      >
-        <asset-card
-          :res-name="image"
-          res-category="backgrounds"
+          :asset-id="asset.id"
+          :asset-kind="kind"
         />
       </v-col>
     </v-row>
@@ -56,8 +39,10 @@ import FabButton from '@/components/FabButton'
 export default {
   components: { AssetCard, FabButton },
   props: {
-    images: Array,
-    backgrounds: Array
+    assets: {
+      type: Array,
+      default: () => []
+    }
   },
   data () {
     return {
@@ -65,19 +50,15 @@ export default {
     }
   },
   computed: {
-    imagesData () {
-      if (this.distinct) {
-        return _.uniq(this.images)
-      } else {
-        return this.images
-      }
+    assetKinds () {
+      return _.uniq(this.assets.map(el => el.kind))
     },
-    backgroundsData () {
+    assetsMap () {
+      let assets = this.assets
       if (this.distinct) {
-        return _.uniq(this.backgrounds)
-      } else {
-        return this.backgrounds
+        assets = _.uniqBy(assets, el => el.id)
       }
+      return _.groupBy(assets, el => el.kind)
     }
   }
 }
