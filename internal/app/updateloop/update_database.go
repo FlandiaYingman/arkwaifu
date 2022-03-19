@@ -5,6 +5,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/arkavg"
+	"strings"
 )
 
 func (c *Controller) updateDatabase(ctx context.Context, resVer string, resDir string) error {
@@ -79,7 +80,7 @@ func storyFromRaw(s *arkavg.Story, resDir string) (avg.Story, error) {
 
 func assetFromRaw(a *arkavg.Asset) avg.Asset {
 	return avg.Asset{
-		ID:   a.ID,
+		ID:   strings.ToLower(a.ID),
 		Kind: string(a.Kind),
 	}
 }
