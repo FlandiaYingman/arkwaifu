@@ -4,118 +4,159 @@ import (
 	"context"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/asset"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/data"
-	"github.com/sirupsen/logrus"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"path/filepath"
+	"time"
 )
 
 type Controller struct {
-	resLocation string
-	forceUpdate bool
-	avgService  *avg.Service
+	ResLocation string
+	ForceUpdate bool
+
+	avgService *avg.Service
 }
 
 func NewController(avgService *avg.Service, conf *config.Config) *Controller {
-	return &Controller{conf.ResourceLocation, conf.ForceUpdate, avgService}
+	return &Controller{
+		ResLocation: conf.ResourceLocation,
+		ForceUpdate: conf.ForceUpdate,
+		avgService:  avgService,
+	}
 }
 
-func (c *Controller) UpdateResources() error {
-	ctx := context.Background()
-	localResVer, remoteResVer, err := c.checkVersion(ctx)
+func (c *Controller) AttemptUpdate(ctx context.Context) error {
+	log.Info("attempt to update resources")
+
+	if c.ForceUpdate {
+		err := c.avgService.Reset(ctx)
+		if err != nil {
+			return err
+		}
+		c.ForceUpdate = false
+	}
+
+	localResVer, err := c.avgService.GetVersion(ctx)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
-	if c.forceUpdate {
-		localResVer = ""
-		logrus.Info("Because a force updated is specified, set the local resVersion to empty.")
+	remoteResVer, err := arkres.GetResVersion()
+	if err != nil {
+		return errors.WithStack(err)
 	}
 
+	log := log.WithFields(log.Fields{
+		"localResVer":  localResVer,
+		"remoteResVer": remoteResVer,
+	})
+	log.Info("retrieved the local & remote resource versions")
+
+	// only the first true case would be executed
 	if localResVer != remoteResVer {
-		log := logrus.WithFields(logrus.Fields{
-			"localResVer":  localResVer,
-			"remoteResVer": remoteResVer,
-		})
-
-		oldResVer := filepath.Join(c.resLocation, localResVer)
-		newResVer := filepath.Join(c.resLocation, remoteResVer)
-
-		log.Info("Getting gamedata...")
-		avgGameData, err := GetAvgGameData(remoteResVer)
+		log.Info("updating, since local & remote resource versions are not the same")
+		begin := time.Now()
+		err = c.doUpdate(ctx, localResVer, remoteResVer)
+		elapsed := time.Since(begin)
+		log.WithField("elapsed", elapsed).Info("updated from localResVer to remoteResVer")
 		if err != nil {
 			return err
 		}
-
-		log.Info("Getting resources...")
-		err = GetAvgResources(ctx, localResVer, remoteResVer, oldResVer, newResVer)
-		if err != nil {
-			return err
-		}
-
-		log.Info("Setting AVG gamedata...")
-		err = c.avgService.SetAvgs(remoteResVer, avgGameData)
-		if err != nil {
-			return err
-		}
-
-		c.forceUpdate = false
-		log.Info("Updated resources.")
 	}
 	return nil
 }
 
-func (c *Controller) checkVersion(ctx context.Context) (string, string, error) {
-	log := logrus.WithFields(logrus.Fields{})
-	log.Info("Attempt to update resources.")
-
-	rResVersion, err := getLatestResourceResVersion()
+// doUpdate updates the resources.
+func (c *Controller) doUpdate(ctx context.Context, oldResVer string, newResVer string) error {
+	var err error
+	err = c.retrieveResources(ctx, oldResVer, newResVer)
 	if err != nil {
-		return "", "", err
+		return err
 	}
-	log.WithFields(logrus.Fields{
-		"rResVersion": rResVersion,
-	}).Info("Got resource resVersion.")
-
-	gResVersion, gCommitRef, err := getLatestGamedataResVersion()
+	err = c.processStatics(ctx, newResVer)
 	if err != nil {
-		return "", "", err
+		return err
 	}
-	log.WithFields(logrus.Fields{
-		"gResVersion": gResVersion,
-		"gCommitRef":  gCommitRef,
-	}).Info("Got gamedata resVersion and commitRef.")
-
-	if rResVersion != gResVersion {
-		log.WithFields(logrus.Fields{
-			"rResVersion": rResVersion,
-			"gResVersion": gResVersion,
-		}).Info("The remote resources are updating.")
-		return "", "", nil
-	}
-
-	remoteResVersion := rResVersion
-	localResVersion, err := c.avgService.GetVersion(ctx)
+	err = c.submitUpdate(ctx, newResVer)
 	if err != nil {
-		return "", "", err
+		return err
 	}
-
-	log = log.WithFields(logrus.Fields{
-		"remoteResVersion": remoteResVersion,
-		"localResVersion":  localResVersion,
-	})
-	// Test whether the resource is up-to-date.
-	if remoteResVersion == localResVersion {
-		log.Info("The local resources are up-to-date.")
-	} else {
-		log.Info("The local resources are out-of-date.")
-	}
-	return localResVersion, remoteResVersion, nil
+	return nil
 }
 
-func getLatestResourceResVersion() (string, error) {
-	return asset.GetLatestResVersion()
+// retrieveResources retrieves the resources into the resource directory.
+// If oldResVer is empty, it retrieves full resources; otherwise, it retrieves only incremental resources.
+//
+// It is skipped if the corresponding resource directory already exists.
+func (c *Controller) retrieveResources(ctx context.Context, oldResVer string, newResVer string) error {
+	resDir := filepath.Join(c.ResLocation, newResVer, "res")
+	if fileutil.Exists(resDir) {
+		log.WithFields(log.Fields{"resDir": resDir}).
+			Info("retrieving resources: resDir already exists; skipping")
+		return nil
+	}
+	err := updateResources(ctx, oldResVer, newResVer, resDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	log.WithFields(log.Fields{
+		"oldResVer": oldResVer,
+		"newResVer": newResVer,
+		"resDir":    resDir,
+	}).Info("updated resources from oldResVer to newResVer, into resDir")
+	return nil
 }
 
-func getLatestGamedataResVersion() (string, string, error) {
-	return data.FindLatestCommitRef()
+// processStatics processes the resources in the resource directory to static files.
+//
+// It is skipped if the corresponding resource directory already exists.
+func (c *Controller) processStatics(ctx context.Context, resVer string) error {
+	resDir := filepath.Join(c.ResLocation, resVer, "res")
+	staticDir := filepath.Join(c.ResLocation, resVer, "static")
+	if fileutil.Exists(staticDir) {
+		log.WithFields(log.Fields{"resDir": resDir}).
+			Info("processing statics: staticDir already exists; skipping")
+		return nil
+	}
+	err := updateStatics(ctx, resDir, staticDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	log.WithFields(log.Fields{
+		"resDir":    resDir,
+		"staticDir": staticDir,
+	}).Info("processed statics from resDir to staticDir")
+	return nil
+}
+
+// submitUpdate submits the gamedata from resources and static files.
+//
+// Note that submitting the gamedata from resources will fully override existing;
+// but submitting the static files will only override incrementally.
+func (c *Controller) submitUpdate(ctx context.Context, resVer string) error {
+	resDir := filepath.Join(c.ResLocation, resVer, "res")
+	staticDir := filepath.Join(c.ResLocation, resVer, "static")
+	mainStaticDir := filepath.Join(c.ResLocation, "static")
+
+	err := fileutil.LowercaseAll(staticDir)
+	if err != nil {
+		return err
+	}
+
+	err = fileutil.CopyAllFileContent(staticDir, mainStaticDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = c.updateDatabase(ctx, resVer, resDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	log.WithFields(log.Fields{
+		"resVer": resVer,
+		"resDir": resDir,
+	}).Info("submitted update from resDir, version resVer")
+	return nil
 }

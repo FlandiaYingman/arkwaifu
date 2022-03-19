@@ -10,8 +10,8 @@ type StoryRepo struct {
 	infra.Repo
 }
 
-// StoryModel is a part of story of an AVG. e.g., "8-1 行动前" or "IW-9 行动后" (IW stands for activity "将进酒").
-type StoryModel struct {
+// storyModel is a part of story of an AVG. e.g., "8-1 行动前" or "IW-9 行动后" (IW stands for activity "将进酒").
+type storyModel struct {
 	bun.BaseModel `bun:"table:stories,alias:s"`
 
 	// ID is the unique ID of the story.
@@ -30,20 +30,19 @@ type StoryModel struct {
 	Tag string
 
 	// Images are the images the story uses.
-	Images []*ImageModel `bun:"rel:has-many,join:id=story_id"`
-
-	// Backgrounds are the backgrounds the story uses.
-	Backgrounds []*BackgroundModel `bun:"rel:has-many,join:id=story_id"`
+	Assets []*assetModel `bun:"rel:has-many,join:id=story_id"`
 
 	// GroupID is the ID of the group the story belongs to.
 	GroupID string
 	// Group is the group the story belongs to.
-	Group *GroupModel `bun:"rel:belongs-to,join:group_id=id"`
+	Group *groupModel `bun:"rel:belongs-to,join:group_id=id"`
+
+	SortID int64 `bun:",autoincrement"`
 }
 
 func NewStoryRepo(db *bun.DB) (*StoryRepo, error) {
 	_, err := db.NewCreateTable().
-		Model((*StoryModel)(nil)).
+		Model((*storyModel)(nil)).
 		IfNotExists().
 		Exec(context.Background())
 	if err != nil {
@@ -51,15 +50,7 @@ func NewStoryRepo(db *bun.DB) (*StoryRepo, error) {
 	}
 
 	_, err = db.NewCreateTable().
-		Model((*ImageModel)(nil)).
-		IfNotExists().
-		Exec(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.NewCreateTable().
-		Model((*BackgroundModel)(nil)).
+		Model((*assetModel)(nil)).
 		IfNotExists().
 		Exec(context.Background())
 	if err != nil {
@@ -70,66 +61,48 @@ func NewStoryRepo(db *bun.DB) (*StoryRepo, error) {
 	}, nil
 }
 
-func (r *StoryRepo) GetStories(ctx context.Context) ([]StoryModel, error) {
-	var items []StoryModel
+func (r *StoryRepo) GetStories(ctx context.Context) ([]storyModel, error) {
+	var items []storyModel
 	err := r.DB.
 		NewSelect().
 		Model(&items).
-		Relation("Images").
-		Relation("Backgrounds").
-		Relation("Group").
+		Relation("Assets", sortAsset).
+		Relation("Group", sortAvg).
+		Apply(sortAvg).
 		Scan(ctx)
 	return items, err
 }
 
-func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*StoryModel, error) {
-	var item StoryModel
+func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*storyModel, error) {
+	var item storyModel
 	err := r.DB.
 		NewSelect().
 		Model(&item).
-		Relation("Images").
-		Relation("Backgrounds").
-		Relation("Group").
+		Relation("Assets", sortAsset).
+		Relation("Group", sortAvg).
 		Where("s.id = ?", id).
 		Scan(ctx)
 	return &item, err
 }
 
-func (r *StoryRepo) InsertStories(ctx context.Context, stories []StoryModel) error {
+func (r *StoryRepo) InsertStories(ctx context.Context, stories []storyModel) error {
 	_, err := r.DB.
 		NewInsert().
 		Model(&stories).
-		// On("CONFLICT (id) DO UPDATE").
-		// Set("id = EXCLUDED.id").
-		// Set("code = EXCLUDED.code").
-		// Set("name = EXCLUDED.name").
-		// Set("tag = EXCLUDED.tag").
-		// Set("group_id = EXCLUDED.group_id").
 		Exec(ctx)
 	if err != nil {
 		return err
 	}
 
-	storyToImages := make([]ImageModel, 0, len(stories))
-	storyToBackgrounds := make([]BackgroundModel, 0, len(stories))
+	storyToAssets := make([]assetModel, 0, len(stories))
 	for _, story := range stories {
-		for _, image := range story.Images {
-			storyToImages = append(storyToImages, *image)
-		}
-		for _, background := range story.Backgrounds {
-			storyToBackgrounds = append(storyToBackgrounds, *background)
+		for _, asset := range story.Assets {
+			storyToAssets = append(storyToAssets, *asset)
 		}
 	}
 	_, err = r.DB.
 		NewInsert().
-		Model(&storyToImages).
-		Exec(ctx)
-	if err != nil {
-		return err
-	}
-	_, err = r.DB.
-		NewInsert().
-		Model(&storyToBackgrounds).
+		Model(&storyToAssets).
 		Exec(ctx)
 	if err != nil {
 		return err
@@ -137,18 +110,12 @@ func (r *StoryRepo) InsertStories(ctx context.Context, stories []StoryModel) err
 	return nil
 }
 
-type ImageModel struct {
-	bun.BaseModel `bun:"table:images"`
-	ID            int64  `bun:"id,pk,autoincrement"`
-	StoryID       string `bun:""`
-	Image         string `bun:""`
-}
-
-type BackgroundModel struct {
-	bun.BaseModel `bun:"table:backgrounds"`
-	ID            int64  `bun:"id,pk,autoincrement"`
-	StoryID       string `bun:""`
-	Background    string `bun:""`
+type assetModel struct {
+	bun.BaseModel `bun:"table:assets"`
+	PK            int64  `bun:"pk,pk,autoincrement"`
+	StoryID       string `bun:"story_id"`
+	ID            string `bun:"id"`
+	Kind          string `bun:"kind"`
 }
 
 func (r *StoryRepo) Truncate(ctx context.Context) (err error) {
@@ -158,13 +125,10 @@ func (r *StoryRepo) Truncate(ctx context.Context) (err error) {
 	}
 	defer func() { _ = r.EndTx(err) }()
 	_, err = r.DB.NewTruncateTable().
-		Model((*StoryModel)(nil)).
+		Model((*storyModel)(nil)).
 		Exec(ctx)
 	_, err = r.DB.NewTruncateTable().
-		Model((*ImageModel)(nil)).
-		Exec(ctx)
-	_, err = r.DB.NewTruncateTable().
-		Model((*BackgroundModel)(nil)).
+		Model((*assetModel)(nil)).
 		Exec(ctx)
 	return err
 }

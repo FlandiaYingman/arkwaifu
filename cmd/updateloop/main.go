@@ -69,7 +69,7 @@ func updateResourcesLoop(ut *updateloopTicker, uc *updateloop.Controller) {
 }
 
 func updateResources(uc *updateloop.Controller) {
-	err := uc.UpdateResources()
+	err := uc.AttemptUpdate(context.Background())
 	if err != nil {
 		log.WithError(err).Error("error occurs during update resources")
 	}

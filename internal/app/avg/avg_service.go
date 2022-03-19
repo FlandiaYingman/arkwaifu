@@ -4,121 +4,6 @@ import (
 	"context"
 )
 
-type Group struct {
-	ID      string  `json:"id"`
-	Name    string  `json:"name"`
-	ActType string  `json:"actType"`
-	Stories []Story `json:"stories"`
-}
-
-type Story struct {
-	ID          string   `json:"id"`
-	Code        string   `json:"code"`
-	Name        string   `json:"name"`
-	Tag         string   `json:"tag"`
-	GroupID     string   `json:"groupID"`
-	Images      []string `json:"images"`
-	Backgrounds []string `json:"backgrounds"`
-}
-
-func groupsToModels(groups []Group) ([]GroupModel, []StoryModel) {
-	groupModels := make([]GroupModel, len(groups))
-	storyModels := make([]StoryModel, 0, len(groups))
-	for i, group := range groups {
-		groupModels[i] = GroupModel{
-			ID:      group.ID,
-			Name:    group.Name,
-			ActType: group.ActType,
-			Stories: nil,
-		}
-		storyModels = append(storyModels, storiesToModels(group, group.Stories)...)
-	}
-	return groupModels, storyModels
-}
-
-func storiesToModels(group Group, stories []Story) []StoryModel {
-	groupModels := make([]StoryModel, len(stories))
-	for i, story := range stories {
-		images := make([]*ImageModel, len(story.Images))
-		for i, image := range story.Images {
-			images[i] = &ImageModel{
-				StoryID: story.ID,
-				Image:   image,
-			}
-		}
-		backgrounds := make([]*BackgroundModel, len(story.Backgrounds))
-		for i, background := range story.Backgrounds {
-			backgrounds[i] = &BackgroundModel{
-				StoryID:    story.ID,
-				Background: background,
-			}
-		}
-		groupModels[i] = StoryModel{
-			ID:          story.ID,
-			Code:        story.Code,
-			Name:        story.Name,
-			Tag:         story.Tag,
-			Images:      images,
-			Backgrounds: backgrounds,
-			GroupID:     group.ID,
-		}
-	}
-	return groupModels
-}
-
-func groupsFromModels(groupModels []GroupModel) []Group {
-	groups := make([]Group, len(groupModels))
-	for i, model := range groupModels {
-		groups[i] = groupFromModel(model)
-	}
-	return groups
-}
-
-func storiesFromModels(storyModels []StoryModel) []Story {
-	stories := make([]Story, len(storyModels))
-	for i, model := range storyModels {
-		stories[i] = storyFromModel(model)
-	}
-	return stories
-}
-
-func storiesFromModelsPtr(storyModels []*StoryModel) []Story {
-	stories := make([]Story, len(storyModels))
-	for i, model := range storyModels {
-		stories[i] = storyFromModel(*model)
-	}
-	return stories
-}
-
-func groupFromModel(model GroupModel) Group {
-	return Group{
-		ID:      model.ID,
-		Name:    model.Name,
-		ActType: model.ActType,
-		Stories: storiesFromModelsPtr(model.Stories),
-	}
-}
-
-func storyFromModel(model StoryModel) Story {
-	images := make([]string, len(model.Images))
-	for i, image := range model.Images {
-		images[i] = image.Image
-	}
-	backgrounds := make([]string, len(model.Backgrounds))
-	for i, background := range model.Backgrounds {
-		backgrounds[i] = background.Background
-	}
-	return Story{
-		ID:          model.ID,
-		Code:        model.Code,
-		Name:        model.Name,
-		Tag:         model.Tag,
-		Images:      images,
-		Backgrounds: backgrounds,
-		GroupID:     model.GroupID,
-	}
-}
-
 type Service struct {
 	versionRepo *VersionRepo
 	groupRepo   *GroupRepo
@@ -217,4 +102,8 @@ func (s *Service) GetStoryByID(ctx context.Context, id string) (*Story, error) {
 	}
 	story := storyFromModel(*model)
 	return &story, nil
+}
+
+func (s *Service) Reset(ctx context.Context) error {
+	return s.versionRepo.UpsertVersion(ctx, "")
 }
