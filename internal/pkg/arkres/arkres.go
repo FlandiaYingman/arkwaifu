@@ -17,7 +17,7 @@ const (
 	DefaultPrefix = "assets/torappu/dynamicassets"
 )
 
-func Get(ctx context.Context, resVersion string, dst string, filter *regexp.Regexp) error {
+func Get(ctx context.Context, resVersion string, dst string, filter ...*regexp.Regexp) error {
 	infos, err := GetResInfos(resVersion)
 	if err != nil {
 		return errors.WithStack(err)
@@ -37,7 +37,7 @@ func Get(ctx context.Context, resVersion string, dst string, filter *regexp.Rege
 	return nil
 }
 
-func Update(ctx context.Context, oldResVer string, newResVer string, dst string, filter *regexp.Regexp) error {
+func GetIncrementally(ctx context.Context, oldResVer string, newResVer string, dst string, filter ...*regexp.Regexp) error {
 	oldResInfos, err := GetResInfos(oldResVer)
 	if err != nil {
 		return errors.WithStack(err)
@@ -61,10 +61,6 @@ func Update(ctx context.Context, oldResVer string, newResVer string, dst string,
 
 func SetChatMask(newChatMask []byte) {
 	setChatMask(newChatMask)
-}
-
-func GetLatestResVersion() (string, error) {
-	return GetResVersion()
 }
 
 // calcDiff returns the infos in "new" but not in "old".

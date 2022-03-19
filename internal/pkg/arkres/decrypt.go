@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"io/fs"
 	"os"
@@ -56,7 +56,7 @@ func decrypt(ctx context.Context, srcDir string, dstDir string) error {
 
 		err = decryptFile(srcPath, srcDir, dstDir)
 		if err != nil {
-			logrus.Error(err)
+			log.Error(err)
 			return nil
 		}
 

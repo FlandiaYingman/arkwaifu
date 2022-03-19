@@ -46,18 +46,6 @@ const (
 	TagAfter     Tag = "行动后"
 )
 
-type Asset struct {
-	ID   string
-	Kind Kind
-}
-
-const (
-	KindImage      Kind = "images"
-	KindBackground Kind = "backgrounds"
-)
-
-type Kind string
-
 func GetAvg(resDir string, prefix string) (Avg, error) {
 	bsonPath := "gamedata/excel/story_review_table.bson"
 	bsonPath = filepath.Join(resDir, prefix, bsonPath)

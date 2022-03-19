@@ -3,10 +3,11 @@ package arkres
 import (
 	"context"
 	"encoding/base64"
+	"github.com/ahmetb/go-linq/v3"
 	"github.com/caarlos0/env/v6"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"regexp"
 	"strings"
@@ -22,7 +23,7 @@ func init() {
 	}
 	err := env.Parse(&conf)
 	if err != nil {
-		logrus.WithError(err).Warn("parsing environment variables")
+		log.WithError(err).Warn("parsing environment variables")
 		return
 	}
 
@@ -32,7 +33,7 @@ func init() {
 	if conf.ChatMask != nil {
 		bytesChatMask, err := base64.StdEncoding.DecodeString(*conf.ChatMask)
 		if err != nil {
-			logrus.
+			log.
 				WithError(err).
 				WithField("conf", conf).
 				Warn("setting chat mask")
@@ -206,8 +207,11 @@ func FilterResInfos(infos []Info, predicate func(i Info) bool) []Info {
 }
 
 // FilterResInfosRegexp returns a slice containing all Info matching the specified regexp.
-func FilterResInfosRegexp(infos []Info, regexp *regexp.Regexp) []Info {
+func FilterResInfosRegexp(infos []Info, r []*regexp.Regexp) []Info {
 	return FilterResInfos(infos, func(i Info) bool {
-		return regexp.MatchString(i.Name)
+		return linq.From(r).
+			AnyWith(func(j any) bool {
+				return j.(*regexp.Regexp).MatchString(i.Name)
+			})
 	})
 }

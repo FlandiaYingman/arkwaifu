@@ -1,6 +1,7 @@
 package fileutil
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -31,6 +32,35 @@ func MoveAllFileContent(srcDir string, dstDir string) error {
 			return fmt.Errorf("couldn't make directories: %w", err)
 		}
 		err = MoveFileContent(srcPath, dstPath)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+// CopyAllFileContent copies all files from srcDir to dstDir recursively.
+// Only files' name and their content are guaranteed same.
+// If the existing files and the coping files have the same path, the existing files will be overridden.
+func CopyAllFileContent(srcDir string, dstDir string) error {
+	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+
+		dstPath, err := ChangeParent(srcPath, srcDir, dstDir)
+		if err != nil {
+			return err
+		}
+		err = os.MkdirAll(filepath.Dir(dstPath), 0755)
+		if err != nil {
+			return fmt.Errorf("couldn't make directories: %w", err)
+		}
+		err = CopyFileContent(srcPath, dstPath)
 		if err != nil {
 			return err
 		}
@@ -102,6 +132,11 @@ func MoveFileContent(src string, dst string) error {
 }
 
 func Exists(path string) bool {
-	_, err := os.Stat("/path/to/whatever")
+	_, err := os.Stat(path)
 	return err == nil
+}
+
+func NotExists(path string) bool {
+	_, err := os.Stat(path)
+	return errors.Is(err, os.ErrNotExist)
 }

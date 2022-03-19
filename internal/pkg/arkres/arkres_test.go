@@ -44,7 +44,7 @@ func TestGetUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
-	err = Update(ctx, "21-12-01-03-53-27-2e01ea", "21-12-31-15-44-39-814f71", dirUpdate, filterRegexp)
+	err = GetIncrementally(ctx, "21-12-01-03-53-27-2e01ea", "21-12-31-15-44-39-814f71", dirUpdate, filterRegexp)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
