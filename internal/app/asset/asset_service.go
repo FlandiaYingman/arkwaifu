@@ -1,4 +1,4 @@
-package res
+package asset
 
 import (
 	"github.com/ahmetb/go-linq/v3"
@@ -14,9 +14,10 @@ type Service struct {
 	versionRepo      *avg.VersionRepo
 }
 
-type Resource struct {
-	Name string
-	Path string
+type Asset struct {
+	ID      string  `json:"id"`
+	Variant Variant `json:"variant"`
+	Kind    Kind    `json:"kind"`
 }
 
 func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
@@ -26,17 +27,45 @@ func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
 	}
 }
 
-func (s *Service) GetAssets(variant Variant, kind Kind) ([]string, error) {
-	dirPath := filepath.Join(s.resourceLocation, "static", string(variant), string(kind))
+func (s *Service) GetAssets(variant *Variant, kind *Kind) ([]Asset, error) {
+	var assets []Asset
+	if variant == nil {
+		for _, v := range Variants {
+			vAssets, err := s.GetAssets(&v, kind)
+			if err != nil {
+				return nil, err
+			}
+
+			assets = append(assets, vAssets...)
+		}
+		return assets, nil
+	}
+	if kind == nil {
+		for _, k := range Kinds {
+			kAssets, err := s.GetAssets(variant, &k)
+			if err != nil {
+				return nil, err
+			}
+
+			assets = append(assets, kAssets...)
+		}
+		return assets, nil
+	}
+	dirPath := filepath.Join(s.resourceLocation, "static", string(*variant), string(*kind))
 	dir, err := os.ReadDir(dirPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []string
+	var result []Asset
 	linq.From(dir).Select(func(i interface{}) interface{} {
 		name := i.(os.DirEntry).Name()
-		return strings.TrimSuffix(name, filepath.Ext(name))
+		name = strings.TrimSuffix(name, filepath.Ext(name))
+		return Asset{
+			ID:      name,
+			Variant: *variant,
+			Kind:    *kind,
+		}
 	}).ToSlice(&result)
 	return result, nil
 }

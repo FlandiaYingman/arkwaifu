@@ -1,10 +1,10 @@
 package app
 
 import (
+	"github.com/flandiayingman/arkwaifu/internal/app/asset"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/flandiayingman/arkwaifu/internal/app/infra"
-	"github.com/flandiayingman/arkwaifu/internal/app/res"
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/flandiayingman/arkwaifu/internal/app/updateloop"
 	"go.uber.org/fx"
@@ -29,11 +29,11 @@ func ProvideOptions() []fx.Option {
 			avg.RegisterController,
 		),
 		fx.Provide(
-			res.NewService,
-			res.NewController,
+			asset.NewService,
+			asset.NewController,
 		),
 		fx.Invoke(
-			res.RegisterController,
+			asset.RegisterController,
 		),
 		fx.Provide(
 			updateloop.NewController,

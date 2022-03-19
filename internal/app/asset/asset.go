@@ -1,4 +1,4 @@
-package res
+package asset
 
 import "fmt"
 
