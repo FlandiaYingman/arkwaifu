@@ -4,7 +4,7 @@ type Avg []Group
 type Group struct {
 	ID      string  `json:"id"`
 	Name    string  `json:"name"`
-	Type    string  `json:"actType"`
+	Type    string  `json:"type"`
 	Stories []Story `json:"stories"`
 }
 type Story struct {
