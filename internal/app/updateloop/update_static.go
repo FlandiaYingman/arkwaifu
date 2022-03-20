@@ -98,7 +98,7 @@ func encodeTimg(asset arkavg.Asset, img image.Image, imgDir string) error {
 		return errors.WithStack(err)
 	}
 
-	img = resize(img, 256, 1024)
+	img = resize(img, 320, 1024)
 
 	dstFile, err := os.Create(dst)
 	if err != nil {
@@ -106,7 +106,7 @@ func encodeTimg(asset arkavg.Asset, img image.Image, imgDir string) error {
 	}
 	defer func() { _ = dstFile.Close() }()
 	return webp.Encode(dstFile, img, &webp.Options{
-		Quality: 75,
+		Quality: 85,
 	})
 }
 
