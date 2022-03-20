@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <group-show
       v-if="story"
       :group-id="story.groupID"
@@ -10,7 +10,7 @@
       :assets="story.assets"
       :distinct="distinct"
     />
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -18,6 +18,7 @@ import GroupShow from '@/components/GroupShow.vue'
 import AssetsShow from '@/components/AssetsShow'
 
 export default {
+  name: 'StoryView',
   components: { AssetsShow, GroupShow },
   props: {
     storyID: String()

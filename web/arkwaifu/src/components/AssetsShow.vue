@@ -12,7 +12,7 @@
       </v-col>
       <v-col
         v-for="(asset, i) in assetsMap[kind]"
-        :key="`${asset.id}-${i}`"
+        :key="i"
         cols="6"
         sm="3"
         lg="2"
@@ -36,7 +36,9 @@
 import AssetCard from '@/components/AssetCard'
 import _ from 'lodash'
 import FabButton from '@/components/FabButton'
+
 export default {
+  name: 'AssetsShow',
   components: { AssetCard, FabButton },
   props: {
     assets: {
@@ -51,7 +53,7 @@ export default {
   },
   computed: {
     assetKinds () {
-      return _.uniq(this.assets.map(el => el.kind))
+      return Object.keys(this.$store.state.assetsKindMap)
     },
     assetsMap () {
       let assets = this.assets

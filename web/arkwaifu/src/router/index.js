@@ -2,10 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import AboutView from '@/views/AboutView.vue'
 import HomeView from '@/views/HomeView.vue'
-import GroupsView from '@/views/assets/GroupsView'
 import StoryView from '@/views/assets/StoryView'
 import NonAvgView from '@/views/assets/NonAvgAssetsView'
 import AllAssetsView from '@/views/assets/AllAssetsView'
+import AvgMainView from '@/views/assets/AvgMainView'
+import AvgMajorView from '@/views/assets/AvgMajorView'
+import AvgMiniView from '@/views/assets/AvgMiniView'
+import AvgOthersView from '@/views/assets/AvgOthersView'
 
 Vue.use(VueRouter)
 
@@ -19,42 +22,30 @@ const routes = [
   },
   {
     path: '/avgs/main_themes',
-    component: GroupsView,
+    component: AvgMainView,
     meta: {
       title: 'Main Themes'
-    },
-    props: {
-      type: 'MAINLINE'
     }
   },
   {
     path: '/avgs/major_events',
-    component: GroupsView,
+    component: AvgMajorView,
     meta: {
       title: 'Major Events'
-    },
-    props: {
-      type: 'ACTIVITY'
     }
   },
   {
     path: '/avgs/vignettes',
-    component: GroupsView,
+    component: AvgMiniView,
     meta: {
       title: 'Vignettes'
-    },
-    props: {
-      type: 'MINI_ACTIVITY'
     }
   },
   {
     path: '/avgs/others',
-    component: GroupsView,
+    component: AvgOthersView,
     meta: {
       title: 'Others'
-    },
-    props: {
-      type: 'NONE'
     }
   },
   {

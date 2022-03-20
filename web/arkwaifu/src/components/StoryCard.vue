@@ -5,9 +5,11 @@
   >
     <v-card-title>{{ story.name }}</v-card-title>
     <v-card-subtitle>
-      {{ story.code ? `${story.code} ` : "" }}{{ story.tag }}
-      <br v-if="!$vuetify.breakpoint.mobile">
-      {{ !$vuetify.breakpoint.mobile ? story.id : "" }}
+      {{ story.code ? `${story.code} ` : '' }}{{ story.tag }}
+      <span>
+        <br v-show="!$vuetify.breakpoint.mobile">
+        {{ story.id }}
+      </span>
     </v-card-subtitle>
   </v-card>
 </template>
@@ -18,9 +20,6 @@ export default {
   props: {
     story: Object(),
     current: Boolean
-  },
-  data () {
-    return {}
   }
 }
 </script>

@@ -1,11 +1,10 @@
 <template>
-  <v-container>
-    <v-row
-      v-for="group in groups"
-      :key="group.id"
-    >
-      <group-show :group-id="group.id" />
-    </v-row>
+  <div>
+    <group-show
+      v-for="(group, i) in groups"
+      :key="i"
+      :group-id="group.id"
+    />
     <fab-button
       v-model="descending"
       icon-on="mdi-sort-calendar-descending"
@@ -13,7 +12,7 @@
       caption-on="Sort: Descending"
       caption-off="Sort: Ascending"
     />
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -22,7 +21,7 @@ import FabButton from '@/components/FabButton'
 import _ from 'lodash'
 
 export default {
-  name: 'GroupsPage',
+  name: 'GroupsShow',
   components: { GroupShow, FabButton },
   props: {
     type: String()
@@ -34,9 +33,8 @@ export default {
   },
   computed: {
     groups () {
-      let groups = this.$store.state.avg.groupsTypeMap[this.type]
+      let groups = this.$store.state.groupsTypeMap[this.type]
       if (groups) {
-        groups = [...groups]
         if (this.descending) {
           groups = _.reverse(groups)
         }

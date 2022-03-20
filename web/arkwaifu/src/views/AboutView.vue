@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <p
       class="text-h3"
     >
@@ -22,13 +22,13 @@
         >https://github.com/FlandiaYingman/arkwaifu</a>
       </template>
     </i18n>
-  </v-container>
+  </div>
 </template>
 
 <script>
 
 export default {
-
+  name: 'AboutView'
 }
 </script>
 

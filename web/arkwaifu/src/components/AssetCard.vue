@@ -19,7 +19,7 @@
 import API_URL from '@/api'
 
 export default {
-  name: 'ResourceCard',
+  name: 'AssetCard',
   props: {
     assetId: String(),
     assetKind: String()

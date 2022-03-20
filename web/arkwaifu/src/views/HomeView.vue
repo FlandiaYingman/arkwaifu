@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <img
       src="/logo_phantom.png"
       alt=""
@@ -13,7 +13,7 @@
     <p class="text-subtitle-1">
       {{ $t("prompt") }}
     </p>
-  </v-container>
+  </div>
 </template>
 
 <script>

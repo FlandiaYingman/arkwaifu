@@ -20,7 +20,7 @@
 </template>
 <script>
 export default {
-  name: 'DistinctButton',
+  name: 'FabButton',
   props: {
     iconOn: {
       type: String,
