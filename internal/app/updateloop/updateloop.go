@@ -8,6 +8,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"os"
 	"path/filepath"
 	"time"
 )
@@ -119,7 +120,11 @@ func (c *Controller) processStatics(ctx context.Context, resVer string) error {
 			Info("processing statics: staticDir already exists; skipping")
 		return nil
 	}
-	err := updateStatics(ctx, resDir, staticDir)
+	err := os.MkdirAll(staticDir, 0755)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	err = updateStatics(ctx, resDir, staticDir)
 	if err != nil {
 		return errors.WithStack(err)
 	}
