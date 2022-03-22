@@ -28,6 +28,7 @@ services:
         target: /var/arkwaifu_resource
     environment:
       - POSTGRES_DSN
+      - ARKRES_CHAT_MASK
       - RESOURCE_LOCATION=/var/arkwaifu_resource
     extra_hosts:
       - "host.docker.internal:host-gateway"
