@@ -24,6 +24,10 @@ import (
 func updateStatics(ctx context.Context, newResDir string, newStaticDir string) error {
 	assets, err := arkavg.GetAssets(newResDir, arkres.DefaultPrefix)
 	if err != nil {
+		// If no resources to process, just skip
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
 		return err
 	}
 
