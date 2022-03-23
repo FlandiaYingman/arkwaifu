@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/app"
 	"github.com/flandiayingman/arkwaifu/internal/app/updateloop"
 	log "github.com/sirupsen/logrus"
@@ -71,6 +72,7 @@ func updateResourcesLoop(ut *updateloopTicker, uc *updateloop.Controller) {
 func updateResources(uc *updateloop.Controller) {
 	err := uc.AttemptUpdate(context.Background())
 	if err != nil {
-		log.WithError(err).Error("error occurs during update resources")
+		log.WithField("error", fmt.Sprintf("%+v", err)).
+			Error("error occurs during update resources")
 	}
 }
