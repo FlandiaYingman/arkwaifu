@@ -12,10 +12,10 @@ var (
 	incrementalResRE = []*regexp.Regexp{
 		regexp.MustCompile("^avg/bg"),
 		regexp.MustCompile("^avg/imgs"),
-		regexp.MustCompile("^gamedata/story"),
 	}
 	fullResRE = []*regexp.Regexp{
 		regexp.MustCompile("^gamedata/excel"),
+		regexp.MustCompile("^gamedata/story"),
 	}
 )
 
