@@ -33,7 +33,7 @@ func NewVersionRepo(db *bun.DB) (*VersionRepo, error) {
 
 func (r *VersionRepo) GetVersion(ctx context.Context) (string, error) {
 	var resVersion ResVersion
-	exists, err := r.DB.
+	exists, err := r.DB().
 		NewSelect().
 		Model(&resVersion).
 		Exists(ctx)
@@ -41,7 +41,7 @@ func (r *VersionRepo) GetVersion(ctx context.Context) (string, error) {
 		return "", err
 	}
 	if exists {
-		err := r.DB.
+		err := r.DB().
 			NewSelect().
 			Model(&resVersion).
 			Scan(ctx)
@@ -58,7 +58,7 @@ func (r *VersionRepo) UpsertVersion(ctx context.Context, resVersion string) erro
 		ID:         true,
 		ResVersion: resVersion,
 	}
-	_, err := r.DB.
+	_, err := r.DB().
 		NewInsert().
 		Model(&resVersionEntity).
 		On("CONFLICT (id) DO UPDATE").

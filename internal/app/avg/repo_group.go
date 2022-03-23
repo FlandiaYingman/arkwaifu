@@ -44,7 +44,7 @@ func NewGroupRepo(db *bun.DB) (*GroupRepo, error) {
 
 func (r *GroupRepo) GetGroups(ctx context.Context) ([]groupModel, error) {
 	var items []groupModel
-	err := r.DB.
+	err := r.DB().
 		NewSelect().
 		Model(&items).
 		Relation("Stories", sortAvg).
@@ -56,7 +56,7 @@ func (r *GroupRepo) GetGroups(ctx context.Context) ([]groupModel, error) {
 
 func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*groupModel, error) {
 	var item groupModel
-	err := r.DB.
+	err := r.DB().
 		NewSelect().
 		Model(&item).
 		Relation("Stories", sortAvg).
@@ -67,7 +67,7 @@ func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*groupModel, e
 }
 
 func (r *GroupRepo) InsertGroups(ctx context.Context, groups []groupModel) error {
-	_, err := r.DB.
+	_, err := r.DB().
 		NewInsert().
 		Model(&groups).
 		// On("CONFLICT (id) DO UPDATE").
@@ -77,7 +77,7 @@ func (r *GroupRepo) InsertGroups(ctx context.Context, groups []groupModel) error
 }
 
 func (r *GroupRepo) Truncate(ctx context.Context) error {
-	_, err := r.DB.NewTruncateTable().
+	_, err := r.DB().NewTruncateTable().
 		Model((*groupModel)(nil)).
 		Exec(ctx)
 	return err

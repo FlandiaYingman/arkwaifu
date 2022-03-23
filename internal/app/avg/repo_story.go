@@ -63,7 +63,7 @@ func NewStoryRepo(db *bun.DB) (*StoryRepo, error) {
 
 func (r *StoryRepo) GetStories(ctx context.Context) ([]storyModel, error) {
 	var items []storyModel
-	err := r.DB.
+	err := r.DB().
 		NewSelect().
 		Model(&items).
 		Relation("Assets", sortAsset).
@@ -75,7 +75,7 @@ func (r *StoryRepo) GetStories(ctx context.Context) ([]storyModel, error) {
 
 func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*storyModel, error) {
 	var item storyModel
-	err := r.DB.
+	err := r.DB().
 		NewSelect().
 		Model(&item).
 		Relation("Assets", sortAsset).
@@ -86,7 +86,7 @@ func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*storyModel, e
 }
 
 func (r *StoryRepo) InsertStories(ctx context.Context, stories []storyModel) error {
-	_, err := r.DB.
+	_, err := r.DB().
 		NewInsert().
 		Model(&stories).
 		Exec(ctx)
@@ -100,7 +100,7 @@ func (r *StoryRepo) InsertStories(ctx context.Context, stories []storyModel) err
 			storyToAssets = append(storyToAssets, *asset)
 		}
 	}
-	_, err = r.DB.
+	_, err = r.DB().
 		NewInsert().
 		Model(&storyToAssets).
 		Exec(ctx)
@@ -124,10 +124,10 @@ func (r *StoryRepo) Truncate(ctx context.Context) (err error) {
 		return err
 	}
 	defer func() { _ = r.EndTx(err) }()
-	_, err = r.DB.NewTruncateTable().
+	_, err = r.DB().NewTruncateTable().
 		Model((*storyModel)(nil)).
 		Exec(ctx)
-	_, err = r.DB.NewTruncateTable().
+	_, err = r.DB().NewTruncateTable().
 		Model((*assetModel)(nil)).
 		Exec(ctx)
 	return err

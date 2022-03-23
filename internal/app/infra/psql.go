@@ -30,16 +30,24 @@ func ProvidePostgres(config *config.Config) (*bun.DB, error) {
 }
 
 type Repo struct {
-	// conn is for injection. e.g., Atomic.
+	// conn is the connection.
 	conn *bun.DB
-	// DB is for normal database operations.
-	DB bun.IDB
+	// txs is the transactions.
+	txs []bun.Tx
 }
 
 func NewRepo(db *bun.DB) Repo {
 	return Repo{
 		conn: db,
-		DB:   db,
+		txs:  nil,
+	}
+}
+
+func (r *Repo) DB() bun.IDB {
+	if len(r.txs) == 0 {
+		return r.conn
+	} else {
+		return r.txs[len(r.txs)-1]
 	}
 }
 
@@ -48,12 +56,12 @@ func (r *Repo) BeginTx(ctx context.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	r.DB = tx
+	r.txs = append(r.txs, tx)
 	return nil
 }
 
 func (r *Repo) Commit() error {
-	tx, ok := r.DB.(bun.Tx)
+	tx, ok := r.DB().(bun.Tx)
 	if !ok {
 		return errors.New("The transaction hasn't begun.")
 	}
@@ -61,12 +69,12 @@ func (r *Repo) Commit() error {
 	if err != nil {
 		return err
 	}
-	r.DB = r.conn
+	r.txs = r.txs[:len(r.txs)-1]
 	return nil
 }
 
 func (r *Repo) Rollback() error {
-	tx, ok := r.DB.(bun.Tx)
+	tx, ok := r.DB().(bun.Tx)
 	if !ok {
 		return errors.New("The transaction hasn't begun.")
 	}
@@ -74,7 +82,7 @@ func (r *Repo) Rollback() error {
 	if err != nil {
 		return err
 	}
-	r.DB = r.conn
+	r.txs = r.txs[:len(r.txs)-1]
 	return nil
 }
 
