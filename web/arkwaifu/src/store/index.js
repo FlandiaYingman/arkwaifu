@@ -56,11 +56,11 @@ const store = new Vuex.Store({
         })
     },
     async updateAssets ({ state }) {
-      return fetch(`${API_URL}/api/v0/assets/img`)
+      return fetch(`${API_URL}/api/v0/assets`)
         .then(resp => resp.json())
         .then(assets => {
           state.assets = assets.map(el => Object.freeze(el))
-          state.assetsMap = _.keyBy(assets, el => el.id)
+          state.assetsMap = _.keyBy(assets, el => el.asset)
           state.assetsKindMap = _.groupBy(assets, el => el.kind)
         })
     }

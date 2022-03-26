@@ -4,6 +4,7 @@
       {{ kindAbbr }}/{{ assetId }}
     </div>
     <v-card
+      :to="`/assets/${assetKind}/${assetId}`"
       :href="assetURL"
       target="_blank"
     >
@@ -30,10 +31,10 @@ export default {
   },
   computed: {
     assetThumbnailURL () {
-      return `${API_URL}/api/v0/assets/timg/${this.assetKind}/${this.assetId}`
+      return `${API_URL}/api/v0/assets/kinds/${this.assetKind}/names/${this.assetId}/variants/timg/file`
     },
     assetURL () {
-      return `${API_URL}/api/v0/assets/img/${this.assetKind}/${this.assetId}`
+      return `${API_URL}/api/v0/assets/kinds/${this.assetKind}/names/${this.assetId}/variants/img/file`
     },
     kindAbbr () {
       switch (this.assetKind) {

@@ -2,17 +2,19 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import AboutView from '@/views/AboutView.vue'
 import HomeView from '@/views/HomeView.vue'
-import StoryView from '@/views/assets/StoryView'
-import NonAvgView from '@/views/assets/NonAvgAssetsView'
-import AllAssetsView from '@/views/assets/AllAssetsView'
-import AvgMainView from '@/views/assets/AvgMainView'
-import AvgMajorView from '@/views/assets/AvgMajorView'
-import AvgMiniView from '@/views/assets/AvgMiniView'
-import AvgOthersView from '@/views/assets/AvgOthersView'
+import StoryView from '@/views/assets/StoryView.vue'
+import NonAvgView from '@/views/assets/NonAvgAssetsView.vue'
+import AllAssetsView from '@/views/assets/AllAssetsView.vue'
+import AvgMainView from '@/views/assets/AvgMainView.vue'
+import AvgMajorView from '@/views/assets/AvgMajorView.vue'
+import AvgMiniView from '@/views/assets/AvgMiniView.vue'
+import AvgOthersView from '@/views/assets/AvgOthersView.vue'
+import { RouteConfigSingleView } from 'vue-router/types/router'
+import AssetView from '@/views/assets/AssetView.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
+const routes: RouteConfigSingleView[] = [
   {
     path: '/',
     component: HomeView,
@@ -76,6 +78,11 @@ const routes = [
     meta: {
       title: 'About'
     }
+  },
+  {
+    path: '/assets/:kind/:id',
+    component: AssetView,
+    props: true
   }
 ]
 

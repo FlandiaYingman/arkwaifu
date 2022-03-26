@@ -21,7 +21,10 @@ export default {
   name: 'StoryView',
   components: { AssetsShow, GroupShow },
   props: {
-    storyID: String()
+    storyID: {
+      required: true,
+      type: String
+    }
   },
   data () {
     return {

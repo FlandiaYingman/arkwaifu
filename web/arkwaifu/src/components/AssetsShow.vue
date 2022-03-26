@@ -18,7 +18,7 @@
         lg="2"
       >
         <asset-card
-          :asset-id="asset.id"
+          :asset-id="asset.asset"
           :asset-kind="kind"
         />
       </v-col>
@@ -58,7 +58,7 @@ export default {
     assetsMap () {
       let assets = this.assets
       if (this.distinct) {
-        assets = _.uniqBy(assets, el => el.id)
+        assets = _.uniqBy(assets, el => el.asset)
       }
       return _.groupBy(assets, el => el.kind)
     }
