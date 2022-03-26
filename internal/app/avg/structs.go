@@ -20,10 +20,10 @@ type Asset struct {
 	Kind string `json:"kind"`
 }
 
-func groupsToModels(groups []Group) ([]groupModel, []storyModel) {
-	groupModels := make([]groupModel, len(groups))
-	storyModels := make([]storyModel, 0, len(groups))
-	for i, group := range groups {
+func avgToModels(avg Avg) ([]groupModel, []storyModel) {
+	groupModels := make([]groupModel, len(avg))
+	storyModels := make([]storyModel, 0, len(avg))
+	for i, group := range avg {
 		groupModels[i] = groupModel{
 			ID:      group.ID,
 			Name:    group.Name,

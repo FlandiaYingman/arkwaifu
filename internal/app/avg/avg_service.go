@@ -22,8 +22,7 @@ func (s *Service) GetVersion(ctx context.Context) (string, error) {
 	return s.versionRepo.GetVersion(ctx)
 }
 
-func (s *Service) SetAvgs(version string, groups []Group) (err error) {
-	ctx := context.Background()
+func (s *Service) SetAvg(ctx context.Context, version string, avg Avg) (err error) {
 	err = s.versionRepo.BeginTx(ctx)
 	if err != nil {
 		return err
@@ -47,7 +46,7 @@ func (s *Service) SetAvgs(version string, groups []Group) (err error) {
 		return err
 	}
 
-	groupModels, storyModels := groupsToModels(groups)
+	groupModels, storyModels := avgToModels(avg)
 
 	err = s.groupRepo.Truncate(ctx)
 	if err != nil {

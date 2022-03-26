@@ -24,7 +24,7 @@ func (c *Controller) updateDatabase(ctx context.Context, resVer string, resDir s
 		return err
 	}
 
-	err = c.avgService.SetAvgs(resVer, avg)
+	err = c.avgService.SetAvg(ctx, resVer, avg)
 	if err != nil {
 		return err
 	}
