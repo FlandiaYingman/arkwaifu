@@ -15,51 +15,6 @@ type Controller struct {
 func NewController(service *Service) Controller {
 	return Controller{service}
 }
-
-func (c *Controller) GetAssetsByV(ctx *fiber.Ctx, variantStr string) error {
-	variant, err := ParseVariant(variantStr)
-	if err != nil {
-		return err
-	}
-	assets, err := c.service.GetAssets(variant, nil)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(assets)
-}
-
-func (c *Controller) GetAssetsByVK(ctx *fiber.Ctx, variantStr string, kindStr string) error {
-	kind, err := ParseKind(kindStr)
-	if err != nil {
-		return err
-	}
-	variant, err := ParseVariant(variantStr)
-	if err != nil {
-		return err
-	}
-	assets, err := c.service.GetAssets(variant, &kind)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(assets)
-}
-
-func (c *Controller) GetAssetsByID(ctx *fiber.Ctx, variantStr string, kindStr string, id string) error {
-	kind, err := ParseKind(kindStr)
-	if err != nil {
-		return err
-	}
-	variant, err := ParseVariant(variantStr)
-	if err != nil {
-		return err
-	}
-	image, err := c.service.GetAssetByID(id, variant, kind)
-	if err != nil {
-		return err
-	}
-	return ctx.SendFile(image)
-}
-
 func RegisterController(v0 *server.V0, c Controller) {
 	router := v0.
 		Group("assets").
@@ -70,13 +25,62 @@ func RegisterController(v0 *server.V0, c Controller) {
 		Use(compress.New(compress.Config{
 			Level: compress.LevelBestSpeed,
 		}))
-	router.Get(":variant", func(ctx *fiber.Ctx) error {
-		return c.GetAssetsByV(ctx, ctx.Params("variant"))
-	})
-	router.Get(":variant/:kind", func(ctx *fiber.Ctx) error {
-		return c.GetAssetsByVK(ctx, ctx.Params("variant"), ctx.Params("kind"))
-	})
-	router.Get(":variant/:kind/:id", func(ctx *fiber.Ctx) error {
-		return c.GetAssetsByID(ctx, ctx.Params("variant"), ctx.Params("kind"), ctx.Params("id"))
-	})
+
+	router.Get("/", c.GetAssets)
+
+	router.Get("/kinds", c.GetKinds)
+	router.Get("/kinds/:kind", c.GetAssets)
+
+	router.Get("/kinds/:kind/names", c.GetNames)
+	router.Get("/kinds/:kind/names/:name", c.GetAssets)
+
+	router.Get("/kinds/:kind/names/:name/variants", c.GetVariants)
+	router.Get("/kinds/:kind/names/:name/variants/:variant", c.GetAsset)
+}
+
+func (c *Controller) GetAssets(ctx *fiber.Ctx) error {
+	kind, name, variant := parseParams(ctx)
+	assets, err := c.service.GetAssets(ctx.Context(), kind, name, variant)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(assets)
+}
+func (c *Controller) GetAsset(ctx *fiber.Ctx) error {
+	kind, name, variant := parseParams(ctx)
+	asset, err := c.service.GetAsset(ctx.Context(), kind, name, variant)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(asset)
+}
+func (c *Controller) GetKinds(ctx *fiber.Ctx) error {
+	kinds, err := c.service.GetKinds(ctx.Context())
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(kinds)
+}
+func (c *Controller) GetNames(ctx *fiber.Ctx) error {
+	kind, _, _ := parseParams(ctx)
+	names, err := c.service.GetNames(ctx.Context(), kind)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(names)
+}
+func (c *Controller) GetVariants(ctx *fiber.Ctx) error {
+	kind, name, _ := parseParams(ctx)
+	variants, err := c.service.GetVariants(ctx.Context(), kind, name)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(variants)
+}
+
+func parseParams(ctx *fiber.Ctx) (string, string, string) {
+	kind := ctx.Params("kind")
+	name := ctx.Params("name")
+	variant := ctx.Params("variant")
+	return kind, name, variant
 }

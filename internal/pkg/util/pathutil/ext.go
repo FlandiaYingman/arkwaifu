@@ -11,6 +11,10 @@ func ReplaceExt(path string, ext string) string {
 	return fmt.Sprintf("%v%v", withoutExt, ext)
 }
 
+func RemoveExt(path string) string {
+	return strings.TrimSuffix(path, filepath.Ext(path))
+}
+
 func ReplaceParent(srcPath string, srcDir string, dstDir string) (dstPath string) {
 	relativePath, err := filepath.Rel(srcDir, srcPath)
 	if err != nil {

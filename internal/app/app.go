@@ -29,6 +29,7 @@ func ProvideOptions() []fx.Option {
 			avg.RegisterController,
 		),
 		fx.Provide(
+			asset.NewRepo,
 			asset.NewService,
 			asset.NewController,
 		),

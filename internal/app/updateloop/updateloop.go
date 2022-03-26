@@ -2,6 +2,7 @@ package updateloop
 
 import (
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/app/asset"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
@@ -17,14 +18,16 @@ type Controller struct {
 	ResLocation string
 	ForceUpdate bool
 
-	avgService *avg.Service
+	avgService   *avg.Service
+	assetService *asset.Service
 }
 
-func NewController(avgService *avg.Service, conf *config.Config) *Controller {
+func NewController(avgService *avg.Service, assetService *asset.Service, conf *config.Config) *Controller {
 	return &Controller{
-		ResLocation: conf.ResourceLocation,
-		ForceUpdate: conf.ForceUpdate,
-		avgService:  avgService,
+		ResLocation:  conf.ResourceLocation,
+		ForceUpdate:  conf.ForceUpdate,
+		avgService:   avgService,
+		assetService: assetService,
 	}
 }
 
@@ -155,6 +158,11 @@ func (c *Controller) submitUpdate(ctx context.Context, resVer string) error {
 	}
 
 	err = c.updateDatabase(ctx, resVer, resDir)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	err = c.updateAssetDatabase(ctx, mainStaticDir)
 	if err != nil {
 		return errors.WithStack(err)
 	}

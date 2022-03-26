@@ -1,69 +1,124 @@
 package asset
 
 import (
-	"github.com/ahmetb/go-linq/v3"
+	"context"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"os"
+	"github.com/pkg/errors"
+	. "github.com/szmcdull/glinq/unsafe"
 	"path/filepath"
-	"strings"
 )
 
 type Service struct {
-	resourceLocation string
-	versionRepo      *avg.VersionRepo
+	staticDir   string
+	repo        *repo
+	versionRepo *avg.VersionRepo
+}
+
+func NewService(conf *config.Config, assetRepo *repo, versionRepo *avg.VersionRepo) *Service {
+	return &Service{
+		staticDir:   filepath.Join(conf.ResourceLocation, "static"),
+		repo:        assetRepo,
+		versionRepo: versionRepo,
+	}
 }
 
 type Asset struct {
-	ID   string `json:"id"`
-	Kind Kind   `json:"kind"`
+	Kind     string `json:"kind"`
+	Asset    string `json:"asset"`
+	Variant  string `json:"variant"`
+	FileName string `json:"fileName"`
 }
 
-func NewService(conf *config.Config, repo *avg.VersionRepo) *Service {
-	return &Service{
-		resourceLocation: conf.ResourceLocation,
-		versionRepo:      repo,
+func (s *Service) SetAssets(ctx context.Context, assets []Asset) error {
+	models := ToSlice(Select(FromSlice(assets), toModel))
+
+	err := s.repo.BeginTx(ctx)
+	if err != nil {
+		return err
 	}
+	defer func() { _ = s.repo.EndTx(err) }()
+
+	err = s.repo.Truncate(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to truncate asset table")
+	}
+
+	err = s.repo.Insert(ctx, models...)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert assets")
+	}
+
+	return nil
 }
-
-func (s *Service) GetAssets(variant Variant, kind *Kind) ([]Asset, error) {
-	var assets []Asset
-	if kind == nil {
-		for _, k := range Kinds {
-			kAssets, err := s.GetAssets(variant, &k)
-			if err != nil {
-				return nil, err
-			}
-
-			assets = append(assets, kAssets...)
-		}
-		return assets, nil
+func (s *Service) GetAssets(ctx context.Context, kind, name, variant string) ([]Asset, error) {
+	kindPtr := &kind
+	namePtr := &name
+	variantPtr := &variant
+	if *kindPtr == "" {
+		kindPtr = nil
 	}
-	dirPath := filepath.Join(s.resourceLocation, "static", string(variant), string(*kind))
-	dir, err := os.ReadDir(dirPath)
+	if *namePtr == "" {
+		namePtr = nil
+	}
+	if *variantPtr == "" {
+		variantPtr = nil
+	}
+
+	models, err := s.repo.SelectAll(ctx, kindPtr, namePtr, variantPtr)
 	if err != nil {
 		return nil, err
 	}
 
-	var result []Asset
-	linq.From(dir).Select(func(i interface{}) interface{} {
-		name := i.(os.DirEntry).Name()
-		name = strings.TrimSuffix(name, filepath.Ext(name))
-		return Asset{
-			ID:   strings.ToLower(name),
-			Kind: *kind,
-		}
-	}).ToSlice(&result)
-	return result, nil
+	return ToSlice(Select(FromSlice(models), fromModel)), nil
+}
+func (s *Service) GetAsset(ctx context.Context, kind, name, variant string) (Asset, error) {
+	kindPtr := &kind
+	namePtr := &name
+	variantPtr := &variant
+	if *kindPtr == "" {
+		kindPtr = nil
+	}
+	if *namePtr == "" {
+		namePtr = nil
+	}
+	if *variantPtr == "" {
+		variantPtr = nil
+	}
+
+	m, err := s.repo.SelectOne(ctx, kindPtr, namePtr, variantPtr)
+	if err != nil {
+		return Asset{}, err
+	}
+
+	return fromModel(m), nil
+}
+func (s *Service) GetKinds(ctx context.Context) ([]string, error) {
+	kinds, err := s.repo.SelectUniqueKinds(ctx, nil, nil, nil)
+	return kinds, err
+}
+func (s *Service) GetNames(ctx context.Context, kind string) ([]string, error) {
+	names, err := s.repo.SelectUniqueNames(ctx, &kind, nil, nil)
+	return names, err
+}
+func (s *Service) GetVariants(ctx context.Context, kind, name string) ([]string, error) {
+	variants, err := s.repo.SelectUniqueVariants(ctx, &kind, &name, nil)
+	return variants, err
 }
 
-func (s *Service) GetAssetByID(id string, variant Variant, kind Kind) (string, error) {
-	name := id + VariantExts[variant]
-	path := filepath.Join(s.resourceLocation, "static", string(variant), string(kind), name)
-
-	_, err := os.Stat(path)
-	if err != nil {
-		return "", err
+func toModel(asset Asset) model {
+	return model{
+		Kind:     asset.Kind,
+		Name:     asset.Asset,
+		Variant:  asset.Variant,
+		FileName: asset.FileName,
 	}
-	return path, nil
+}
+func fromModel(model model) Asset {
+	return Asset{
+		Kind:     model.Kind,
+		Asset:    model.Name,
+		Variant:  model.Variant,
+		FileName: model.FileName,
+	}
 }

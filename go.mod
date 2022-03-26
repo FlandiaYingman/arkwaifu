@@ -10,14 +10,16 @@ require (
 	github.com/gofiber/fiber/v2 v2.24.0
 	github.com/mholt/archiver/v4 v4.0.0-alpha.5
 	github.com/pkg/errors v0.9.1
+	github.com/samber/lo v1.11.0
 	github.com/sirupsen/logrus v1.8.1
+	github.com/szmcdull/glinq v0.0.0-20220323171239-d6a0a13fb71d
 	github.com/uptrace/bun v1.1.1
 	github.com/uptrace/bun/dialect/pgdialect v1.1.1
 	github.com/uptrace/bun/driver/pgdriver v1.1.1
 	go.mongodb.org/mongo-driver v1.8.4
 	go.uber.org/fx v1.17.0
 	golang.org/x/image v0.0.0-20220302094943-723b81ca9867
-	golang.org/x/mod v0.5.1
+	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
 
@@ -45,6 +47,7 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20220307211146-efcb8507fb70 // indirect
+	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	mellium.im/sasl v0.2.1 // indirect
