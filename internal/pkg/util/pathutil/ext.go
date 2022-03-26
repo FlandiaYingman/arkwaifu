@@ -15,6 +15,10 @@ func RemoveExt(path string) string {
 	return strings.TrimSuffix(path, filepath.Ext(path))
 }
 
+func RemoveExtAll(path string) string {
+	return strings.Split(path, ".")[0]
+}
+
 func ReplaceParent(srcPath string, srcDir string, dstDir string) (dstPath string) {
 	relativePath, err := filepath.Rel(srcDir, srcPath)
 	if err != nil {

@@ -93,7 +93,7 @@ func scanKindDir(variants *[]asset.Asset, variantDir, kindDir string) error {
 			continue
 		}
 		assetFileName := assetFile.Name()
-		assetName := pathutil.RemoveExt(assetFileName)
+		assetName := pathutil.RemoveExtAll(assetFileName)
 		*variants = append(*variants, asset.Asset{
 			Kind:     kindName,
 			Asset:    assetName,
