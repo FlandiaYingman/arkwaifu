@@ -105,6 +105,15 @@ func (s *Service) GetVariants(ctx context.Context, kind, name string) ([]string,
 	variants, err := s.repo.SelectUniqueVariants(ctx, &kind, &name, nil)
 	return variants, err
 }
+func (s *Service) GetAssetFilePath(ctx context.Context, kind, name, variant string) (string, error) {
+	asset, err := s.GetAsset(ctx, kind, name, variant)
+	if err != nil {
+		return "", err
+	}
+
+	assetFilePath := filepath.Join(s.staticDir, asset.Variant, asset.Kind, asset.FileName)
+	return assetFilePath, nil
+}
 
 func toModel(asset Asset) model {
 	return model{

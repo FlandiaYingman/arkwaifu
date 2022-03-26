@@ -36,6 +36,8 @@ func RegisterController(v0 *server.V0, c Controller) {
 
 	router.Get("/kinds/:kind/names/:name/variants", c.GetVariants)
 	router.Get("/kinds/:kind/names/:name/variants/:variant", c.GetAsset)
+
+	router.Get("/kinds/:kind/names/:name/variants/:variant/file", c.GetAssetFile)
 }
 
 func (c *Controller) GetAssets(ctx *fiber.Ctx) error {
@@ -76,6 +78,14 @@ func (c *Controller) GetVariants(ctx *fiber.Ctx) error {
 		return err
 	}
 	return ctx.JSON(variants)
+}
+func (c *Controller) GetAssetFile(ctx *fiber.Ctx) error {
+	kind, name, variant := parseParams(ctx)
+	assetFilePath, err := c.service.GetAssetFilePath(ctx.Context(), kind, name, variant)
+	if err != nil {
+		return err
+	}
+	return ctx.SendFile(assetFilePath)
 }
 
 func parseParams(ctx *fiber.Ctx) (string, string, string) {
