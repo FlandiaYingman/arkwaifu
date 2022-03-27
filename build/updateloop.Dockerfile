@@ -9,7 +9,7 @@ WORKDIR /app
 COPY ./go.mod ./go.sum ./
 RUN go mod download
 
-RUN apt-get update && apt-get install gcc libc-dev
+RUN apt-get update && apt-get install -y gcc libc-dev
 COPY ./cmd  ./cmd
 COPY ./internal ./internal
 RUN go build -o updateloop github.com/flandiayingman/arkwaifu/cmd/updateloop
