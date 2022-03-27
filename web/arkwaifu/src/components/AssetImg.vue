@@ -6,7 +6,7 @@
       alt=""
     >
     <p class="text-caption">
-      {{ kind }}/{{ name }} ({{ variant }}), {{ imgWidth }}×{{ imgHeight }} {{ imgFormat }}
+      {{ kind }}/{{ name }} ({{ variant }}), {{ imgWidth }}×{{ imgHeight }} {{ fileName }}
     </p>
   </div>
 </template>
@@ -33,9 +33,9 @@ export default {
   },
   data: function () {
     return {
-      imgFormat: '',
       imgWidth: 0,
-      imgHeight: 0
+      imgHeight: 0,
+      fileName: ''
     }
   },
   computed: {
@@ -43,15 +43,17 @@ export default {
       return `${Api}/api/v0/assets/kinds/${this.kind}/names/${this.name}/variants/${this.variant}/file`
     }
   },
+  created () {
+    fetch(`${Api}/api/v0/assets/kinds/${this.kind}/names/${this.name}/variants/${this.variant}`)
+      .then(res => res.json())
+      .then(asset => (this.fileName = asset.fileName))
+  },
   mounted () {
     this.$refs.img.onload = () => {
       const img = this.$refs.img
       this.imgWidth = img.naturalWidth
       this.imgHeight = img.naturalHeight
     }
-    fetch(this.url, { method: 'HEAD' })
-      .then(resp => resp.headers.get('Content-Type'))
-      .then(type => (this.imgFormat = type))
   }
 }
 
