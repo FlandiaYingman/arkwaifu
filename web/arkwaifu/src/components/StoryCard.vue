@@ -6,8 +6,8 @@
     <v-card-title>{{ story.name }}</v-card-title>
     <v-card-subtitle>
       {{ story.code ? `${story.code} ` : '' }}{{ story.tag }}
-      <span>
-        <br v-show="!$vuetify.breakpoint.mobile">
+      <span v-show="!$vuetify.breakpoint.mobile">
+        <br>
         {{ story.id }}
       </span>
     </v-card-subtitle>
