@@ -8,14 +8,16 @@
       :name="id"
     />
     <p class="text-h4">
-      Variants
+      {{ $t('variants') }}
     </p>
     <v-expansion-panels>
       <v-expansion-panel
         v-for="variant in variants"
         :key="variant"
       >
-        <v-expansion-panel-header>{{ variant }}</v-expansion-panel-header>
+        <v-expansion-panel-header>
+          {{ $t(`variant.${variant}`) }}
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-lazy>
             <AssetImg
@@ -56,3 +58,24 @@ export default {
   }
 }
 </script>
+
+<i18n>{
+  "en": {
+    "variants": "Variants",
+    "variant": {
+      "img": "Raw Image",
+      "timg": "Thumbnail Image",
+      "real-esrgan": "Super-Resolution: Real-ESRGAN",
+      "real-cugan": "Super-Resolution: Real-CUGAN"
+    }
+  },
+  "zh":    {
+  "variants": "变体",
+  "variant": {
+    "img": "原始图",
+    "timg": "缩略图",
+    "real-esrgan": "超分辨率: Real-ESRGAN",
+    "real-cugan": "超分辨率: Real-CUGAN"
+  }
+}
+}</i18n>
