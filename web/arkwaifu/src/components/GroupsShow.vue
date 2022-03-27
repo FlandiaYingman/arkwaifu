@@ -1,10 +1,11 @@
 <template>
   <div>
-    <group-show
+    <v-lazy
       v-for="(group, i) in groups"
       :key="i"
-      :group-id="group.id"
-    />
+    >
+      <group-show :group-id="group.id" />
+    </v-lazy>
     <fab-button
       v-model="descending"
       icon-on="mdi-sort-calendar-descending"

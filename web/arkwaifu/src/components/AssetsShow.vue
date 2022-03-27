@@ -17,10 +17,12 @@
         sm="3"
         lg="2"
       >
-        <asset-card
-          :asset-id="asset.name"
-          :asset-kind="kind"
-        />
+        <v-lazy>
+          <asset-card
+            :asset-id="asset.name"
+            :asset-kind="kind"
+          />
+        </v-lazy>
       </v-col>
     </v-row>
     <fab-button
