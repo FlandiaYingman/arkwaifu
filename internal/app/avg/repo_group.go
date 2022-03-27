@@ -12,7 +12,7 @@ type GroupRepo struct {
 
 // groupModel is a group of story. e.g., a 活动 such as "将进酒" or a 主线 such as "怒号光明".
 type groupModel struct {
-	bun.BaseModel `bun:"table:groups,alias:g"`
+	bun.BaseModel `bun:"table:avg_groups"`
 
 	// ID is the unique id of the AvgGroup.
 	// e.g.: "1stact" (骑兵与猎人), "act15side" (将进酒).
@@ -61,7 +61,7 @@ func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*groupModel, e
 		Model(&item).
 		Relation("Stories", sortAvg).
 		Relation("Stories.Assets", sortAsset).
-		Where("g.id = ?", id).
+		Where("avg_groups.id = ?", id).
 		Scan(ctx)
 	return &item, err
 }

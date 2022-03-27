@@ -14,7 +14,7 @@ type ResVersion struct {
 	bun.BaseModel `bun:"table:version"`
 
 	// ID can only be true, because this table should only have one row.
-	ID         bool   `bun:",pk"`
+	ID         *bool  `bun:",pk,default:true"`
 	ResVersion string `bun:""`
 }
 
@@ -22,6 +22,7 @@ func NewVersionRepo(db *bun.DB) (*VersionRepo, error) {
 	_, err := db.NewCreateTable().
 		Model((*ResVersion)(nil)).
 		IfNotExists().
+		ColumnExpr("CHECK (id = ?)", true).
 		Exec(context.Background())
 	if err != nil {
 		return nil, err
@@ -55,7 +56,6 @@ func (r *VersionRepo) GetVersion(ctx context.Context) (string, error) {
 
 func (r *VersionRepo) UpsertVersion(ctx context.Context, resVersion string) error {
 	resVersionEntity := ResVersion{
-		ID:         true,
 		ResVersion: resVersion,
 	}
 	_, err := r.DB().

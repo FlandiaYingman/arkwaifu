@@ -12,7 +12,7 @@ type StoryRepo struct {
 
 // storyModel is a part of story of an AVG. e.g., "8-1 行动前" or "IW-9 行动后" (IW stands for activity "将进酒").
 type storyModel struct {
-	bun.BaseModel `bun:"table:stories,alias:s"`
+	bun.BaseModel `bun:"table:avg_stories"`
 
 	// ID is the unique ID of the story.
 	// e.g., "1stact_level_a001_01_beg".
@@ -80,7 +80,7 @@ func (r *StoryRepo) GetStoryByID(ctx context.Context, id string) (*storyModel, e
 		Model(&item).
 		Relation("Assets", sortAsset).
 		Relation("Group", sortAvg).
-		Where("s.id = ?", id).
+		Where("avg_stories.id = ?", id).
 		Scan(ctx)
 	return &item, err
 }
@@ -111,7 +111,7 @@ func (r *StoryRepo) InsertStories(ctx context.Context, stories []storyModel) err
 }
 
 type assetModel struct {
-	bun.BaseModel `bun:"table:assets"`
+	bun.BaseModel `bun:"table:avg_assets"`
 	PK            int64  `bun:"pk,pk,autoincrement"`
 	StoryID       string `bun:"story_id"`
 	Name          string `bun:"name"`
