@@ -114,7 +114,7 @@ type assetModel struct {
 	bun.BaseModel `bun:"table:assets"`
 	PK            int64  `bun:"pk,pk,autoincrement"`
 	StoryID       string `bun:"story_id"`
-	ID            string `bun:"id"`
+	Name          string `bun:"name"`
 	Kind          string `bun:"kind"`
 }
 

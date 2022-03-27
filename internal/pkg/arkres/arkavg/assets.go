@@ -10,7 +10,7 @@ import (
 )
 
 type Asset struct {
-	ID   string
+	Name string
 	Kind Kind
 }
 type Kind string
@@ -45,10 +45,10 @@ func GetAssetsKind(resDir string, prefix string, kind Kind) ([]Asset, error) {
 
 	assets := make([]Asset, len(assetsDir))
 	for i, it := range assetsDir {
-		id := filepath.Base(it.Name())
-		id = strings.TrimSuffix(id, filepath.Ext(id))
+		name := filepath.Base(it.Name())
+		name = strings.TrimSuffix(name, filepath.Ext(name))
 		assets[i] = Asset{
-			ID:   id,
+			Name: name,
 			Kind: kind,
 		}
 	}
@@ -56,6 +56,6 @@ func GetAssetsKind(resDir string, prefix string, kind Kind) ([]Asset, error) {
 }
 
 func (a *Asset) Open(resDir string, prefix string) (*os.File, error) {
-	assetPath := filepath.Join(resDir, prefix, "avg", string(a.Kind), pathutil.ReplaceExt(a.ID, ".png"))
+	assetPath := filepath.Join(resDir, prefix, "avg", string(a.Kind), pathutil.ReplaceExt(a.Name, ".png"))
 	return os.Open(assetPath)
 }

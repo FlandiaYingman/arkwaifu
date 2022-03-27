@@ -78,7 +78,7 @@ func procAsset(asset arkavg.Asset, resDir string, staticDir string) error {
 }
 
 func encodeImg(asset arkavg.Asset, img image.Image, imgDir string) error {
-	dst := filepath.Join(imgDir, string(asset.Kind), asset.ID+".webp")
+	dst := filepath.Join(imgDir, string(asset.Kind), asset.Name+".webp")
 	err := os.MkdirAll(filepath.Dir(dst), 0755)
 	if err != nil {
 		return errors.WithStack(err)
@@ -96,7 +96,7 @@ func encodeImg(asset arkavg.Asset, img image.Image, imgDir string) error {
 }
 
 func encodeTimg(asset arkavg.Asset, img image.Image, imgDir string) error {
-	dst := filepath.Join(imgDir, string(asset.Kind), asset.ID+".webp")
+	dst := filepath.Join(imgDir, string(asset.Kind), asset.Name+".webp")
 	err := os.MkdirAll(filepath.Dir(dst), 0755)
 	if err != nil {
 		return errors.WithStack(err)

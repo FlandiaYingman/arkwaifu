@@ -16,7 +16,7 @@ type Story struct {
 	Assets  []Asset `json:"assets"`
 }
 type Asset struct {
-	ID   string `json:"id"`
+	Name string `json:"name"`
 	Kind string `json:"kind"`
 }
 
@@ -40,7 +40,7 @@ func storiesToModels(group Group, stories []Story) []storyModel {
 		assets := make([]*assetModel, len(story.Assets))
 		for i, asset := range story.Assets {
 			assets[i] = &assetModel{
-				ID:      asset.ID,
+				Name:    asset.Name,
 				Kind:    asset.Kind,
 				StoryID: story.ID,
 			}
@@ -90,7 +90,7 @@ func storyFromModel(model storyModel) Story {
 	assets := make([]Asset, len(model.Assets))
 	for i, asset := range model.Assets {
 		assets[i] = Asset{
-			ID:   asset.ID,
+			Name: asset.Name,
 			Kind: asset.Kind,
 		}
 	}

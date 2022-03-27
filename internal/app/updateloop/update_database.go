@@ -96,7 +96,7 @@ func scanKindDir(variants *[]asset.Asset, variantDir, kindDir string) error {
 		assetName := pathutil.RemoveExtAll(assetFileName)
 		*variants = append(*variants, asset.Asset{
 			Kind:     kindName,
-			Asset:    assetName,
+			Name:     assetName,
 			Variant:  variantName,
 			FileName: assetFileName,
 		})
@@ -154,7 +154,7 @@ func storyFromRaw(s *arkavg.Story, resDir string) (avg.Story, error) {
 }
 func assetFromRaw(a *arkavg.Asset) avg.Asset {
 	return avg.Asset{
-		ID:   strings.ToLower(a.ID),
+		Name: strings.ToLower(a.Name),
 		Kind: string(a.Kind),
 	}
 }

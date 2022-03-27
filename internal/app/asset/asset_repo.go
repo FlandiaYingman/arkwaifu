@@ -7,14 +7,6 @@ import (
 	"github.com/uptrace/bun"
 )
 
-type model struct {
-	bun.BaseModel `bun:"table:asset_assets"`
-	Kind          string `bun:"kind,pk"`
-	Name          string `bun:"name,pk"`
-	Variant       string `bun:"variant,pk"`
-	FileName      string `bun:"fileName"`
-}
-
 type repo struct {
 	infra.Repo
 }
@@ -29,6 +21,14 @@ func NewRepo(db *bun.DB) (*repo, error) {
 	}
 	r := repo{Repo: infra.NewRepo(db)}
 	return &r, nil
+}
+
+type model struct {
+	bun.BaseModel `bun:"table:asset_assets"`
+	Kind          string `bun:"kind,pk"`
+	Name          string `bun:"name,pk"`
+	Variant       string `bun:"variant,pk"`
+	FileName      string `bun:"fileName"`
 }
 
 func (r *repo) Truncate(ctx context.Context) error {

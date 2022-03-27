@@ -25,7 +25,7 @@ func NewService(conf *config.Config, assetRepo *repo, versionRepo *avg.VersionRe
 
 type Asset struct {
 	Kind     string `json:"kind"`
-	Asset    string `json:"asset"`
+	Name     string `json:"name"`
 	Variant  string `json:"variant"`
 	FileName string `json:"fileName"`
 }
@@ -118,7 +118,7 @@ func (s *Service) GetAssetFilePath(ctx context.Context, kind, name, variant stri
 func toModel(asset Asset) model {
 	return model{
 		Kind:     asset.Kind,
-		Name:     asset.Asset,
+		Name:     asset.Name,
 		Variant:  asset.Variant,
 		FileName: asset.FileName,
 	}
@@ -126,7 +126,7 @@ func toModel(asset Asset) model {
 func fromModel(model model) Asset {
 	return Asset{
 		Kind:     model.Kind,
-		Asset:    model.Name,
+		Name:     model.Name,
 		Variant:  model.Variant,
 		FileName: model.FileName,
 	}

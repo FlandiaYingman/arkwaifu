@@ -99,7 +99,7 @@ func findAssetsFromTxt(txt string, kind Kind, regexp *regexp.Regexp) []Asset {
 	matches := regexp.FindAllStringSubmatch(txt, -1)
 	for _, match := range matches {
 		assets = append(assets, Asset{
-			ID:   match[1],
+			Name: match[1],
 			Kind: kind,
 		})
 	}
