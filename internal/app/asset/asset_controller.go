@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/etag"
 	"strings"
 	"time"
 )
@@ -20,6 +21,7 @@ func RegisterController(v0 *server.V0, c Controller) {
 	router := v0.
 		Group("assets").
 		Use(newCompress()).
+		Use(newETag()).
 		Use(newCache())
 
 	router.Get("/", c.GetAssets)
@@ -41,6 +43,14 @@ func newCompress() fiber.Handler {
 			return strings.HasSuffix(ctx.Path(), "/file")
 		},
 		Level: compress.LevelBestSpeed,
+	})
+}
+func newETag() fiber.Handler {
+	return etag.New(etag.Config{
+		Next: func(ctx *fiber.Ctx) bool {
+			// skip ETag if it isn't a file request
+			return !strings.HasSuffix(ctx.Path(), "/file")
+		},
 	})
 }
 func newCache() fiber.Handler {
