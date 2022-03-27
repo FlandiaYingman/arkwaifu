@@ -32,7 +32,7 @@ const store = new Vuex.Store({
       dispatch('updateAssets')
     },
     async updateGroups ({ state }) {
-      return fetch(`${API_URL}/api/v0/groups`)
+      return fetch(`${API_URL}/api/v0/avg/groups`)
         .then((resp) => resp.json())
         .then((groups) => {
           state.groups = groups.map(el => Object.freeze(el))
@@ -41,7 +41,7 @@ const store = new Vuex.Store({
         })
     },
     async updateStories ({ state }) {
-      return fetch(`${API_URL}/api/v0/stories`)
+      return fetch(`${API_URL}/api/v0/avg/stories`)
         .then((resp) => resp.json())
         .then((stories) => {
           state.stories = stories.map(el => Object.freeze(el))
