@@ -52,7 +52,7 @@ const store = new Vuex.Store({
               storyId: story.id
             }))
           })
-          state.storiesAssetsMap = _.keyBy(state.storiesAssets, el => el.asset.id)
+          state.storiesAssetsMap = _.keyBy(state.storiesAssets, el => el.asset.name)
         })
     },
     async updateAssets ({ state }) {

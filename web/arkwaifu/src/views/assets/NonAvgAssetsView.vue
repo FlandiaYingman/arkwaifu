@@ -13,7 +13,7 @@ export default {
     nonAvgAssets () {
       const allAssets = this.$store.state.assets
       const avgAssets = this.$store.state.storiesAssetsMap
-      const nonAvgAssets = allAssets.filter(allEl => !(allEl.id in avgAssets))
+      const nonAvgAssets = allAssets.filter(allEl => !(allEl.name in avgAssets))
       return nonAvgAssets
     }
   }
