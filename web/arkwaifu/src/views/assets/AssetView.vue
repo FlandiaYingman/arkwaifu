@@ -8,7 +8,10 @@
       :name="id"
     />
     <p class="text-h4">
-      {{ $t('variants') }}
+      {{ $t('variants.title') }}
+    </p>
+    <p class="text-body-1">
+      {{ $t('variants.desc') }}
     </p>
     <v-expansion-panels>
       <v-expansion-panel
@@ -61,7 +64,10 @@ export default {
 
 <i18n>{
   "en": {
-    "variants": "Variants",
+    "variants": {
+      "title": "Variants",
+      "desc": "These are the variants of the asset. Note that some files are huge (~10MB) and may take a while to load."
+    },
     "variant": {
       "img": "Raw Image",
       "timg": "Thumbnail Image",
@@ -69,9 +75,12 @@ export default {
       "real-cugan": "Super-Resolution: Real-CUGAN"
     }
   },
-  "zh":    {
-  "variants": "变体",
-  "variant": {
+  "zh": {
+    "variants": {
+      "title": "变体",
+      "desc": "这些是资源的变体。注意，一些文件是很大的（~10MB），可能需要一段时间来加载。"
+    },
+    "variant": {
     "img": "原始图",
     "timg": "缩略图",
     "real-esrgan": "超分辨率: Real-ESRGAN",
