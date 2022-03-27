@@ -40,6 +40,7 @@ func (c *Controller) AttemptUpdate(ctx context.Context) error {
 			return err
 		}
 		c.ForceUpdate = false
+		log.Info("force update flag was set, reset service to force update; force update flag reset")
 	}
 
 	localResVer, err := c.avgService.GetVersion(ctx)
