@@ -1527,10 +1527,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mdi/font@npm:6.5.95":
-  version: 6.5.95
-  resolution: "@mdi/font@npm:6.5.95"
-  checksum: 6333a2e15462b55e4a981c8f1a249254090a9c0e242f6331f75403897241bbc94d9470a660bf0c596471e47a68e07cd630e0984cb576e1e12a4d6e8bfc02198c
+"@mdi/js@npm:^6.6.95":
+  version: 6.6.95
+  resolution: "@mdi/js@npm:6.6.95"
+  checksum: 4cf8c48156f0e9ff67e4394cd428158bd164b1a6b7ca1aa70fc6a6aee91cfede9eba56720eb7d13fa57315ac636e9519a62dedd3cd2a9708aa11f2e3624ddbff
   languageName: node
   linkType: hard
 
@@ -2914,7 +2914,7 @@ __metadata:
     "@babel/core": ^7.17.8
     "@babel/eslint-parser": ^7.17.0
     "@intlify/vue-i18n-loader": ^1.1.0
-    "@mdi/font": 6.5.95
+    "@mdi/js": ^6.6.95
     "@types/lodash": ^4.14.180
     "@typescript-eslint/eslint-plugin": ^5.16.0
     "@typescript-eslint/parser": ^5.16.0

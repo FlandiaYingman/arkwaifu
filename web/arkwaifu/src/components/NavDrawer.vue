@@ -23,7 +23,7 @@
         to="/"
       >
         <v-list-item-icon>
-          <v-icon>mdi-home</v-icon>
+          <v-icon>{{ mdiHome }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
@@ -34,7 +34,7 @@
 
       <v-list-group
         link
-        prepend-icon="mdi-television"
+        :prepend-icon="mdiTelevision"
       >
         <template #activator>
           <v-list-item-content>
@@ -48,7 +48,7 @@
         </template>
         <v-list-item to="/avgs/main_themes">
           <v-list-item-icon>
-            <v-icon>mdi-cube</v-icon>
+            <v-icon>{{ mdiCube }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
@@ -61,7 +61,7 @@
         </v-list-item>
         <v-list-item to="/avgs/major_events">
           <v-list-item-icon>
-            <v-icon>mdi-music-clef-treble</v-icon>
+            <v-icon>{{ mdiMusicClefTreble }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
@@ -74,7 +74,7 @@
         </v-list-item>
         <v-list-item to="/avgs/vignettes">
           <v-list-item-icon>
-            <v-icon>mdi-music-clef-bass</v-icon>
+            <v-icon>{{ mdiMusicClefBass }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
@@ -87,7 +87,7 @@
         </v-list-item>
         <v-list-item to="/avgs/others">
           <v-list-item-icon>
-            <v-icon>mdi-music-rest-quarter</v-icon>
+            <v-icon>{{ mdiMusicRestQuarter }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
@@ -105,7 +105,7 @@
         to="/non_avgs"
       >
         <v-list-item-icon>
-          <v-icon>mdi-television-off</v-icon>
+          <v-icon>{{ mdiTelevisionOff }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
@@ -122,7 +122,7 @@
         to="/all"
       >
         <v-list-item-icon>
-          <v-icon>mdi-all-inclusive</v-icon>
+          <v-icon>{{ mdiAllInclusive }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
@@ -139,7 +139,7 @@
         to="/about"
       >
         <v-list-item-icon>
-          <v-icon>mdi-information</v-icon>
+          <v-icon>{{ mdiInformation }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
           <v-list-item-title>
@@ -152,11 +152,34 @@
 </template>
 
 <script>
+import {
+  mdiAllInclusive,
+  mdiCube,
+  mdiHome,
+  mdiInformation,
+  mdiMusicClefBass,
+  mdiMusicClefTreble,
+  mdiMusicRestQuarter,
+  mdiTelevision,
+  mdiTelevisionOff
+} from '@mdi/js'
+
 export default {
   name: 'NavigationDrawer',
   props: {
     value: Boolean
-  }
+  },
+  data: () => ({
+    mdiHome: mdiHome,
+    mdiCube: mdiCube,
+    mdiMusicClefTreble: mdiMusicClefTreble,
+    mdiMusicClefBass: mdiMusicClefBass,
+    mdiMusicRestQuarter: mdiMusicRestQuarter,
+    mdiTelevision: mdiTelevision,
+    mdiTelevisionOff: mdiTelevisionOff,
+    mdiAllInclusive: mdiAllInclusive,
+    mdiInformation: mdiInformation
+  })
 }
 </script>
 

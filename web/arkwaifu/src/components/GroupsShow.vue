@@ -8,8 +8,8 @@
     </v-lazy>
     <fab-button
       v-model="descending"
-      icon-on="mdi-sort-calendar-descending"
-      icon-off="mdi-sort-calendar-ascending"
+      :icon-on="mdiSortCalendarDescending"
+      :icon-off="mdiSortCalendarAscending"
       caption-on="Sort: Descending"
       caption-off="Sort: Ascending"
     />
@@ -20,6 +20,7 @@
 import GroupShow from '@/components/GroupShow'
 import FabButton from '@/components/FabButton'
 import _ from 'lodash'
+import { mdiSortCalendarAscending, mdiSortCalendarDescending } from '@mdi/js'
 
 export default {
   name: 'GroupsShow',
@@ -29,7 +30,9 @@ export default {
   },
   data () {
     return {
-      descending: true
+      descending: true,
+      mdiSortCalendarDescending: mdiSortCalendarDescending,
+      mdiSortCalendarAscending: mdiSortCalendarAscending
     }
   },
   computed: {

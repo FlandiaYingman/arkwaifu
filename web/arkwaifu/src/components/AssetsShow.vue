@@ -27,8 +27,8 @@
     </v-row>
     <fab-button
       v-model="distinct"
-      icon-on="mdi-fingerprint"
-      icon-off="mdi-fingerprint-off"
+      :icon-on="mdiFingerprint"
+      :icon-off="mdiFingerprintOff"
       :caption-on="$t('distinctOn')"
       :caption-off="$t('distinctOff')"
     />
@@ -38,6 +38,9 @@
 import AssetCard from '@/components/AssetCard'
 import _ from 'lodash'
 import FabButton from '@/components/FabButton'
+import {
+  mdiFingerprint, mdiFingerprintOff
+} from '@mdi/js'
 
 export default {
   name: 'AssetsShow',
@@ -50,7 +53,9 @@ export default {
   },
   data () {
     return {
-      distinct: true
+      distinct: true,
+      mdiFingerprint: mdiFingerprint,
+      mdiFingerprintOff: mdiFingerprintOff
     }
   },
   computed: {
