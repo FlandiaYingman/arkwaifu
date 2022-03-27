@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"strings"
 	"time"
 )
 
@@ -18,13 +19,8 @@ func NewController(service *Service) Controller {
 func RegisterController(v0 *server.V0, c Controller) {
 	router := v0.
 		Group("assets").
-		Use(cache.New(cache.Config{
-			Expiration:   24 * time.Hour,
-			CacheControl: true,
-		})).
-		Use(compress.New(compress.Config{
-			Level: compress.LevelBestSpeed,
-		}))
+		Use(newCompress()).
+		Use(newCache())
 
 	router.Get("/", c.GetAssets)
 
@@ -38,6 +34,35 @@ func RegisterController(v0 *server.V0, c Controller) {
 	router.Get("/kinds/:kind/names/:name/variants/:variant", c.GetAsset)
 
 	router.Get("/kinds/:kind/names/:name/variants/:variant/file", c.GetAssetFile)
+}
+func newCompress() fiber.Handler {
+	return compress.New(compress.Config{
+		Next: func(ctx *fiber.Ctx) bool {
+			return strings.HasSuffix(ctx.Path(), "/file")
+		},
+		Level: compress.LevelBestSpeed,
+	})
+}
+func newCache() fiber.Handler {
+	return cache.New(cache.Config{
+		CacheControl: true,
+		Next: func(ctx *fiber.Ctx) bool {
+			switch {
+			case strings.HasSuffix(ctx.Path(), "/file"):
+				return ctx.Response().StatusCode() != fiber.StatusOK
+			default:
+				return false
+			}
+		},
+		ExpirationGenerator: func(ctx *fiber.Ctx, config *cache.Config) time.Duration {
+			switch {
+			case strings.HasSuffix(ctx.Path(), "/file"):
+				return 24 * time.Hour
+			default:
+				return 1 * time.Minute
+			}
+		},
+	})
 }
 
 func (c *Controller) GetAssets(ctx *fiber.Ctx) error {
