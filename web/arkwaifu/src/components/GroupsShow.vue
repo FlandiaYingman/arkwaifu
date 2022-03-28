@@ -10,8 +10,8 @@
       v-model="descending"
       :icon-on="mdiSortCalendarDescending"
       :icon-off="mdiSortCalendarAscending"
-      caption-on="Sort: Descending"
-      caption-off="Sort: Ascending"
+      :caption-on="$t('sortDesc')"
+      :caption-off="$t('sortAsc')"
     />
   </div>
 </template>
@@ -49,3 +49,14 @@ export default {
   }
 }
 </script>
+
+<i18n>{
+  "en": {
+    "sortAsc": "Sort: Ascending",
+    "sortDesc": "Sort: Descending"
+  },
+  "zh": {
+    "sortAsc": "排序: 升序",
+    "sortDesc": "排序: 降序"
+  }
+}</i18n>
