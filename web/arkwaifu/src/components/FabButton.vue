@@ -7,7 +7,7 @@
         fixed
         bottom
         right
-        color="primary"
+        color="secondary"
         v-bind="attrs"
         @click="dataValue = !dataValue"
         v-on="on"

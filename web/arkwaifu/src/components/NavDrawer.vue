@@ -1,152 +1,169 @@
 <template>
   <v-navigation-drawer
-    width="288"
+    width="320px"
     permanant
     app
     :value="value"
     @input="$emit('input', $event )"
   >
-    <v-img
-      src="/logo_phantom.png"
-      width="128"
-      height="128"
-      class="mx-4"
-    />
+    <v-card
+      v-ripple
+      class="ma-3 pa-2"
+      elevation="0"
+      rounded="xl"
+      color="accent lighten-5"
+      style=""
+    >
+      <div class="mr-5">
+        <v-img
+          src="/logo_phantom.png"
+          width="192px"
+          height="192px"
+          class="mx-auto"
+          style="filter: drop-shadow(-15px 15px 15px rgba(0,0,0,0.15)); user-select: none;"
+        />
+      </div>
+      <v-card-title class="justify-center text-caption">
+        <span
+          class="primary--text"
+          style="user-select: none;"
+        >Arkwaifu - Phantom</span>
+      </v-card-title>
+    </v-card>
 
     <v-list nav>
       <v-subheader>
         {{ $t("header") }}
       </v-subheader>
-
-      <v-list-item
-        link
-        to="/"
+      <v-list-item-group
+        color="primary"
       >
-        <v-list-item-icon>
-          <v-icon>{{ mdiHome }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ $t("home.title") }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-group
-        link
-        :prepend-icon="mdiTelevision"
-      >
-        <template #activator>
-          <v-list-item-content>
-            <v-list-item-title>
-              {{ $t("avg.title") }}
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ $t("avg.subtitle") }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </template>
-        <v-list-item to="/avgs/main_themes">
+        <v-list-item
+          link
+          to="/"
+        >
           <v-list-item-icon>
-            <v-icon>{{ mdiCube }}</v-icon>
+            <v-icon>{{ mdiHome }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t("avg.mainThemes.title") }}
+              {{ $t("home.title") }}
             </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ $t("avg.mainThemes.subtitle") }}
-            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/avgs/major_events">
+        <v-list-group
+          link
+          :prepend-icon="mdiTelevision"
+        >
+          <template #activator>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $t("avg.title") }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ $t("avg.subtitle") }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+          <v-list-item to="/avgs/main_themes">
+            <v-list-item-icon>
+              <v-icon>{{ mdiCube }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $t("avg.mainThemes.title") }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ $t("avg.mainThemes.subtitle") }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/avgs/major_events">
+            <v-list-item-icon>
+              <v-icon>{{ mdiMusicClefTreble }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $t("avg.majorEvents.title") }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ $t("avg.majorEvents.subtitle") }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/avgs/vignettes">
+            <v-list-item-icon>
+              <v-icon>{{ mdiMusicClefBass }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $t("avg.vignettes.title") }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ $t("avg.vignettes.subtitle") }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/avgs/others">
+            <v-list-item-icon>
+              <v-icon>{{ mdiMusicRestQuarter }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ $t("avg.others.title") }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                {{ $t("avg.others.subtitle") }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-group>
+        <v-list-item
+          link
+          to="/non_avgs"
+        >
           <v-list-item-icon>
-            <v-icon>{{ mdiMusicClefTreble }}</v-icon>
+            <v-icon>{{ mdiTelevisionOff }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t("avg.majorEvents.title") }}
+              {{ $t("nonAvg.title") }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{ $t("avg.majorEvents.subtitle") }}
+              {{ $t("nonAvg.subtitle") }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/avgs/vignettes">
+        <v-list-item
+          link
+          to="/all"
+        >
           <v-list-item-icon>
-            <v-icon>{{ mdiMusicClefBass }}</v-icon>
+            <v-icon>{{ mdiAllInclusive }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t("avg.vignettes.title") }}
+              {{ $t("all.title") }}
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{ $t("avg.vignettes.subtitle") }}
+              {{ $t("all.subtitle") }}
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item to="/avgs/others">
+        <v-list-item
+          link
+          to="/about"
+        >
           <v-list-item-icon>
-            <v-icon>{{ mdiMusicRestQuarter }}</v-icon>
+            <v-icon>{{ mdiInformation }}</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>
-              {{ $t("avg.others.title") }}
+              {{ $t("about.title") }}
             </v-list-item-title>
-            <v-list-item-subtitle>
-              {{ $t("avg.others.subtitle") }}
-            </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
-      </v-list-group>
-
-      <v-list-item
-        link
-        to="/non_avgs"
-      >
-        <v-list-item-icon>
-          <v-icon>{{ mdiTelevisionOff }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ $t("nonAvg.title") }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ $t("nonAvg.subtitle") }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item
-        link
-        to="/all"
-      >
-        <v-list-item-icon>
-          <v-icon>{{ mdiAllInclusive }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ $t("all.title") }}
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            {{ $t("all.subtitle") }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item
-        link
-        to="/about"
-      >
-        <v-list-item-icon>
-          <v-icon>{{ mdiInformation }}</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>
-            {{ $t("about.title") }}
-          </v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -170,6 +187,7 @@ export default {
     value: Boolean
   },
   data: () => ({
+    selected: {},
     mdiHome: mdiHome,
     mdiCube: mdiCube,
     mdiMusicClefTreble: mdiMusicClefTreble,
