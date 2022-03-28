@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="800px">
+  <div>
     <p class="text-h4">
       {{ kind }}/{{ id }}
     </p>
@@ -38,7 +38,7 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
-  </v-container>
+  </div>
 </template>
 
 <script>
