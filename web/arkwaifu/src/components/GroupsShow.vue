@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     groups () {
-      let groups = this.$store.state.groupsTypeMap[this.type]
+      let groups = [...this.$store.state.groupsTypeMap[this.type]]
       if (groups) {
         if (this.descending) {
           groups = _.reverse(groups)
