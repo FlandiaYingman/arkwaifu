@@ -6,7 +6,6 @@
     <v-card
       :to="`/assets/${assetKind}/${assetId}`"
       :href="assetURL"
-      target="_blank"
     >
       <v-img
         :src="assetThumbnailURL"
