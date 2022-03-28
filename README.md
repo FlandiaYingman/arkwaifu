@@ -15,7 +15,7 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 
 # TODOs V1 #
 
-- [x] Beautify the frontend. (Partially Done)
+- [x] Beautify the frontend. (Done<del>, probably uglified</del>)
 - [x] List assets which aren't included in AVGs. e.g., assets appeared in mode *Integrated Strategies*.
 - [x] Use cache to speed up website (backend).
 - [x] Use cache to speed up website (frontend).
@@ -23,8 +23,8 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 - [x] I18N 🌏! Add Chinese support.
 - [x] Extract gamedata directly from resources.
 - [x] Provide API to manually update resources.
-- [ ] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN)
-- [ ] Rewrite controller interface.
+- [x] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN) (Partially Done)
+- [x] Rewrite controller interface. (Partially Done)
 - [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
 - [ ] <del>Create a statistic module to show how many times the website is requested.</del>
 - [ ] //...
