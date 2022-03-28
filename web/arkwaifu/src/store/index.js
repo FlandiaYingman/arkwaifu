@@ -60,7 +60,7 @@ const store = new Vuex.Store({
         .then(resp => resp.json())
         .then(assets => {
           state.assets = assets.map(el => Object.freeze(el))
-          state.assetsMap = _.keyBy(assets, el => el.asset)
+          state.assetsMap = _.keyBy(assets, el => el.name)
           state.assetsKindMap = _.groupBy(assets, el => el.kind)
         })
     }

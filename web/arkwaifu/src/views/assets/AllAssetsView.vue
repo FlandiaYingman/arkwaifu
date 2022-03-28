@@ -1,6 +1,6 @@
 <template>
   <assets-show
-    :assets="$store.state.assets"
+    :assets="allAssets"
   />
 </template>
 <script>
@@ -8,6 +8,12 @@ import AssetsShow from '@/components/AssetsShow'
 
 export default {
   name: 'AllAssetsView',
-  components: { AssetsShow }
+  components: { AssetsShow },
+  computed: {
+    allAssets () {
+      const allAssets = this.$store.state.assetsMap
+      return Object.values(allAssets)
+    }
+  }
 }
 </script>

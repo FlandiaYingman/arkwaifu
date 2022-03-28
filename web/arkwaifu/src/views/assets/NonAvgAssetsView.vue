@@ -11,9 +11,9 @@ export default {
   components: { AssetsShow },
   computed: {
     nonAvgAssets () {
-      const allAssets = this.$store.state.assets
+      const allAssets = this.$store.state.assetsMap
       const avgAssets = this.$store.state.storiesAssetsMap
-      const nonAvgAssets = allAssets.filter(allEl => !(allEl.name in avgAssets))
+      const nonAvgAssets = Object.values(allAssets).filter(allEl => !(allEl.name in avgAssets))
       return nonAvgAssets
     }
   }
