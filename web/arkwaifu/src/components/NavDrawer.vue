@@ -8,7 +8,7 @@
   >
     <v-card
       v-ripple
-      class="ma-3 pa-2"
+      class="ma-4 pa-2"
       elevation="0"
       rounded="xl"
       color="accent lighten-5"
