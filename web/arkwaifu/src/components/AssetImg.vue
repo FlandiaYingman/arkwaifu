@@ -8,10 +8,23 @@
     <p class="text-caption">
       {{ kind }}/{{ name }} ({{ variant }}), {{ imgWidth }}×{{ imgHeight }} {{ fileName }}
     </p>
+    <p>
+      <v-btn
+        color="primary"
+        :href="url"
+        :download="fileName"
+      >
+        <v-icon left>
+          {{ mdiDownload }}
+        </v-icon>
+        {{ $t('download') }}
+      </v-btn>
+    </p>
   </div>
 </template>
 
 <script>
+import { mdiDownload } from '@mdi/js'
 import Api from '@/api'
 
 export default {
@@ -35,7 +48,8 @@ export default {
     return {
       imgWidth: 0,
       imgHeight: 0,
-      fileName: ''
+      fileName: '',
+      mdiDownload
     }
   },
   computed: {
@@ -56,7 +70,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>
