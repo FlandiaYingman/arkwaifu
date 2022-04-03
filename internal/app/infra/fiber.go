@@ -3,6 +3,7 @@ package infra
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"time"
 )
 
@@ -15,6 +16,6 @@ func ProvideFiber() *fiber.App {
 	})
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
-	}))
+	})).Use(logger.New())
 	return app
 }
