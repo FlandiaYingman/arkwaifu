@@ -163,7 +163,7 @@ func (c *Controller) submitUpdate(ctx context.Context, resVer string) error {
 		return errors.WithStack(err)
 	}
 
-	err = c.updateAssetDatabase(ctx, mainStaticDir)
+	err = c.updateAssetDatabase(ctx)
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -11,6 +11,7 @@ func ProvideFiber() *fiber.App {
 		AppName:      "Ark Waifu",
 		ReadTimeout:  time.Second * 20,
 		WriteTimeout: time.Second * 20,
+		BodyLimit:    16 * 1024 * 1024,
 	})
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
