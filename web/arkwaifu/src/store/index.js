@@ -56,7 +56,7 @@ const store = new Vuex.Store({
         })
     },
     async updateAssets ({ state }) {
-      return fetch(`${API_URL}/api/v0/assets`)
+      return fetch(`${API_URL}/api/v0/asset/assets`)
         .then(resp => resp.json())
         .then(assets => {
           state.assets = assets.map(el => Object.freeze(el))

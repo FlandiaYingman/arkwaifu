@@ -6,13 +6,13 @@
       alt=""
     >
     <p class="text-caption">
-      {{ kind }}/{{ name }} ({{ variant }}), {{ imgWidth }}×{{ imgHeight }} {{ fileName }}
+      {{ kind }}/{{ name }} ({{ variant }}), {{ imgWidth }}×{{ imgHeight }} {{ filename }}
     </p>
     <p>
       <v-btn
         color="primary"
         :href="url"
-        :download="fileName"
+        :download="filename"
       >
         <v-icon left>
           {{ mdiDownload }}
@@ -48,19 +48,19 @@ export default {
     return {
       imgWidth: 0,
       imgHeight: 0,
-      fileName: '',
+      filename: '',
       mdiDownload
     }
   },
   computed: {
     url: function () {
-      return `${Api}/api/v0/assets/kinds/${this.kind}/names/${this.name}/variants/${this.variant}/file`
+      return `${Api}/api/v0/asset/variants/${this.kind}/${this.name}/${this.variant}/file`
     }
   },
   created () {
-    fetch(`${Api}/api/v0/assets/kinds/${this.kind}/names/${this.name}/variants/${this.variant}`)
+    fetch(`${Api}/api/v0/asset/variants/${this.kind}/${this.name}/${this.variant}`)
       .then(res => res.json())
-      .then(asset => (this.fileName = asset.fileName))
+      .then(asset => (this.filename = asset.filename))
   },
   mounted () {
     this.$refs.img.onload = () => {

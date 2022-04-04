@@ -22,17 +22,17 @@
     <v-expansion-panels>
       <v-expansion-panel
         v-for="variant in variants"
-        :key="variant"
+        :key="variant.variant"
       >
         <v-expansion-panel-header>
-          {{ $t(`variant.${variant}`) }}
+          {{ $t(`variant.${variant.variant}`) }}
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-lazy>
             <AssetImg
               :kind="kind"
               :name="id"
-              :variant="variant"
+              :variant="variant.variant"
             />
           </v-lazy>
         </v-expansion-panel-content>
@@ -61,7 +61,7 @@ export default {
   computed: {},
   asyncComputed: {
     variants () {
-      return fetch(`${Api}/api/v0/assets/kinds/${this.kind}/names/${this.id}/variants`)
+      return fetch(`${Api}/api/v0/asset/variants/${this.kind}/${this.id}`)
         .then(res => res.json())
     }
   }

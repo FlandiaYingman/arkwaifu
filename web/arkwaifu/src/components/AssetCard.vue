@@ -30,10 +30,10 @@ export default {
   },
   computed: {
     assetThumbnailURL () {
-      return `${API_URL}/api/v0/assets/kinds/${this.assetKind}/names/${this.assetId}/variants/timg/file`
+      return `${API_URL}/api/v0/asset/variants/${this.assetKind}/${this.assetId}/timg/file`
     },
     assetURL () {
-      return `${API_URL}/api/v0/assets/kinds/${this.assetKind}/names/${this.assetId}/variants/img/file`
+      return `${API_URL}/api/v0/asset/variants/${this.assetKind}/${this.assetId}/img/file`
     },
     kindAbbr () {
       switch (this.assetKind) {
