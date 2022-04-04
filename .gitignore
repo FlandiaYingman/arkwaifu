@@ -1,5 +1,6 @@
 ### Ark Waifu ###
 arkwaifu_resource
+arkwaifu_static
 .env
 
 # Created by https://www.toptal.com/developers/gitignore/api/go

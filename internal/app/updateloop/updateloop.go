@@ -15,8 +15,9 @@ import (
 )
 
 type Controller struct {
-	ResLocation string
-	ForceUpdate bool
+	ResourceLocation string
+	StaticLocation   string
+	ForceUpdate      bool
 
 	avgService   *avg.Service
 	assetService *asset.Service
@@ -24,10 +25,11 @@ type Controller struct {
 
 func NewController(avgService *avg.Service, assetService *asset.Service, conf *config.Config) *Controller {
 	return &Controller{
-		ResLocation:  conf.ResourceLocation,
-		ForceUpdate:  conf.ForceUpdate,
-		avgService:   avgService,
-		assetService: assetService,
+		ResourceLocation: conf.ResourceLocation,
+		StaticLocation:   conf.StaticLocation,
+		ForceUpdate:      conf.ForceUpdate,
+		avgService:       avgService,
+		assetService:     assetService,
 	}
 }
 
@@ -97,7 +99,7 @@ func (c *Controller) doUpdate(ctx context.Context, oldResVer string, newResVer s
 //
 // It is skipped if the corresponding resource directory already exists.
 func (c *Controller) retrieveResources(ctx context.Context, oldResVer string, newResVer string) error {
-	resDir := filepath.Join(c.ResLocation, newResVer, "res")
+	resDir := filepath.Join(c.ResourceLocation, newResVer, "res")
 	if fileutil.Exists(resDir) {
 		log.WithFields(log.Fields{"resDir": resDir}).
 			Info("retrieving resources: resDir already exists; skipping")
@@ -119,8 +121,8 @@ func (c *Controller) retrieveResources(ctx context.Context, oldResVer string, ne
 //
 // It is skipped if the corresponding resource directory already exists.
 func (c *Controller) processStatics(ctx context.Context, resVer string) error {
-	resDir := filepath.Join(c.ResLocation, resVer, "res")
-	staticDir := filepath.Join(c.ResLocation, resVer, "static")
+	resDir := filepath.Join(c.ResourceLocation, resVer, "res")
+	staticDir := filepath.Join(c.ResourceLocation, resVer, "static")
 	if fileutil.Exists(staticDir) {
 		log.WithFields(log.Fields{"resDir": resDir}).
 			Info("processing statics: staticDir already exists; skipping")
@@ -146,16 +148,15 @@ func (c *Controller) processStatics(ctx context.Context, resVer string) error {
 // Note that submitting the gamedata from resources will fully override existing;
 // but submitting the static files will only override incrementally.
 func (c *Controller) submitUpdate(ctx context.Context, resVer string) error {
-	resDir := filepath.Join(c.ResLocation, resVer, "res")
-	staticDir := filepath.Join(c.ResLocation, resVer, "static")
-	mainStaticDir := filepath.Join(c.ResLocation, "static")
+	resDir := filepath.Join(c.ResourceLocation, resVer, "res")
+	staticDir := filepath.Join(c.ResourceLocation, resVer, "static")
 
 	err := fileutil.LowercaseAll(staticDir)
 	if err != nil {
 		return err
 	}
 
-	err = fileutil.CopyAllFileContent(staticDir, mainStaticDir)
+	err = fileutil.CopyAllFileContent(staticDir, c.StaticLocation)
 	if err != nil {
 		return errors.WithStack(err)
 	}
