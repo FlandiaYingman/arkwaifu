@@ -130,7 +130,7 @@ func (r *Repo) InsertStories(ctx context.Context, stories []storyModel) error {
 	}
 	return nil
 }
-func (r *Repo) TruncateStory(ctx context.Context) (err error) {
+func (r *Repo) TruncateStories(ctx context.Context) (err error) {
 	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		_, err = r.NewTruncateTable().
 			Model((*storyModel)(nil)).
@@ -198,7 +198,7 @@ func (r *Repo) InsertGroups(ctx context.Context, groups []groupModel) error {
 		Exec(ctx)
 	return err
 }
-func (r *Repo) Truncate(ctx context.Context) error {
+func (r *Repo) TruncateGroups(ctx context.Context) error {
 	_, err := r.NewTruncateTable().
 		Model((*groupModel)(nil)).
 		Exec(ctx)
@@ -251,11 +251,11 @@ func (r Repo) UpdateAvg(ctx context.Context, version string, gms []groupModel, s
 		r.IDB = tx
 		var err error
 
-		err = r.Truncate(ctx)
+		err = r.TruncateGroups(ctx)
 		if err != nil {
 			return err
 		}
-		err = r.Truncate(ctx)
+		err = r.TruncateStories(ctx)
 		if err != nil {
 			return err
 		}
