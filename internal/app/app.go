@@ -41,7 +41,3 @@ func ProvideOptions() []fx.Option {
 	}
 	return opts
 }
-
-func Run() {
-
-}
