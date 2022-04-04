@@ -12,27 +12,7 @@ func (s *Service) ScanStaticDir(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrapf(err, "failed to scan static dir %s", s.staticDir)
 	}
-
-	err = s.repo.BeginTx(ctx)
-	if err != nil {
-		return errors.Wrapf(err, "failed to begin transaction")
-	}
-	defer func() { _ = s.repo.EndTx(err) }()
-
-	err = s.repo.Truncate(ctx)
-	if err != nil {
-		return errors.Wrapf(err, "failed to truncate asset table")
-	}
-	err = s.repo.InsertAsset(ctx, am...)
-	if err != nil {
-		return errors.Wrapf(err, "failed to insert assets %v", am)
-	}
-	err = s.repo.InsertVariant(ctx, vm...)
-	if err != nil {
-		return errors.Wrapf(err, "failed to insert variants %v", vm)
-	}
-
-	return nil
+	return s.repo.Update(ctx, am, vm)
 }
 
 func scanStaticDir(staticDir string) ([]modelAsset, []modelVariant, error) {

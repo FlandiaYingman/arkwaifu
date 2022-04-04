@@ -19,9 +19,7 @@ func ProvideOptions() []fx.Option {
 		),
 		fx.Provide(server.ProvideV0),
 		fx.Provide(
-			avg.NewVersionRepo,
-			avg.NewStoryRepo,
-			avg.NewGroupRepo,
+			avg.NewRepo,
 			avg.NewService,
 			avg.NewController,
 		),

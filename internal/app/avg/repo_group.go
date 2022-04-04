@@ -2,13 +2,8 @@ package avg
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/uptrace/bun"
 )
-
-type GroupRepo struct {
-	infra.Repo
-}
 
 // groupModel is a group of story. e.g., a 活动 such as "将进酒" or a 主线 such as "怒号光明".
 type groupModel struct {
@@ -29,22 +24,9 @@ type groupModel struct {
 	SortID  int64         `bun:",autoincrement"`
 }
 
-func NewGroupRepo(db *bun.DB) (*GroupRepo, error) {
-	_, err := db.NewCreateTable().
-		Model((*groupModel)(nil)).
-		IfNotExists().
-		Exec(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	return &GroupRepo{
-		Repo: infra.NewRepo(db),
-	}, nil
-}
-
-func (r *GroupRepo) GetGroups(ctx context.Context) ([]groupModel, error) {
+func (r *Repo) GetGroups(ctx context.Context) ([]groupModel, error) {
 	var items []groupModel
-	err := r.DB().
+	err := r.
 		NewSelect().
 		Model(&items).
 		Relation("Stories", sortAvg).
@@ -53,10 +35,9 @@ func (r *GroupRepo) GetGroups(ctx context.Context) ([]groupModel, error) {
 		Scan(ctx)
 	return items, err
 }
-
-func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*groupModel, error) {
+func (r *Repo) GetGroupByID(ctx context.Context, id string) (*groupModel, error) {
 	var item groupModel
-	err := r.DB().
+	err := r.
 		NewSelect().
 		Model(&item).
 		Relation("Stories", sortAvg).
@@ -65,9 +46,8 @@ func (r *GroupRepo) GetGroupByID(ctx context.Context, id string) (*groupModel, e
 		Scan(ctx)
 	return &item, err
 }
-
-func (r *GroupRepo) InsertGroups(ctx context.Context, groups []groupModel) error {
-	_, err := r.DB().
+func (r *Repo) InsertGroups(ctx context.Context, groups []groupModel) error {
+	_, err := r.
 		NewInsert().
 		Model(&groups).
 		// On("CONFLICT (id) DO UPDATE").
@@ -75,9 +55,8 @@ func (r *GroupRepo) InsertGroups(ctx context.Context, groups []groupModel) error
 		Exec(ctx)
 	return err
 }
-
-func (r *GroupRepo) Truncate(ctx context.Context) error {
-	_, err := r.DB().NewTruncateTable().
+func (r *Repo) Truncate(ctx context.Context) error {
+	_, err := r.NewTruncateTable().
 		Model((*groupModel)(nil)).
 		Exec(ctx)
 	return err

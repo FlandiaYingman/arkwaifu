@@ -5,104 +5,50 @@ import (
 )
 
 type Service struct {
-	versionRepo *VersionRepo
-	groupRepo   *GroupRepo
-	storyRepo   *StoryRepo
+	r *Repo
 }
 
-func NewService(versionRepo *VersionRepo, groupRepo *GroupRepo, storyRepo *StoryRepo) *Service {
-	return &Service{
-		versionRepo: versionRepo,
-		groupRepo:   groupRepo,
-		storyRepo:   storyRepo,
-	}
+func NewService(r *Repo) *Service {
+	return &Service{r: r}
 }
 
 func (s *Service) GetVersion(ctx context.Context) (string, error) {
-	return s.versionRepo.GetVersion(ctx)
+	return s.r.GetVersion(ctx)
 }
-
-func (s *Service) SetAvg(ctx context.Context, version string, avg Avg) (err error) {
-	err = s.versionRepo.BeginTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = s.versionRepo.EndTx(err) }()
-
-	err = s.groupRepo.BeginTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = s.groupRepo.EndTx(err) }()
-
-	err = s.storyRepo.BeginTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = s.storyRepo.EndTx(err) }()
-
-	err = s.versionRepo.UpsertVersion(ctx, version)
-	if err != nil {
-		return err
-	}
-
-	groupModels, storyModels := avgToModels(avg)
-
-	err = s.groupRepo.Truncate(ctx)
-	if err != nil {
-		return err
-	}
-	err = s.groupRepo.InsertGroups(ctx, groupModels)
-	if err != nil {
-		return err
-	}
-
-	err = s.storyRepo.Truncate(ctx)
-	if err != nil {
-		return err
-	}
-	err = s.storyRepo.InsertStories(ctx, storyModels)
-	if err != nil {
-		return err
-	}
-
-	return
+func (s *Service) UpdateAvg(ctx context.Context, version string, avg Avg) (err error) {
+	gms, sms := avgToModels(avg)
+	return s.r.UpdateAvg(ctx, version, gms, sms)
 }
-
 func (s *Service) GetGroups(ctx context.Context) ([]Group, error) {
-	groups, err := s.groupRepo.GetGroups(ctx)
+	groups, err := s.r.GetGroups(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return groupsFromModels(groups), nil
 }
-
 func (s *Service) GetGroupByID(ctx context.Context, id string) (*Group, error) {
-	model, err := s.groupRepo.GetGroupByID(ctx, id)
+	model, err := s.r.GetGroupByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	group := groupFromModel(*model)
 	return &group, nil
 }
-
 func (s *Service) GetStories(ctx context.Context) ([]Story, error) {
-	stories, err := s.storyRepo.GetStories(ctx)
+	stories, err := s.r.GetStories(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return storiesFromModels(stories), nil
 }
-
 func (s *Service) GetStoryByID(ctx context.Context, id string) (*Story, error) {
-	model, err := s.storyRepo.GetStoryByID(ctx, id)
+	model, err := s.r.GetStoryByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	story := storyFromModel(*model)
 	return &story, nil
 }
-
 func (s *Service) Reset(ctx context.Context) error {
-	return s.versionRepo.UpsertVersion(ctx, "")
+	return s.r.UpsertVersion(ctx, "")
 }

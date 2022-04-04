@@ -2,7 +2,6 @@ package asset
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
@@ -12,16 +11,14 @@ import (
 )
 
 type Service struct {
-	staticDir   string
-	repo        *repo
-	versionRepo *avg.VersionRepo
+	staticDir string
+	repo      *repo
 }
 
-func NewService(conf *config.Config, assetRepo *repo, versionRepo *avg.VersionRepo) *Service {
+func NewService(conf *config.Config, assetRepo *repo) *Service {
 	return &Service{
-		staticDir:   filepath.Join(conf.ResourceLocation, "static"),
-		repo:        assetRepo,
-		versionRepo: versionRepo,
+		staticDir: filepath.Join(conf.ResourceLocation, "static"),
+		repo:      assetRepo,
 	}
 }
 
@@ -91,23 +88,12 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 		Filename:  variant.Filename,
 	}
 
-	err := s.repo.BeginTx(ctx)
-	if err != nil {
-		return err
-	}
-	defer func() { _ = s.repo.EndTx(err) }()
-
 	a, err := s.GetAsset(ctx, kind, name)
 	if err != nil {
 		return err
 	}
 	if a == nil {
 		return errors.Errorf("asset %s/%s not found", kind, name)
-	}
-
-	err = s.repo.InsertVariant(ctx, vm)
-	if err != nil {
-		return errors.Wrap(err, "failed to insert variant")
 	}
 
 	dstPath := filepath.Join(s.staticDir, vm.Variant, vm.AssetKind, variant.Filename)
@@ -119,6 +105,11 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 	_, err = io.Copy(dstFile, file)
 	if err != nil {
 		return errors.Wrapf(err, "failed to copy file to %s", dstPath)
+	}
+
+	err = s.repo.InsertVariant(ctx, vm)
+	if err != nil {
+		return errors.Wrap(err, "failed to insert variant")
 	}
 
 	return nil

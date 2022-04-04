@@ -2,32 +2,36 @@ package asset
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/app/infra"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
 type repo struct {
-	infra.Repo
+	bun.IDB
+	DB *bun.DB
 }
 
 func NewRepo(db *bun.DB) (*repo, error) {
-	var err error
-	_, err = db.NewCreateTable().
-		Model((*modelAsset)(nil)).
-		IfNotExists().
-		Exec(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	_, err = db.NewCreateTable().
-		Model((*modelVariant)(nil)).
-		IfNotExists().
-		Exec(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	r := repo{Repo: infra.NewRepo(db)}
-	return &r, nil
+	r := repo{IDB: db, DB: db}
+	err := r.DB.RunInTx(context.Background(), nil, func(ctx context.Context, tx bun.Tx) error {
+		var err error
+		_, err = db.NewCreateTable().
+			Model((*modelAsset)(nil)).
+			IfNotExists().
+			Exec(context.Background())
+		if err != nil {
+			return err
+		}
+		_, err = db.NewCreateTable().
+			Model((*modelVariant)(nil)).
+			IfNotExists().
+			Exec(context.Background())
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return &r, err
 }
 
 type modelAsset struct {
@@ -45,33 +49,35 @@ type modelVariant struct {
 }
 
 func (r *repo) Truncate(ctx context.Context) error {
-	var err error
-	_, err = r.DB().
-		NewTruncateTable().
-		Model((*modelAsset)(nil)).
-		Exec(ctx)
-	if err != nil {
-		return err
-	}
-	_, err = r.DB().
-		NewTruncateTable().
-		Model((*modelVariant)(nil)).
-		Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
+	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		var err error
+		_, err = tx.
+			NewTruncateTable().
+			Model((*modelAsset)(nil)).
+			Exec(ctx)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			NewTruncateTable().
+			Model((*modelVariant)(nil)).
+			Exec(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (r *repo) InsertAsset(ctx context.Context, models ...modelAsset) error {
-	_, err := r.DB().
+	_, err := r.
 		NewInsert().
 		Model(&models).
 		Exec(ctx)
 	return err
 }
 func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error {
-	_, err := r.DB().
+	_, err := r.
 		NewInsert().
 		Model(&models).
 		Exec(ctx)
@@ -80,7 +86,7 @@ func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error 
 
 func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, error) {
 	models := new([]modelAsset)
-	query := r.DB().
+	query := r.
 		NewSelect().
 		Model(models).
 		Relation("Variants")
@@ -92,7 +98,7 @@ func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, er
 }
 func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*modelAsset, error) {
 	model := new(modelAsset)
-	err := r.DB().
+	err := r.
 		NewSelect().
 		Model(model).
 		Relation("Variants").
@@ -103,12 +109,11 @@ func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*modelAsset,
 
 func (r *repo) SelectVariants(ctx context.Context, kind, name string) ([]modelVariant, error) {
 	models := new([]modelVariant)
-	query := r.DB().
+	err := r.
 		NewSelect().
 		Model(models).
 		Where("(asset_kind, asset_name) = (?, ?)", kind, name).
 		Scan(ctx)
-	err := query
 	if err != nil {
 		return nil, err
 	}
@@ -116,10 +121,30 @@ func (r *repo) SelectVariants(ctx context.Context, kind, name string) ([]modelVa
 }
 func (r *repo) SelectVariant(ctx context.Context, kind, name, variant string) (*modelVariant, error) {
 	model := new(modelVariant)
-	err := r.DB().
+	err := r.
 		NewSelect().
 		Model(model).
 		Where("(asset_kind, asset_name, variant) = (?, ?, ?)", kind, name, variant).
 		Scan(ctx)
 	return model, err
+}
+
+func (r repo) Update(ctx context.Context, ams []modelAsset, vms []modelVariant) error {
+	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		r.IDB = tx
+		var err error
+		err = r.Truncate(ctx)
+		if err != nil {
+			return errors.Wrapf(err, "failed to truncate asset table")
+		}
+		err = r.InsertAsset(ctx, ams...)
+		if err != nil {
+			return errors.Wrapf(err, "failed to insert assets %v", ams)
+		}
+		err = r.InsertVariant(ctx, vms...)
+		if err != nil {
+			return errors.Wrapf(err, "failed to insert variants %v", vms)
+		}
+		return nil
+	})
 }

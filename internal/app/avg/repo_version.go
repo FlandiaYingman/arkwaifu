@@ -2,13 +2,10 @@ package avg
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/app/infra"
+	"database/sql"
+	"github.com/pkg/errors"
 	"github.com/uptrace/bun"
 )
-
-type VersionRepo struct {
-	infra.Repo
-}
 
 type ResVersion struct {
 	bun.BaseModel `bun:"table:version"`
@@ -18,47 +15,25 @@ type ResVersion struct {
 	ResVersion string `bun:""`
 }
 
-func NewVersionRepo(db *bun.DB) (*VersionRepo, error) {
-	_, err := db.NewCreateTable().
-		Model((*ResVersion)(nil)).
-		IfNotExists().
-		ColumnExpr("CHECK (id = ?)", true).
-		Exec(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	return &VersionRepo{
-		Repo: infra.NewRepo(db),
-	}, nil
-}
-
-func (r *VersionRepo) GetVersion(ctx context.Context) (string, error) {
+func (r *Repo) GetVersion(ctx context.Context) (string, error) {
 	var resVersion ResVersion
-	exists, err := r.DB().
+	err := r.
 		NewSelect().
 		Model(&resVersion).
-		Exists(ctx)
+		Scan(ctx)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", nil
+	}
 	if err != nil {
 		return "", err
 	}
-	if exists {
-		err := r.DB().
-			NewSelect().
-			Model(&resVersion).
-			Scan(ctx)
-		if err != nil {
-			return "", err
-		}
-		return resVersion.ResVersion, nil
-	}
-	return "", nil
+	return resVersion.ResVersion, nil
 }
-
-func (r *VersionRepo) UpsertVersion(ctx context.Context, resVersion string) error {
+func (r *Repo) UpsertVersion(ctx context.Context, resVersion string) error {
 	resVersionEntity := ResVersion{
 		ResVersion: resVersion,
 	}
-	_, err := r.DB().
+	_, err := r.
 		NewInsert().
 		Model(&resVersionEntity).
 		On("CONFLICT (id) DO UPDATE").
