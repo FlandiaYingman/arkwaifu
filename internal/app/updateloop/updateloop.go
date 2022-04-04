@@ -100,12 +100,16 @@ func (c *Controller) doUpdate(ctx context.Context, oldResVer string, newResVer s
 // It is skipped if the corresponding resource directory already exists.
 func (c *Controller) retrieveResources(ctx context.Context, oldResVer string, newResVer string) error {
 	resDir := filepath.Join(c.ResourceLocation, newResVer, "res")
-	if fileutil.Exists(resDir) {
+	exists, err := fileutil.Exists(resDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to check if resource directory exists: %s", resDir)
+	}
+	if exists {
 		log.WithFields(log.Fields{"resDir": resDir}).
 			Info("retrieving resources: resDir already exists; skipping")
 		return nil
 	}
-	err := updateResources(ctx, oldResVer, newResVer, resDir)
+	err = updateResources(ctx, oldResVer, newResVer, resDir)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -123,12 +127,16 @@ func (c *Controller) retrieveResources(ctx context.Context, oldResVer string, ne
 func (c *Controller) processStatics(ctx context.Context, resVer string) error {
 	resDir := filepath.Join(c.ResourceLocation, resVer, "res")
 	staticDir := filepath.Join(c.ResourceLocation, resVer, "static")
-	if fileutil.Exists(staticDir) {
-		log.WithFields(log.Fields{"resDir": resDir}).
+	exists, err := fileutil.Exists(staticDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to check if static directory exists: %s", staticDir)
+	}
+	if exists {
+		log.WithFields(log.Fields{"staticDir": staticDir}).
 			Info("processing statics: staticDir already exists; skipping")
 		return nil
 	}
-	err := os.MkdirAll(staticDir, 0755)
+	err = os.MkdirAll(staticDir, 0755)
 	if err != nil {
 		return errors.WithStack(err)
 	}
