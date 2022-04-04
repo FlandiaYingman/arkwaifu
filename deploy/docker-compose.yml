@@ -14,9 +14,13 @@ services:
       - type: bind
         source: ./arkwaifu_resource
         target: /var/arkwaifu_resource
+      - type: bind
+        source: ./arkwaifu_static
+        target: /var/arkwaifu_static
     environment:
       - POSTGRES_DSN
-      - RESOURCE_LOCATION=/var/arkwaifu_resource
+      - RESOURCE_DIR=/var/arkwaifu_resource
+      - STATIC_DIR=/var/arkwaifu_static
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -26,10 +30,14 @@ services:
       - type: bind
         source: ./arkwaifu_resource
         target: /var/arkwaifu_resource
+      - type: bind
+        source: ./arkwaifu_static
+        target: /var/arkwaifu_static
     environment:
       - POSTGRES_DSN
       - ARKRES_CHAT_MASK
-      - RESOURCE_LOCATION=/var/arkwaifu_resource
+      - RESOURCE_DIR=/var/arkwaifu_resource
+      - STATIC_DIR=/var/arkwaifu_static
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

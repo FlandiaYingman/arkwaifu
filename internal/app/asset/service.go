@@ -17,7 +17,7 @@ type Service struct {
 
 func NewService(conf *config.Config, assetRepo *repo) *Service {
 	return &Service{
-		staticDir: conf.StaticLocation,
+		staticDir: conf.StaticDir,
 		repo:      assetRepo,
 	}
 }

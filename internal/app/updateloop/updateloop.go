@@ -25,8 +25,8 @@ type Controller struct {
 
 func NewController(avgService *avg.Service, assetService *asset.Service, conf *config.Config) *Controller {
 	return &Controller{
-		ResourceLocation: conf.ResourceLocation,
-		StaticLocation:   conf.StaticLocation,
+		ResourceLocation: conf.ResourceDir,
+		StaticLocation:   conf.StaticDir,
 		ForceUpdate:      conf.ForceUpdate,
 		avgService:       avgService,
 		assetService:     assetService,
