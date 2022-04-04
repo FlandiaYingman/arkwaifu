@@ -70,6 +70,9 @@ func (r *repo) Truncate(ctx context.Context) error {
 }
 
 func (r *repo) InsertAsset(ctx context.Context, models ...modelAsset) error {
+	if len(models) == 0 {
+		return nil
+	}
 	_, err := r.
 		NewInsert().
 		Model(&models).
@@ -77,6 +80,9 @@ func (r *repo) InsertAsset(ctx context.Context, models ...modelAsset) error {
 	return err
 }
 func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error {
+	if len(models) == 0 {
+		return nil
+	}
 	_, err := r.
 		NewInsert().
 		Model(&models).
