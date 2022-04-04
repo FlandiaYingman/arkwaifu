@@ -68,6 +68,8 @@ func (c *Controller) AttemptUpdate(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		log.Info("not updating, since local & remote resource versions are the same")
 	}
 	return nil
 }
