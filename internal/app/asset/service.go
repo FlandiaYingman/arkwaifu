@@ -80,6 +80,24 @@ func (s *Service) GetVariant(ctx context.Context, kind string, name string, vari
 	return &v, nil
 }
 
+func (s *Service) InitNames(ctx context.Context, kindNames []string, variantNames []string) error {
+	return s.repo.InitNames(ctx, kindNames, variantNames)
+}
+func (s *Service) GetKindNames(ctx context.Context) ([]string, error) {
+	kinds, err := s.repo.SelectKindNames(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return kinds, nil
+}
+func (s *Service) GetVariantNames(ctx context.Context) ([]string, error) {
+	variants, err := s.repo.SelectVariantNames(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return variants, nil
+}
+
 func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Variant, file io.Reader) error {
 	vm := modelVariant{
 		AssetKind: kind,

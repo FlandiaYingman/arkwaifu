@@ -31,6 +31,9 @@ func RegisterController(v0 *server.V0, c Controller) {
 	router.Get("/variants/:kind/:name/:variant", c.GetVariant)
 	router.Get("/variants/:kind/:name/:variant/file", c.GetVariantFile)
 
+	router.Get("/kind-names", c.GetKindNames)
+	router.Get("/variant-names", c.GetVariantNames)
+
 	router.Post("/variants/:kind/:name/:variant", c.PostVariant)
 }
 
@@ -144,6 +147,21 @@ func (c *Controller) GetVariantFile(ctx *fiber.Ctx) error {
 	} else {
 		return ctx.SendStatus(fiber.StatusNotFound)
 	}
+}
+
+func (c *Controller) GetKindNames(ctx *fiber.Ctx) error {
+	kindNames, err := c.service.GetKindNames(ctx.Context())
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(kindNames)
+}
+func (c *Controller) GetVariantNames(ctx *fiber.Ctx) error {
+	variantNames, err := c.service.GetVariantNames(ctx.Context())
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(variantNames)
 }
 
 func (c *Controller) PostVariant(ctx *fiber.Ctx) error {

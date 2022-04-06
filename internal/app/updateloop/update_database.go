@@ -27,7 +27,11 @@ func (c *Controller) updateDatabase(ctx context.Context, resVer string, resDir s
 	return nil
 }
 func (c *Controller) updateAssetDatabase(ctx context.Context) error {
-	err := c.assetService.ScanStaticDir(ctx)
+	err := c.assetService.InitNames(ctx, AcceptableAssetKinds, AcceptableAssetVariants)
+	if err != nil {
+		return err
+	}
+	err = c.assetService.ScanStaticDir(ctx)
 	return err
 }
 
