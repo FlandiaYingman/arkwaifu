@@ -25,7 +25,7 @@ func NewService(conf *config.Config, assetRepo *repo) *Service {
 type Asset struct {
 	Kind     string    `json:"kind"`
 	Name     string    `json:"name"`
-	Variants []Variant `json:"variant"`
+	Variants []Variant `json:"variants"`
 }
 type Variant struct {
 	Variant  string `json:"variant"`
