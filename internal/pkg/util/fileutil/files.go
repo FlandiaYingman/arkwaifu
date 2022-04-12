@@ -1,6 +1,7 @@
 package fileutil
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -193,4 +194,23 @@ func ListAllFiles(dirPath string) ([]string, error) {
 		return nil
 	})
 	return allFiles, err
+}
+
+// MkFileFromReader calls MkFile and then writes the content of the reader to the file.
+//
+// Note that it's the caller's responsibility to close the reader.
+func MkFileFromReader(filePath string, r io.Reader) error {
+	f, err := MkFile(filePath)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = f.Close() }()
+
+	_, err = io.Copy(f, r)
+	return nil
+}
+
+// MkFileFromBytes calls MkFile and then writes the content of the bytes to the file.
+func MkFileFromBytes(filePath string, b []byte) error {
+	return MkFileFromReader(filePath, bytes.NewReader(b))
 }
