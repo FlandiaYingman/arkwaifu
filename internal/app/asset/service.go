@@ -2,12 +2,13 @@ package asset
 
 import (
 	"context"
+	"io"
+	"path/filepath"
+
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 type Service struct {
@@ -115,10 +116,11 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 	}
 
 	dstPath := filepath.Join(s.staticDir, vm.Variant, vm.AssetKind, variant.Filename)
-	dstFile, err := os.Create(dstPath)
+	dstFile, err := fileutil.MkFile(dstPath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create dst %s", dstPath)
 	}
+	defer func() { _ = dstFile.Close() }()
 
 	_, err = io.Copy(dstFile, file)
 	if err != nil {
