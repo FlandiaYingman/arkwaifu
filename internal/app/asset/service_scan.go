@@ -2,9 +2,10 @@ package asset
 
 import (
 	"context"
+	"path/filepath"
+
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/pkg/errors"
-	"path/filepath"
 )
 
 func (s *Service) ScanStaticDir(ctx context.Context) error {
@@ -33,7 +34,7 @@ func scanStaticDir(staticDir string) ([]modelAsset, []modelVariant, error) {
 		scanFile, filename := filepath.Split(scanFile)
 		scanFile, kindName := filepath.Split(filepath.Dir(scanFile))
 		scanFile, variantName := filepath.Split(filepath.Dir(scanFile))
-		name := pathutil.RemoveExtAll(filename)
+		name := pathutil.RemoveAllExt(filename)
 
 		if _, ok := assetMap[kindName]; !ok {
 			assetMap[kindName] = make(map[string]modelAsset)

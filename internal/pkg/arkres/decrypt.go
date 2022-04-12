@@ -5,14 +5,15 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/json"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 const (
@@ -117,9 +118,12 @@ func decryptFile(srcPath string, srcDir string, dstDir string) error {
 }
 
 func saveFile(srcPath string, srcDir string, dstDir string, dstExt string, content []byte) error {
-	dstPath := pathutil.ReplaceParentExt(srcPath, srcDir, dstDir, dstExt)
+	dstPath, err := pathutil.ChangeParent(srcPath, srcDir, dstDir)
+	dstPath = pathutil.ReplaceExt(dstPath, dstExt)
+	if err != nil {
+		return errors.WithStack(err)
+	}
 
-	var err error
 	err = os.MkdirAll(filepath.Dir(dstPath), 0755)
 	if err != nil {
 		return errors.WithStack(err)

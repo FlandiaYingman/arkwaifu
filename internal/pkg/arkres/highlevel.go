@@ -3,14 +3,15 @@ package arkres
 import (
 	"context"
 	"encoding/base64"
+	"os"
+	"regexp"
+	"strings"
+
 	"github.com/ahmetb/go-linq/v3"
 	"github.com/caarlos0/env/v6"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"regexp"
-	"strings"
 )
 
 func init() {
@@ -127,11 +128,11 @@ func GetRes(ctx context.Context, infos []Info, dst string) error {
 		_ = os.RemoveAll(tmpDecrypt)
 	}()
 
-	err = fileutil.MoveAllFileContent(tmpUnpack, dst)
+	err = fileutil.MoveAllContent(tmpUnpack, dst)
 	if err != nil {
 		return err
 	}
-	err = fileutil.MoveAllFileContent(tmpDecrypt, dst)
+	err = fileutil.MoveAllContent(tmpDecrypt, dst)
 	if err != nil {
 		return err
 	}

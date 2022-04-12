@@ -8,141 +8,189 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 )
 
-// MoveAllFileContent moves all files from srcDir to dstDir recursively.
-// Only files' name and their content are guaranteed same.
-// If the existing files and the moving files have the same path, the existing files will be overridden.
-// This prevents os.Rename to panic "invalid cross-device link".
-func MoveAllFileContent(srcDir string, dstDir string) error {
-	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-
-		dstPath, err := ChangeParent(srcPath, srcDir, dstDir)
-		if err != nil {
-			return err
-		}
-		err = os.MkdirAll(filepath.Dir(dstPath), 0755)
-		if err != nil {
-			return fmt.Errorf("couldn't make directories: %w", err)
-		}
-		err = MoveFileContent(srcPath, dstPath)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-}
-
-// CopyAllFileContent copies all files from srcDir to dstDir recursively.
-// Only files' name and their content are guaranteed same.
-// If the existing files and the coping files have the same path, the existing files will be overridden.
-func CopyAllFileContent(srcDir string, dstDir string) error {
-	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			return nil
-		}
-
-		dstPath, err := ChangeParent(srcPath, srcDir, dstDir)
-		if err != nil {
-			return err
-		}
-		err = os.MkdirAll(filepath.Dir(dstPath), 0755)
-		if err != nil {
-			return fmt.Errorf("couldn't make directories: %w", err)
-		}
-		err = CopyFileContent(srcPath, dstPath)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-}
-
-func LowercaseAll(dir string) error {
-	return filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		lowerPath := filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path)))
-		if path != lowerPath {
-			return os.Rename(path, lowerPath)
-		}
-		return nil
-	})
-}
-
-func ChangeParent(srcPath string, srcDir string, dstDir string) (dstPath string, err error) {
-	relativePath, err := filepath.Rel(srcDir, srcPath)
+// MkParents creates all parents of a file with mode 0755 (before unmask).
+// If the parents of the file already exist, MkParents does nothing.
+func MkParents(filePath string) error {
+	err := os.MkdirAll(filepath.Dir(filePath), 0755)
 	if err != nil {
-		err = fmt.Errorf("couldn't make relative path: %w", err)
-		return
+		return fmt.Errorf("failed to create parent directories of %s: %v", filePath, err)
 	}
-	dstPath = filepath.Join(dstDir, relativePath)
-	return
+	return err
 }
 
-func CopyFileContent(src string, dst string) error {
+// MkFile creates a file and its parents with respectively mode 0666 and 0755 (both before unmask).
+// If the parents of the file already exist, MkFile does nothing.
+// If the file already exist, MkFile truncates it.
+func MkFile(filePath string) (*os.File, error) {
+	err := MkParents(filePath)
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.Create(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file %s: %v", filePath, err)
+	}
+	return file, nil
+}
+
+// CopyAllContent copies all files from srcDir to dstDir recursively.
+// Only files' name and content are guaranteed to be the same.
+// Only files are copied, (empty) directories are ignored.
+// Any existing files will be overridden.
+func CopyAllContent(srcDir string, dstDir string) error {
+	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+
+		dstPath := pathutil.MustChangeParent(srcPath, srcDir, dstDir)
+		err = CopyContent(srcPath, dstPath)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+// MoveAllContent moves all files from srcDir to dstDir recursively.
+// Only files' name and content are guaranteed to be the same.
+// Only files are moved, (empty) directories are ignored.
+// Any existing files will be overridden.
+//
+// Use MoveAllContent to prevent os.Rename to panic "invalid cross-device link".
+func MoveAllContent(srcDir string, dstDir string) error {
+	return filepath.WalkDir(srcDir, func(srcPath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+
+		dstPath := pathutil.MustChangeParent(srcPath, srcDir, dstDir)
+		err = MoveContent(srcPath, dstPath)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+// CopyContent copies the file src to dst.
+// Only the file's name and content are guaranteed to be the same.
+// The parents will be created if they don't exist.
+// The existing file will be overridden.
+func CopyContent(src string, dst string) error {
 	srcFile, err := os.Open(src)
 	if err != nil {
-		return fmt.Errorf("couldn't open src %s: %w", src, err)
+		return fmt.Errorf("failed to open src %s: %w", src, err)
 	}
 	defer srcFile.Close()
 
-	dstFile, err := os.Create(dst)
+	dstFile, err := MkFile(dst)
 	if err != nil {
-		return fmt.Errorf("couldn't open dst %s: %w", dst, err)
+		return fmt.Errorf("failed to make dst %s: %w", dst, err)
 	}
 	defer dstFile.Close()
 
 	_, err = io.Copy(dstFile, srcFile)
 	if err != nil {
-		return fmt.Errorf("couldn't copy to dst %s from src %s: %w", dst, src, err)
+		return fmt.Errorf("failed to copy to dst %s from src %s: %w", dst, src, err)
 	}
 
 	return nil
 }
 
-func MoveFileContent(src string, dst string) error {
+// MoveContent moves the file src to dst.
+// Only the file's name and content are guaranteed to be the same.
+// The parents will be created if they don't exist.
+// The existing file will be overridden.
+func MoveContent(src string, dst string) error {
 	err := os.Rename(src, dst)
 	if err != nil {
-		err := CopyFileContent(src, dst)
+		err = CopyContent(src, dst)
 		if err != nil {
 			return err
 		}
 
-		// if copy was successful, remove src
 		err = os.Remove(src)
 		if err != nil {
-			return fmt.Errorf("couldn't remove src %s: %w", src, err)
+			return fmt.Errorf("failed to remove src %s: %w", src, err)
 		}
 	}
 
 	return nil
 }
 
+// Exists checks if the file or directory exists.
+// If Exists cannot determinate whether the file or directory exists (e.g., permission error), it returns an error.
 func Exists(path string) (bool, error) {
 	_, err := os.Stat(path)
-	if err != nil {
-		return false, err
-	}
 	if errors.Is(err, os.ErrNotExist) {
 		return false, nil
+	}
+	if err != nil {
+		return false, err
 	}
 	return true, nil
 }
 
-func NotExists(path string) (bool, error) {
-	exists, err := Exists(path)
-	return !exists, err
+// LowercaseAll renames the directory to lowercase recursively.
+// If a file or directory is already lower-cased, LowercaseAll does nothing to it.
+func LowercaseAll(dirPath string) error {
+	return filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		return Lowercase(filepath.Join(dirPath, path))
+	})
+}
+
+// Lowercase renames the file or directory to lowercase.
+// If the file or directory is already lower-cased, it does nothing.
+func Lowercase(path string) error {
+	lowerPath := filepath.Join(filepath.Dir(path), strings.ToLower(filepath.Base(path)))
+	if path != lowerPath {
+		return os.Rename(path, lowerPath)
+	} else {
+		return nil
+	}
+}
+
+// ListAll lists all files and directories under the directory dirPath.
+func ListAll(dirPath string) ([]string, error) {
+	var all []string
+	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		all = append(all, filepath.Join(dirPath, path))
+		return nil
+	})
+	return all, err
+}
+
+// ListAllFiles lists all files under the directory dirPath.
+func ListAllFiles(dirPath string) ([]string, error) {
+	var allFiles []string
+	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			return nil
+		}
+		allFiles = append(allFiles, filepath.Join(dirPath, path))
+		return nil
+	})
+	return allFiles, err
 }

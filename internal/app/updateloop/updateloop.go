@@ -2,6 +2,10 @@ package updateloop
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/flandiayingman/arkwaifu/internal/app/asset"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
@@ -9,9 +13,6 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 type Controller struct {
@@ -164,7 +165,7 @@ func (c *Controller) submitUpdate(ctx context.Context, resVer string) error {
 		return err
 	}
 
-	err = fileutil.CopyAllFileContent(staticDir, c.StaticLocation)
+	err = fileutil.CopyAllContent(staticDir, c.StaticLocation)
 	if err != nil {
 		return errors.WithStack(err)
 	}

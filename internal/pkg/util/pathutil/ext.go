@@ -6,28 +6,24 @@ import (
 	"strings"
 )
 
-func ReplaceExt(path string, ext string) string {
-	withoutExt := strings.TrimSuffix(path, filepath.Ext(path))
-	return fmt.Sprintf("%v%v", withoutExt, ext)
-}
-
+// RemoveExt returns the path without the extension.
 func RemoveExt(path string) string {
 	return strings.TrimSuffix(path, filepath.Ext(path))
 }
 
-func RemoveExtAll(path string) string {
+// RemoveAllExt returns the path without all extensions.
+func RemoveAllExt(path string) string {
 	return strings.Split(path, ".")[0]
 }
 
-func ReplaceParent(srcPath string, srcDir string, dstDir string) (dstPath string) {
-	relativePath, err := filepath.Rel(srcDir, srcPath)
-	if err != nil {
-		return "."
-	}
-	return filepath.Join(dstDir, relativePath)
+// ReplaceExt replaces the extension of the given path with the given extension.
+func ReplaceExt(path string, ext string) string {
+	withoutExt := RemoveExt(path)
+	return fmt.Sprintf("%v%v", withoutExt, ext)
 }
 
-func ReplaceParentExt(srcPath, srcDir, dstDir, dstExt string) (dstPath string) {
-	dstPath = ReplaceExt(ReplaceParent(srcPath, srcDir, dstDir), dstExt)
-	return
+// ReplaceAllExt replaces all extensions of the given path with the given extension.
+func ReplaceAllExt(path string, ext string) string {
+	withoutExt := RemoveAllExt(path)
+	return fmt.Sprintf("%v%v", withoutExt, ext)
 }
