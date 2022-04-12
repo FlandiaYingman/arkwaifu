@@ -7,10 +7,61 @@ import (
 	"github.com/samber/lo"
 )
 
+const (
+	KindImages      = "images"
+	KindBackgrounds = "backgrounds"
+
+	VariantImg        = "img"
+	VariantTimg       = "timg"
+	VariantRealEsrgan = "real-esrgan"
+	VariantRealCugan  = "real-cugan"
+)
+
+var (
+	Kinds = []string{
+		KindImages,
+		KindBackgrounds,
+	}
+	KindsMap = map[string]string{
+		KindImages:      KindImages,
+		KindBackgrounds: KindBackgrounds,
+	}
+	Variants = []string{
+		VariantImg,
+		VariantTimg,
+		VariantRealEsrgan,
+		VariantRealCugan,
+	}
+	VariantsMap = map[string]string{
+		VariantImg:        VariantImg,
+		VariantTimg:       VariantTimg,
+		VariantRealEsrgan: VariantRealEsrgan,
+		VariantRealCugan:  VariantRealCugan,
+	}
+)
+
+var (
+	ErrInvalidKind    = fmt.Errorf("invalid kind")
+	ErrInvalidVariant = fmt.Errorf("invalid variant")
+)
+
+func CheckKind(kind string) error {
+	if _, ok := KindsMap[kind]; !ok {
+		return fmt.Errorf("%s: %w", kind, ErrInvalidKind)
+	}
+	return nil
+}
+func CheckVariant(variant string) error {
+	if _, ok := VariantsMap[variant]; !ok {
+		return fmt.Errorf("%s: %w", variant, ErrInvalidVariant)
+	}
+	return nil
+}
+
 type Asset struct {
-	Kind     string    `json:"kind"`
-	Name     string    `json:"name"`
-	Variants []Variant `json:"variants"`
+	Kind     string     `json:"kind"`
+	Name     string     `json:"name"`
+	Variants *[]Variant `json:"variants"`
 }
 type Variant struct {
 	Variant  string `json:"variant"`
@@ -19,19 +70,26 @@ type Variant struct {
 }
 
 func fromAssetModel(model modelAsset) Asset {
-	vms := lo.Map(model.Variants, func(vmPtr *modelVariant, _ int) Variant {
-		return fromVariantModel(*vmPtr)
-	})
-	return Asset{
+	asset := Asset{
 		Kind:     model.Kind,
 		Name:     model.Name,
-		Variants: vms,
+		Variants: nil,
 	}
+	vs := lo.Map(model.Variants,
+		func(vmPtr *modelVariant, _ int) Variant {
+			v := fromVariantModel(*vmPtr)
+			v.Asset = &asset
+			return v
+		},
+	)
+	asset.Variants = &vs
+	return asset
 }
 func fromVariantModel(model modelVariant) Variant {
 	return Variant{
 		Variant:  model.Variant,
 		Filename: model.Filename,
+		Asset:    nil,
 	}
 }
 

@@ -2,10 +2,11 @@ package updateloop
 
 import (
 	"context"
+	"strings"
+
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/arkavg"
-	"strings"
 )
 
 func (c *Controller) updateDatabase(ctx context.Context, resVer string, resDir string) error {
@@ -27,7 +28,7 @@ func (c *Controller) updateDatabase(ctx context.Context, resVer string, resDir s
 	return nil
 }
 func (c *Controller) updateAssetDatabase(ctx context.Context) error {
-	err := c.assetService.InitNames(ctx, AcceptableAssetKinds, AcceptableAssetVariants)
+	err := c.assetService.InitNames(ctx)
 	if err != nil {
 		return err
 	}

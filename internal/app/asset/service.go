@@ -70,8 +70,8 @@ func (s *Service) GetVariant(ctx context.Context, kind string, name string, vari
 	return &v, nil
 }
 
-func (s *Service) InitNames(ctx context.Context, kindNames []string, variantNames []string) error {
-	return s.repo.InitNames(ctx, kindNames, variantNames)
+func (s *Service) InitNames(ctx context.Context) error {
+	return s.repo.InitNames(ctx, Kinds, Variants)
 }
 func (s *Service) GetKindNames(ctx context.Context) ([]string, error) {
 	kinds, err := s.repo.SelectKindNames(ctx)
