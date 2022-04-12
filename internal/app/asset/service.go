@@ -3,7 +3,6 @@ package asset
 import (
 	"context"
 	"io"
-	"path/filepath"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
@@ -21,16 +20,6 @@ func NewService(conf *config.Config, assetRepo *repo) *Service {
 		staticDir: conf.StaticDir,
 		repo:      assetRepo,
 	}
-}
-
-type Asset struct {
-	Kind     string    `json:"kind"`
-	Name     string    `json:"name"`
-	Variants []Variant `json:"variants"`
-}
-type Variant struct {
-	Variant  string `json:"variant"`
-	Filename string `json:"filename"`
 }
 
 func (s *Service) GetAssets(ctx context.Context, kind *string) ([]Asset, error) {
@@ -62,7 +51,7 @@ func (s *Service) GetVariantFile(ctx context.Context, kind, name, variant string
 		return nil, nil
 	}
 
-	assetFilePath := filepath.Join(s.staticDir, variant, kind, v.Filename)
+	assetFilePath := v.FilePath(s.staticDir)
 	return &assetFilePath, nil
 }
 func (s *Service) GetVariants(ctx context.Context, kind string, name string) ([]Variant, error) {
@@ -115,7 +104,7 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 		return errors.Errorf("asset %s/%s not found", kind, name)
 	}
 
-	dstPath := filepath.Join(s.staticDir, vm.Variant, vm.AssetKind, variant.Filename)
+	dstPath := variant.FilePath(s.staticDir)
 	dstFile, err := fileutil.MkFile(dstPath)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create dst %s", dstPath)
@@ -133,23 +122,6 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 	}
 
 	return nil
-}
-
-func fromAssetModel(model modelAsset) Asset {
-	vms := lo.Map(model.Variants, func(vmPtr *modelVariant, _ int) Variant {
-		return fromVariantModel(*vmPtr)
-	})
-	return Asset{
-		Kind:     model.Kind,
-		Name:     model.Name,
-		Variants: vms,
-	}
-}
-func fromVariantModel(model modelVariant) Variant {
-	return Variant{
-		Variant:  model.Variant,
-		Filename: model.Filename,
-	}
 }
 
 func wrapIter[T any, R any](f func(T) R) func(T, int) R {
