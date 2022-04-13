@@ -34,9 +34,7 @@ func ProvideOptions() []fx.Option {
 		fx.Invoke(
 			asset.RegisterController,
 		),
-		fx.Provide(
-			updateloop.NewController,
-		),
+		updateloop.Module(),
 		// ...
 	}
 	return opts

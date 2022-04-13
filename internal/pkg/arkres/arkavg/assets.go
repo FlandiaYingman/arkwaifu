@@ -2,11 +2,12 @@ package arkavg
 
 import (
 	"fmt"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
+	"github.com/pkg/errors"
 )
 
 type Asset struct {
@@ -56,6 +57,10 @@ func GetAssetsKind(resDir string, prefix string, kind Kind) ([]Asset, error) {
 }
 
 func (a *Asset) Open(resDir string, prefix string) (*os.File, error) {
-	assetPath := filepath.Join(resDir, prefix, "avg", string(a.Kind), pathutil.ReplaceExt(a.Name, ".png"))
+	assetPath := a.FilePath(resDir, prefix)
 	return os.Open(assetPath)
+}
+
+func (a *Asset) FilePath(resDir string, prefix string) string {
+	return filepath.Join(resDir, prefix, "avg", string(a.Kind), pathutil.ReplaceExt(a.Name, ".png"))
 }

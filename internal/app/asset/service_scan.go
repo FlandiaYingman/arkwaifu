@@ -4,11 +4,21 @@ import (
 	"context"
 	"path/filepath"
 
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/pkg/errors"
 )
 
-func (s *Service) ScanStaticDir(ctx context.Context) error {
+func (s *Service) PopulateFrom(ctx context.Context, dirPath string) error {
+	err := fileutil.CopyAllContent(dirPath, s.staticDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to copy all content from %s to static dir %s", dirPath, s.staticDir)
+	}
+	err = fileutil.LowercaseAll(s.staticDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to lowercase all files in static dir %s", s.staticDir)
+	}
+
 	am, vm, err := scanStaticDir(s.staticDir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to scan static dir %s", s.staticDir)

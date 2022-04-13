@@ -18,10 +18,6 @@ type Config struct {
 	StaticDir string `env:"STATIC_DIR" envDefault:"./arkwaifu_static"`
 
 	PostgresDSN string `env:"POSTGRES_DSN"`
-
-	// ForceUpdate indicates whether updateloop should force an update (only once).
-	// This environment variable is useful in development. Don't use in production unless you really find it fits.
-	ForceUpdate bool `env:"FORCE_UPDATE" envDefault:"false"`
 }
 
 func ProvideConfig() (*Config, error) {
