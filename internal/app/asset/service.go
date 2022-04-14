@@ -66,7 +66,13 @@ func (s *Service) GetVariant(ctx context.Context, kind string, name string, vari
 	if err != nil {
 		return nil, err
 	}
+	ma, err := s.repo.SelectAsset(ctx, kind, name)
+	if err != nil {
+		return nil, err
+	}
 	v := fromVariantModel(*mv)
+	a := fromAssetModel(*ma)
+	v.Asset = &a
 	return &v, nil
 }
 

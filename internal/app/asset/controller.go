@@ -1,12 +1,13 @@
 package asset
 
 import (
+	"strings"
+	"time"
+
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/etag"
-	"strings"
-	"time"
 )
 
 type Controller struct {
@@ -183,7 +184,15 @@ func (c *Controller) PostVariant(ctx *fiber.Ctx) error {
 	}
 	defer func() { _ = file.Close() }()
 
-	v := Variant{Variant: variant, Filename: formFile.Filename}
+	v := Variant{
+		Variant:  variant,
+		Filename: formFile.Filename,
+		Asset: &Asset{
+			Kind:     kind,
+			Name:     name,
+			Variants: nil,
+		},
+	}
 	err = c.service.PostVariant(ctx.Context(), kind, name, v, file)
 	if err != nil {
 		return err
