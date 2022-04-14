@@ -9,6 +9,9 @@ type Config struct {
 	// ForceSubmit indicates whether updateloop should force a submit operation (only once).
 	// This environment variable is useful in development. Don't use in production unless you find it fits.
 	ForceSubmit bool `env:"FORCE_SUBMIT" envDefault:"false"`
+	// ForceResVersion indicates whether updateloop should force the remote resVersion to a specific value (only once).
+	// This environment variable is useful in development. Don't use in production unless you find it fits.
+	ForceResVersion string `env:"FORCE_RES_VERSION" envDefault:""`
 }
 
 func ProvideConfig() (*Config, error) {

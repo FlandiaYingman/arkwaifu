@@ -24,10 +24,11 @@ func Module() fx.Option {
 }
 
 type Service struct {
-	MainResDir    string
-	MainStaticDir string
-	ForceUpdate   bool
-	ForceSubmit   bool
+	MainResDir      string
+	MainStaticDir   string
+	ForceUpdate     bool
+	ForceSubmit     bool
+	ForceResVersion string
 
 	AvgService   *avg.Service
 	AssetService *asset.Service
@@ -41,12 +42,13 @@ func NewService(
 	conf *Config,
 ) *Service {
 	return &Service{
-		MainResDir:    appConf.ResourceDir,
-		MainStaticDir: appConf.StaticDir,
-		ForceUpdate:   conf.ForceUpdate,
-		ForceSubmit:   conf.ForceSubmit,
-		AvgService:    avgS,
-		AssetService:  assetS,
+		MainResDir:      appConf.ResourceDir,
+		MainStaticDir:   appConf.StaticDir,
+		ForceUpdate:     conf.ForceUpdate,
+		ForceSubmit:     conf.ForceSubmit,
+		ForceResVersion: conf.ForceResVersion,
+		AvgService:      avgS,
+		AssetService:    assetS,
 	}
 }
 
@@ -58,6 +60,12 @@ func (s *Service) ResVer(ctx context.Context) (ResVersion, ResVersion, error) {
 	remote, err := arkres.GetResVersion()
 	if err != nil {
 		return "", "", errors.Wrapf(err, "cannot get remote resource version")
+	}
+	if s.ForceResVersion != "" {
+		log.WithFields(log.Fields{"local": local, "remote": remote, "forceResVersion": s.ForceResVersion}).
+			Warn("force res version is set, ignoring res remote version and use the force res version")
+		remote = s.ForceResVersion
+		defer func() { s.ForceResVersion = "" }()
 	}
 	return ResVersion(local), ResVersion(remote), nil
 }
