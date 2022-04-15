@@ -1,16 +1,22 @@
 import argparse
 import functools
+import json
+import os.path
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+from typing import Any
 from typing import List
 
 import PIL.Image
 import UnityPy
+from UnityPy.classes import Object
+from UnityPy.classes import PPtr
+from UnityPy.classes.Object import NodeHelper
 
 # flush every line to prevent blocking outputs
 # noinspection PyShadowingBuiltins
-print = functools.partial(print)
+print = functools.partial(print, flush=True)
 
 # initialize PIL to preload supported formats
 PIL.Image.preinit()
@@ -39,23 +45,89 @@ def unpack(src: Path, dst: Path, filters: List[str], workers=None):
                     executor.submit(unpack, it, dst, filters)
     elif src.is_file():
         env = UnityPy.load(str(src))
-        for path, obj in env.container.items():
-            if any(path.startswith(f) for f in filters):
-                dest = dst.joinpath(*path.split('/'))
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                data = obj.read()
-                if obj.type.name in ["Texture2D", "Sprite"]:
-                    if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
-                        data.image.save(dest)
-                        print(f"{path}=>{dest}")
-                    else:
-                        print(f"type of {path} is not supported", file=sys.stderr)
-                if obj.type.name in ["TextAsset"]:
-                    with open(dest, "wb") as file:
-                        file.write(bytes(data.script))
-                    print(f"{path}=>{dest}")
+        for container, obj_reader in env.container.items():
+            if any(container.startswith(f) for f in filters):
+                obj = obj_reader.read()
+                container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
+                export(obj, dst, container_path)
     else:
-        print(f"WARN: {src} is not dir neither file; is skipped")
+        print(f"WARN: {src} is not dir neither file; skipping")
+
+
+def export(obj: Object, dst: Path, container_path: str):
+    obj_name = getattr(obj, 'name', '')
+    obj_path = obj.container or f"{container_path}/{obj_name}"
+    if obj.type.name in ["Texture2D", "Sprite"]:
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.png"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
+        if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
+            obj.image.save(dest)
+            print(f"{obj_path}({obj.type.name})=>{dest}")
+        else:
+            print(f"cannot export {obj_path}({obj.type.name}), format is not supported", file=sys.stderr)
+
+    if obj.type.name in ["TextAsset"]:
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.txt"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(dest, "wb") as file:
+            file.write(bytes(obj.script))
+        print(f"{obj_path}({obj.type.name})=>{dest}")
+
+    if obj.type.name in ["MonoBehaviour"]:
+        script = obj.m_Script.read()
+        dest = dst / obj.container if obj.container else dst / container_path / f"{script.name}.json"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(dest, "w", encoding="utf8") as file:
+            json.dump(obj.read_typetree(), file, ensure_ascii=False, indent=4)
+        print(f"{obj_path}({obj.type.name})=>{dest}")
+
+    if obj.type.name in ["GameObject"]:
+        nodes = traverse(obj)
+        container_path = os.path.normpath(os.path.join(container_path, '..', obj.name))
+        for node in nodes:
+            export(node, dst, container_path)
+
+
+def traverse(obj: Object) -> List[Object]:
+    """
+    traverse() traverses through an UnityPy Object, returning all sub UnityPy Objects.
+    """
+
+    def traverse_tree(o: Any, r: List[Object]):
+        if not o:
+            return
+        if isinstance(o, PPtr):
+            o = o.read()
+            r += [o]
+
+        skipping_attr_names = ["m_GameObject", "m_Father", "m_Script"]
+        match o:
+            case list():
+                for i, attr in enumerate(o):
+                    traverse_tree(attr, r)
+            case dict():
+                for name, attr in o.items():
+                    traverse_tree(attr, r)
+            case NodeHelper():
+                for name, attr in o.items():
+                    if name in skipping_attr_names:
+                        continue
+                    traverse_tree(attr, r)
+            case _:
+                attr_names = dir(o)
+                attr_names = list(filter(lambda x: x.startswith('m_') or x == "type_tree", attr_names))
+                for attr_name in attr_names:
+                    if attr_name in skipping_attr_names:
+                        continue
+                    sub_obj = getattr(o, attr_name)
+                    traverse_tree(sub_obj, r)
+
+    results = []
+    traverse_tree(obj, results)
+    return results
 
 
 def main():
@@ -100,7 +172,8 @@ def main():
                 list_assets(Path(src), filters=args.filter)
         case "unpack":
             for src in args.src:
-                unpack(Path(src), Path(args.dst), filters=args.filter, workers=int(args.workers) if args.workers else None)
+                unpack(Path(src), Path(args.dst), filters=args.filter,
+                       workers=int(args.workers) if args.workers else None)
 
 
 if __name__ == '__main__':
