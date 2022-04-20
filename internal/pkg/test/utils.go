@@ -6,14 +6,15 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/gob"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
-	"github.com/pkg/errors"
-	"golang.org/x/mod/sumdb/dirhash"
 	"hash"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
+	"github.com/pkg/errors"
+	"golang.org/x/mod/sumdb/dirhash"
 )
 
 func HashDir(dir string) string {
@@ -72,7 +73,7 @@ func AssertAllIn(dirA, dirB string) error {
 			return nil
 		}
 
-		dstPath := pathutil.ReplaceParent(srcPath, dirA, dirB)
+		dstPath := pathutil.MustChangeParent(srcPath, dirA, dirB)
 
 		srcHash := HashFile(srcPath)
 		dstHash := HashFile(dstPath)
