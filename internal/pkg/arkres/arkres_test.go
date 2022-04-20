@@ -2,10 +2,11 @@ package arkres
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/test"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/flandiayingman/arkwaifu/internal/pkg/test"
 )
 
 var (
@@ -22,7 +23,7 @@ func TestGet(t *testing.T) {
 		t.Fatalf("%+v", err)
 	}
 
-	expected := "h1:8g0nB4HSnlGiv7taFGo0gY9wZJJcINzi64VGp1ICO/Q="
+	expected := "h1:lrJBULywG33Q3Rfu7i1f/KjojSnvG+HsfkW5wnK0CLk="
 	actual := test.HashDir(dir)
 	if expected != actual {
 		t.Fatalf("expected: %v; actual: %v", expected, actual)
