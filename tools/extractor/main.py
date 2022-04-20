@@ -6,6 +6,7 @@ import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any
+from typing import Dict
 from typing import List
 
 import PIL.Image
@@ -49,18 +50,25 @@ def unpack(src: Path, dst: Path, filters: List[str], workers=None):
             if any(container.startswith(f) for f in filters):
                 obj = obj_reader.read()
                 container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
-                export(obj, dst, container_path)
+                path_id_path = dst / os.path.normpath(os.path.join(obj.container, '..', f"{obj.name}.json"))
+                path_id_dict = export(obj, dst, container_path)
+                if len(path_id_dict) > 0:
+                    with open(path_id_path, "w", encoding="utf8") as file:
+                        json.dump(path_id_dict, file, ensure_ascii=False, indent=4)
+
     else:
         print(f"WARN: {src} is not dir neither file; skipping")
 
 
-def export(obj: Object, dst: Path, container_path: str):
+def export(obj: Object, dst: Path, container_path: str, path_id_dict: Dict[int, str] = None) -> Dict[int, str]:
+    path_id_dict = {} if path_id_dict is None else path_id_dict
+
     obj_name = getattr(obj, 'name', '')
     obj_path = obj.container or f"{container_path}/{obj_name}"
     if obj.type.name in ["Texture2D", "Sprite"]:
         dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.png"
         dest.parent.mkdir(parents=True, exist_ok=True)
-
+        path_id_dict[obj.path_id] = str(dest.name)
         if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
             obj.image.save(dest)
             print(f"{obj_path}({obj.type.name})=>{dest}")
@@ -70,16 +78,17 @@ def export(obj: Object, dst: Path, container_path: str):
     if obj.type.name in ["TextAsset"]:
         dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.txt"
         dest.parent.mkdir(parents=True, exist_ok=True)
-
+        path_id_dict[obj.path_id] = str(dest.name)
         with open(dest, "wb") as file:
             file.write(bytes(obj.script))
         print(f"{obj_path}({obj.type.name})=>{dest}")
 
     if obj.type.name in ["MonoBehaviour"]:
         script = obj.m_Script.read()
-        dest = dst / obj.container if obj.container else dst / container_path / f"{script.name}.json"
+        obj_name = script.name
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj_name}.json"
         dest.parent.mkdir(parents=True, exist_ok=True)
-
+        path_id_dict[obj.path_id] = str(dest.name)
         with open(dest, "w", encoding="utf8") as file:
             json.dump(obj.read_typetree(), file, ensure_ascii=False, indent=4)
         print(f"{obj_path}({obj.type.name})=>{dest}")
@@ -88,7 +97,9 @@ def export(obj: Object, dst: Path, container_path: str):
         nodes = traverse(obj)
         container_path = os.path.normpath(os.path.join(container_path, '..', obj.name))
         for node in nodes:
-            export(node, dst, container_path)
+            export(node, dst, container_path, path_id_dict)
+
+    return path_id_dict
 
 
 def traverse(obj: Object) -> List[Object]:
