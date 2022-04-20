@@ -167,7 +167,51 @@ func Lowercase(path string) error {
 	}
 }
 
-// ListAll lists all files and directories under the directory dirPath.
+// List lists all files and directories under the directory dirPath (no recursive).
+func List(dirPath string) ([]string, error) {
+	dirEntries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	var all []string
+	for _, dirEntry := range dirEntries {
+		all = append(all, filepath.Join(dirPath, dirEntry.Name()))
+	}
+	return all, err
+}
+
+// ListFiles lists all files under the directory dirPath (no recursive).
+func ListFiles(dirPath string) ([]string, error) {
+	dirEntries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	var all []string
+	for _, dirEntry := range dirEntries {
+		if dirEntry.IsDir() {
+			continue
+		}
+		all = append(all, filepath.Join(dirPath, dirEntry.Name()))
+	}
+	return all, err
+}
+
+// ListDirs lists all directories under the directory dirPath (no recursive).
+func ListDirs(dirPath string) ([]string, error) {
+	dirEntries, err := os.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	var all []string
+	for _, dirEntry := range dirEntries {
+		if dirEntry.IsDir() {
+			all = append(all, filepath.Join(dirPath, dirEntry.Name()))
+		}
+	}
+	return all, err
+}
+
+// ListAll lists all files and directories under the directory dirPath (recursive).
 func ListAll(dirPath string) ([]string, error) {
 	var all []string
 	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
@@ -180,7 +224,7 @@ func ListAll(dirPath string) ([]string, error) {
 	return all, err
 }
 
-// ListAllFiles lists all files under the directory dirPath.
+// ListAllFiles lists all files under the directory dirPath (recursive).
 func ListAllFiles(dirPath string) ([]string, error) {
 	var allFiles []string
 	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
@@ -191,6 +235,21 @@ func ListAllFiles(dirPath string) ([]string, error) {
 			return nil
 		}
 		allFiles = append(allFiles, filepath.Join(dirPath, path))
+		return nil
+	})
+	return allFiles, err
+}
+
+// ListALlDirs lists all directories under the directory dirPath (recursive).
+func ListALlDirs(dirPath string) ([]string, error) {
+	var allFiles []string
+	err := filepath.WalkDir(dirPath, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if entry.IsDir() {
+			allFiles = append(allFiles, filepath.Join(dirPath, path))
+		}
 		return nil
 	})
 	return allFiles, err
