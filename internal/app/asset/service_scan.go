@@ -10,15 +10,19 @@ import (
 )
 
 func (s *Service) PopulateFrom(ctx context.Context, dirPath string) error {
-	err := fileutil.CopyAllContent(dirPath, s.staticDir)
-	if err != nil {
-		return errors.Wrapf(err, "failed to copy all content from %s to static dir %s", dirPath, s.staticDir)
+	if exist, err := fileutil.Exists(dirPath); exist || err != nil {
+		if err != nil {
+			return errors.Wrapf(err, "failed to check if dir %s exists", dirPath)
+		}
+		err := fileutil.CopyAllContent(dirPath, s.staticDir)
+		if err != nil {
+			return errors.Wrapf(err, "failed to copy all content from %s to static dir %s", dirPath, s.staticDir)
+		}
+		err = fileutil.LowercaseAll(s.staticDir)
+		if err != nil {
+			return errors.Wrapf(err, "failed to lowercase all files in static dir %s", s.staticDir)
+		}
 	}
-	err = fileutil.LowercaseAll(s.staticDir)
-	if err != nil {
-		return errors.Wrapf(err, "failed to lowercase all files in static dir %s", s.staticDir)
-	}
-
 	am, vm, err := scanStaticDir(s.staticDir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to scan static dir %s", s.staticDir)
