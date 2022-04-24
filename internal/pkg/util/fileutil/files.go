@@ -152,7 +152,7 @@ func LowercaseAll(dirPath string) error {
 		if err != nil {
 			return err
 		}
-		return Lowercase(filepath.Join(dirPath, path))
+		return Lowercase(path)
 	})
 }
 
@@ -218,7 +218,7 @@ func ListAll(dirPath string) ([]string, error) {
 		if err != nil {
 			return err
 		}
-		all = append(all, filepath.Join(dirPath, path))
+		all = append(all, path)
 		return nil
 	})
 	return all, err
@@ -234,7 +234,7 @@ func ListAllFiles(dirPath string) ([]string, error) {
 		if entry.IsDir() {
 			return nil
 		}
-		allFiles = append(allFiles, filepath.Join(dirPath, path))
+		allFiles = append(allFiles, path)
 		return nil
 	})
 	return allFiles, err
@@ -248,7 +248,7 @@ func ListALlDirs(dirPath string) ([]string, error) {
 			return err
 		}
 		if entry.IsDir() {
-			allFiles = append(allFiles, filepath.Join(dirPath, path))
+			allFiles = append(allFiles, path)
 		}
 		return nil
 	})
