@@ -257,8 +257,10 @@ func ListALlDirs(dirPath string) ([]string, error) {
 
 // MkFileFromReader calls MkFile and then writes the content of the reader to the file.
 //
-// Note that it's the caller's responsibility to close the reader.
+// If the reader implements io.Closer, it would be closed when the method returns.
 func MkFileFromReader(filePath string, r io.Reader) error {
+	defer func() { _ = CloseIfIsCloser(r) }()
+
 	f, err := MkFile(filePath)
 	if err != nil {
 		return err
@@ -272,4 +274,11 @@ func MkFileFromReader(filePath string, r io.Reader) error {
 // MkFileFromBytes calls MkFile and then writes the content of the bytes to the file.
 func MkFileFromBytes(filePath string, b []byte) error {
 	return MkFileFromReader(filePath, bytes.NewReader(b))
+}
+
+func CloseIfIsCloser(r any) error {
+	if closer, ok := r.(io.Closer); ok {
+		return closer.Close()
+	}
+	return nil
 }
