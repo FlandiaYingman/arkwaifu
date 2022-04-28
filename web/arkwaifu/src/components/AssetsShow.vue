@@ -77,12 +77,14 @@ export default {
   "en": {
     "images": "Images",
     "backgrounds": "Backgrounds",
+    "characters": "Characters",
     "distinctOn": "Distinct: ON",
     "distinctOff": "Distinct: Off"
   },
   "zh": {
     "images": "图片",
     "backgrounds": "背景",
+    "characters": "角色",
     "distinctOn": "显示重复：关",
     "distinctOff": "显示重复：开"
   }
