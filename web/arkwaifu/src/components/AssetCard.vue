@@ -41,8 +41,10 @@ export default {
           return 'img'
         case 'backgrounds':
           return 'bg'
+        case 'characters':
+          return 'char'
         default:
-          return ''
+          return this.assetKind
       }
     }
   }

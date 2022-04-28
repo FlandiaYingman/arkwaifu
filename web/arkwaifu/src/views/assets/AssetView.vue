@@ -73,12 +73,13 @@ export default {
     "variants": {
       "title": "Variants",
       "desc": "These are the variants of the asset. Note that some files are huge (~10MB) and may take a while to load.",
-      "descVariants": "The Raw Image is the original image extracted from the game. The Super-Resolution Images are the high-resolution versions of image after super-resolution with different models (Real-CUGAN, Real-ESRGAN, etc.). Thumbnail is the low-resolution and low-quality version of the image. ",
+      "descVariants": "The Raw Image is the original image extracted from the game. The Super-Resolution Images are the high-resolution versions of image after super-resolution with different models (Real-CUGAN, Real-ESRGAN, etc.). Thumbnail is the low-resolution and low-quality version of the image. The Raw Transparency Mask is the transparency mask of the Raw Image (if has).",
       "descSuperResolution": "Real-CUGAN and Real-ESRGAN are two different models. There are slightly differences between the produced images. For me, Real-CUGAN looks more massive, and Real-ESRGAN looks more fine and smooth. "
     },
     "variant": {
       "img": "Raw Image",
       "timg": "Thumbnail Image",
+      "alpha": "Raw Transparency Mask",
       "real-esrgan": "Super-Resolution: Real-ESRGAN",
       "real-cugan": "Super-Resolution: Real-CUGAN"
     }
@@ -87,12 +88,13 @@ export default {
     "variants": {
       "title": "变体",
       "desc": "这些是资源的变体。注意，一些文件是很大的（~10MB），可能需要一段时间来加载。",
-      "descVariants": "原始图指从游戏中提取的原始图像；超分辨率指使用不同模型（Real-CUGAN、Real-ESRGAN 等）进行超分辨率后的高清版原始图像；缩略图指原始图像降低分辨率和质量后的缩略图。",
+      "descVariants": "原始图指从游戏中提取的原始图像；超分辨率指使用不同模型（Real-CUGAN、Real-ESRGAN 等）进行超分辨率后的高清版原始图像；缩略图指原始图像降低分辨率和质量后的缩略图；原始透明通道是原始图的透明通道（如果有的话）。",
       "descSuperResolution": "Real-CUGAN 和 Real-ESRGAN 是两个不同的模型，它们的超分辨率效果有细微的不同。就作者本人而言，Real-CUGAN 更厚重，而 Real-ESRGAN 更细腻。"
     },
     "variant": {
       "img": "原始图",
       "timg": "缩略图",
+      "alpha": "原始透明通道",
       "real-esrgan": "超分辨率: Real-ESRGAN",
       "real-cugan": "超分辨率: Real-CUGAN"
     }
