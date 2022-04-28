@@ -22,6 +22,7 @@ const store = new Vuex.Store({
   getters: {
     groupByID: (state) => (id) => state.groupsMap[id],
     storyByID: (state) => (id) => state.storiesMap[id],
+    groupsByType: (state) => (type) => state.groupsTypeMap[type] || [],
     images: ({ assetsKindMap }) => assetsKindMap.images,
     backgrounds: ({ assetsKindMap }) => assetsKindMap.backgrounds
   },

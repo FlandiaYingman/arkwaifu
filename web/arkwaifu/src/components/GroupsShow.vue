@@ -37,14 +37,11 @@ export default {
   },
   computed: {
     groups () {
-      let groups = [...this.$store.state.groupsTypeMap[this.type]]
-      if (groups) {
-        if (this.descending) {
-          groups = _.reverse(groups)
-        }
-        return groups
+      let groups = [...this.$store.getters.groupsByType(this.type)]
+      if (this.descending) {
+        groups = _.reverse(groups)
       }
-      return null
+      return groups
     }
   }
 }
