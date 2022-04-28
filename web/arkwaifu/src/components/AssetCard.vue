@@ -4,7 +4,7 @@
       {{ kindAbbr }}/{{ assetId }}
     </div>
     <v-card
-      :to="`/assets/${assetKind}/${assetId}`"
+      :to="`/assets/${assetKind}/${encodeURIComponent(assetId)}`"
       :href="assetURL"
     >
       <v-img
@@ -30,10 +30,10 @@ export default {
   },
   computed: {
     assetThumbnailURL () {
-      return `${API_URL}/api/v0/asset/variants/${this.assetKind}/${this.assetId}/timg/file`
+      return `${API_URL}/api/v0/asset/variants/${encodeURIComponent(this.assetKind)}/${encodeURIComponent(this.assetId)}/timg/file`
     },
     assetURL () {
-      return `${API_URL}/api/v0/asset/variants/${this.assetKind}/${this.assetId}/img/file`
+      return `${API_URL}/api/v0/asset/variants/${encodeURIComponent(this.assetKind)}/${encodeURIComponent(this.assetId)}/img/file`
     },
     kindAbbr () {
       switch (this.assetKind) {

@@ -61,7 +61,7 @@ export default {
   computed: {},
   asyncComputed: {
     variants () {
-      return fetch(`${Api}/api/v0/asset/variants/${this.kind}/${this.id}`)
+      return fetch(`${Api}/api/v0/asset/variants/${this.kind}/${encodeURIComponent(this.id)}`)
         .then(res => res.json())
     }
   }

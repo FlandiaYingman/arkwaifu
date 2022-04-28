@@ -2,7 +2,7 @@
   <div>
     <img
       ref="img"
-      :src="url"
+      :src="fileURL"
       alt=""
     >
     <p class="text-caption">
@@ -11,7 +11,7 @@
     <p>
       <v-btn
         color="primary"
-        :href="url"
+        :href="fileURL"
         :download="filename"
       >
         <v-icon left>
@@ -53,12 +53,15 @@ export default {
     }
   },
   computed: {
+    fileURL: function () {
+      return `${Api}/api/v0/asset/variants/${encodeURIComponent(this.kind)}/${encodeURIComponent(this.name)}/${encodeURIComponent(this.variant)}/file`
+    },
     url: function () {
-      return `${Api}/api/v0/asset/variants/${this.kind}/${this.name}/${this.variant}/file`
+      return `${Api}/api/v0/asset/variants/${encodeURIComponent(this.kind)}/${encodeURIComponent(this.name)}/${encodeURIComponent(this.variant)}`
     }
   },
   created () {
-    fetch(`${Api}/api/v0/asset/variants/${this.kind}/${this.name}/${this.variant}`)
+    fetch(this.url)
       .then(res => res.json())
       .then(asset => (this.filename = asset.filename))
   },
