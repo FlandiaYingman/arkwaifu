@@ -2,13 +2,16 @@ package asset
 
 import (
 	"net/url"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/samber/lo"
 )
 
 type Controller struct {
@@ -145,7 +148,7 @@ func (c *Controller) GetVariantFile(ctx *fiber.Ctx) error {
 	}
 	if vFile != nil {
 		ctx.Attachment(v.Filename)
-		return ctx.SendFile(url.PathEscape(*vFile))
+		return ctx.SendFile(filepath.Join(lo.Map(pathutil.Splits(*vFile), wrapIter(url.PathEscape))...))
 	} else {
 		return ctx.SendStatus(fiber.StatusNotFound)
 	}

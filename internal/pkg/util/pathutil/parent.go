@@ -3,6 +3,7 @@ package pathutil
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 )
 
 // ChangeParent changes the parent of srcPath from srcDir to dstDir, and returns the dstPath.
@@ -29,4 +30,11 @@ func MustChangeParent(srcPath string, srcDir string, dstDir string) string {
 		panic(err)
 	}
 	return dstPath
+}
+
+const slash = "/"
+
+func Splits(path string) (parts []string) {
+	parts = strings.Split(filepath.ToSlash(path), slash)
+	return
 }
