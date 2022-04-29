@@ -10,9 +10,11 @@ import (
 const (
 	KindImages      = "images"
 	KindBackgrounds = "backgrounds"
+	KindCharacters  = "characters"
 
 	VariantImg        = "img"
 	VariantTimg       = "timg"
+	VariantAlpha      = "alpha"
 	VariantRealEsrgan = "real-esrgan"
 	VariantRealCugan  = "real-cugan"
 )
@@ -21,20 +23,24 @@ var (
 	Kinds = []string{
 		KindImages,
 		KindBackgrounds,
+		KindCharacters,
 	}
 	KindsMap = map[string]string{
 		KindImages:      KindImages,
 		KindBackgrounds: KindBackgrounds,
+		KindCharacters:  KindCharacters,
 	}
 	Variants = []string{
 		VariantImg,
 		VariantTimg,
+		VariantAlpha,
 		VariantRealEsrgan,
 		VariantRealCugan,
 	}
 	VariantsMap = map[string]string{
 		VariantImg:        VariantImg,
 		VariantTimg:       VariantTimg,
+		VariantAlpha:      VariantAlpha,
 		VariantRealEsrgan: VariantRealEsrgan,
 		VariantRealCugan:  VariantRealCugan,
 	}

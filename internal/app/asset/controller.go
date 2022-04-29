@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"net/url"
 	"strings"
 	"time"
 
@@ -54,7 +55,7 @@ func newCache() fiber.Handler {
 			case strings.HasSuffix(ctx.Path(), "/file"):
 				return ctx.Response().StatusCode() != fiber.StatusOK
 			default:
-				return false
+				return true
 			}
 		},
 		ExpirationGenerator: func(ctx *fiber.Ctx, config *cache.Config) time.Duration {
@@ -62,7 +63,7 @@ func newCache() fiber.Handler {
 			case strings.HasSuffix(ctx.Path(), "/file"):
 				return 24 * time.Hour
 			default:
-				return 1 * time.Minute
+				return 0
 			}
 		},
 	})
@@ -144,7 +145,7 @@ func (c *Controller) GetVariantFile(ctx *fiber.Ctx) error {
 	}
 	if vFile != nil {
 		ctx.Attachment(v.Filename)
-		return ctx.SendFile(*vFile)
+		return ctx.SendFile(url.PathEscape(*vFile))
 	} else {
 		return ctx.SendStatus(fiber.StatusNotFound)
 	}

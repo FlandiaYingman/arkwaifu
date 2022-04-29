@@ -2,6 +2,12 @@ package asset
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"path/filepath"
+
+	"github.com/flandiayingman/arkwaifu/internal/app/config"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/uptrace/bun"
@@ -10,10 +16,16 @@ import (
 type repo struct {
 	bun.IDB
 	DB *bun.DB
+
+	StaticDir string
 }
 
-func NewRepo(db *bun.DB) (*repo, error) {
-	r := repo{IDB: db, DB: db}
+func NewRepo(db *bun.DB, conf *config.Config) (*repo, error) {
+	r := repo{
+		IDB:       db,
+		DB:        db,
+		StaticDir: conf.StaticDir,
+	}
 	err := r.DB.RunInTx(context.Background(), nil, func(ctx context.Context, tx bun.Tx) error {
 		var err error
 		_, err = db.NewCreateTable().
@@ -76,6 +88,10 @@ type modelVariantName struct {
 	SortID        int    `bun:"sort_id,autoincrement"`
 }
 
+var (
+	ErrExists = errors.New("asset: the asset or variant already exists.")
+)
+
 func (r *repo) Truncate(ctx context.Context) error {
 	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		var err error
@@ -118,6 +134,36 @@ func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error 
 		Model(&models).
 		Exec(ctx)
 	return err
+}
+func (r *repo) InsertVariantFile(ctx context.Context, m modelVariant, f io.Reader) error {
+	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		// Insert the variant. The variant is invisible until the transaction is committed.
+		res, err := tx.NewInsert().
+			Model(&m).
+			On("CONFLICT DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return err
+		}
+
+		// Check if the insertion conflicts. If it conflicts, return ErrExists.
+		rows, err := res.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if rows <= 0 {
+			return ErrExists
+		}
+
+		// Write variant file. Note MkFileFromReader closes the reader.
+		err = fileutil.MkFileFromReader(m.FilePath(r.StaticDir), f)
+		if err != nil {
+			return err
+		}
+
+		// Return nil to commit if everything success.
+		return nil
+	})
 }
 
 func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, error) {
@@ -249,4 +295,19 @@ func (r repo) Update(ctx context.Context, ams []modelAsset, vms []modelVariant) 
 		}
 		return nil
 	})
+}
+
+// Path returns the relative path to the variant file.
+//
+// The path of assets is "{variant}/{asset.kind}/{filename}".
+// When the program want to find an asset file in a certain directory, it will check the path relative to the directory.
+func (v modelVariant) Path() string {
+	return fmt.Sprintf("%s/%s/%s", v.Variant, v.AssetKind, v.Filename)
+}
+
+// FilePath returns the absolute path to the variant file.
+//
+// This is a shortcut for filepath.Join(dir, v.Path()).
+func (v modelVariant) FilePath(dirPath string) string {
+	return filepath.Join(dirPath, v.Path())
 }

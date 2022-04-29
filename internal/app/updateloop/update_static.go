@@ -3,22 +3,21 @@ package updateloop
 import (
 	"context"
 	"image"
-	"math"
 	"os"
 	"path/filepath"
 	"runtime"
 
 	"github.com/chai2010/webp"
+	"github.com/disintegration/imaging"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/arkavg"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/image/draw"
 	"golang.org/x/sync/errgroup"
 )
 
-// updateStatic processes the resources to static files.
+// updatePicStatic processes the resources to static files.
 // The resources are from the corresponding resource directory,
 // and the static files are stored in the corresponding static directory.
 //
@@ -44,7 +43,11 @@ func (s *Service) updateStatic(ctx context.Context, resVer ResVersion) error {
 		return nil
 	}
 
-	err = updateStatic(ctx, resDir, staticDir)
+	err = updatePicStatic(ctx, resDir, staticDir)
+	if err != nil {
+		return errors.Wrapf(err, "cannot update statics: %s", staticDir)
+	}
+	err = updateCharStatic(ctx, resDir, staticDir)
 	if err != nil {
 		return errors.Wrapf(err, "cannot update statics: %s", staticDir)
 	}
@@ -56,11 +59,8 @@ func (s *Service) updateStatic(ctx context.Context, resVer ResVersion) error {
 	return nil
 }
 
-// updateStatic processes the resources into static files.
-//
-// See: Service.updateStatic.
-func updateStatic(ctx context.Context, newResDir string, newStaticDir string) error {
-	assets, err := arkavg.GetAssets(newResDir, arkres.DefaultPrefix)
+func updatePicStatic(ctx context.Context, newResDir string, newStaticDir string) error {
+	assets, err := arkavg.ScanForPicAssets(newResDir, arkres.DefaultPrefix)
 	if err != nil {
 		// Skip if no resources to process
 		if errors.Is(err, os.ErrNotExist) {
@@ -75,7 +75,7 @@ func updateStatic(ctx context.Context, newResDir string, newStaticDir string) er
 		lock <- struct{}{}
 		asset := asset
 		eg.Go(func() error {
-			err := processStatic(asset, newResDir, newStaticDir)
+			err := procPicAsset(asset, newResDir, newStaticDir)
 			<-lock
 			return err
 		})
@@ -87,8 +87,7 @@ func updateStatic(ctx context.Context, newResDir string, newStaticDir string) er
 
 	return nil
 }
-
-func processStatic(asset arkavg.Asset, resDir string, staticDir string) error {
+func procPicAsset(asset arkavg.Asset, resDir string, staticDir string) error {
 	assetPath := asset.FilePath(resDir, arkres.DefaultPrefix)
 	assetFile, err := os.Open(assetPath)
 	if err != nil {
@@ -100,11 +99,11 @@ func processStatic(asset arkavg.Asset, resDir string, staticDir string) error {
 		return errors.Wrapf(err, "cannot decode asset: %s", assetPath)
 	}
 
-	err = encodeImg(asset, img, staticDir)
+	err = saveIMG(asset, img, staticDir)
 	if err != nil {
 		return err
 	}
-	err = encodeTimg(asset, img, staticDir)
+	err = saveTIMG(asset, img, staticDir)
 	if err != nil {
 		return err
 	}
@@ -116,7 +115,62 @@ func processStatic(asset arkavg.Asset, resDir string, staticDir string) error {
 
 	return nil
 }
-func encodeImg(asset arkavg.Asset, img image.Image, staticDir string) error {
+
+func updateCharStatic(ctx context.Context, resDir, staticDir string) error {
+	assets, err := arkavg.ScanForCharAssets(resDir, arkres.DefaultPrefix)
+	if errors.Is(err, os.ErrNotExist) {
+		// Skip if no assets to process
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	eg, ctx := errgroup.WithContext(ctx)
+	lock := make(chan struct{}, runtime.NumCPU())
+	for _, asset := range assets {
+		lock <- struct{}{}
+		asset := asset
+		eg.Go(func() error {
+			err := procCharAsset(asset, resDir, staticDir)
+			<-lock
+			return err
+		})
+	}
+	return eg.Wait()
+}
+func procCharAsset(ca arkavg.CharAsset, resDir, staticDir string) error {
+	for hn, h := range ca.Hubs {
+		merges, mergesAlpha, err := h.MergeFace(resDir, arkres.DefaultPrefix)
+		if err != nil {
+			return err
+		}
+		for fn := range merges {
+			asset := arkavg.Asset{
+				Name: ca.AssetName(hn, fn),
+				Kind: arkavg.KindCharacter,
+			}
+			err = saveIMG(asset, merges[fn], staticDir)
+			if err != nil {
+				return err
+			}
+			err = saveAlpha(asset, mergesAlpha[fn], staticDir)
+			if err != nil {
+				return err
+			}
+			err = saveTIMG(asset, arkavg.MergeAlpha(merges[fn], mergesAlpha[fn]), staticDir)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	log.WithFields(log.Fields{
+		"charAsset": ca,
+		"staticDir": staticDir,
+	}).Info("processed static file from char asset into static dir")
+	return nil
+}
+
+func saveIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 	imgStaticDir := filepath.Join(staticDir, "img")
 
 	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), asset.Name+".webp")
@@ -125,13 +179,11 @@ func encodeImg(asset arkavg.Asset, img image.Image, staticDir string) error {
 		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
 	}
 	defer func() { _ = dstFile.Close() }()
-
 	return webp.Encode(dstFile, img, &webp.Options{
 		Lossless: true,
-		Exact:    true,
 	})
 }
-func encodeTimg(asset arkavg.Asset, img image.Image, staticDir string) error {
+func saveTIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 	timgStaticDir := filepath.Join(staticDir, "timg")
 
 	dstPath := filepath.Join(timgStaticDir, string(asset.Kind), asset.Name+".webp")
@@ -140,31 +192,21 @@ func encodeTimg(asset arkavg.Asset, img image.Image, staticDir string) error {
 		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
 	}
 	defer func() { _ = dstFile.Close() }()
-
-	img = resize(img, 320, 1280)
+	img = imaging.Fit(img, 320, 1280, imaging.Linear)
 	return webp.Encode(dstFile, img, &webp.Options{
 		Quality: 85,
 	})
 }
-func resize(img image.Image, maxW int, maxH int) image.Image {
-	width := img.Bounds().Dx()
-	height := img.Bounds().Dy()
-	wScale := 1.0
-	hScale := 1.0
-	if width > maxW {
-		wScale = float64(maxW) / float64(width)
-	}
-	if height > maxH {
-		hScale = float64(maxH) / float64(height)
-	}
-	// Since the image must conform to both maxW and maxH, use the smaller (stricter) scale.
-	scale := math.Min(wScale, hScale)
-	resultRect := image.Rect(0, 0,
-		int(math.Round(float64(width)*scale)),
-		int(math.Round(float64(height)*scale)),
-	)
-	result := image.NewNRGBA(resultRect)
-	draw.ApproxBiLinear.Scale(result, resultRect, img, img.Bounds(), draw.Over, nil)
+func saveAlpha(asset arkavg.Asset, img image.Image, staticDir string) error {
+	imgStaticDir := filepath.Join(staticDir, "alpha")
 
-	return result
+	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), asset.Name+".webp")
+	dstFile, err := fileutil.MkFile(dstPath)
+	if err != nil {
+		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
+	}
+	defer func() { _ = dstFile.Close() }()
+	return webp.Encode(dstFile, img, &webp.Options{
+		Lossless: true,
+	})
 }

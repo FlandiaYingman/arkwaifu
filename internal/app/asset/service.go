@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
 )
@@ -101,32 +100,10 @@ func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Va
 		Variant:   variant.Variant,
 		Filename:  variant.Filename,
 	}
-
-	a, err := s.GetAsset(ctx, kind, name)
-	if err != nil {
-		return err
-	}
-	if a == nil {
-		return errors.Errorf("asset %s/%s not found", kind, name)
-	}
-
-	dstPath := variant.FilePath(s.staticDir)
-	dstFile, err := fileutil.MkFile(dstPath)
-	if err != nil {
-		return errors.Wrapf(err, "failed to create dst %s", dstPath)
-	}
-	defer func() { _ = dstFile.Close() }()
-
-	_, err = io.Copy(dstFile, file)
-	if err != nil {
-		return errors.Wrapf(err, "failed to copy file to %s", dstPath)
-	}
-
-	err = s.repo.InsertVariant(ctx, vm)
+	err := s.repo.InsertVariantFile(ctx, vm, file)
 	if err != nil {
 		return errors.Wrap(err, "failed to insert variant")
 	}
-
 	return nil
 }
 

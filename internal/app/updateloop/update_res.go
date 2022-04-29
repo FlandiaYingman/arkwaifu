@@ -22,6 +22,7 @@ var (
 	incrementalResRE = []*regexp.Regexp{
 		regexp.MustCompile("^avg/bg"),
 		regexp.MustCompile("^avg/imgs"),
+		regexp.MustCompile("^avg/characters"),
 	}
 	// allResRE are the regular expressions which consist of fullResRE and incrementalResRE.
 	allResRE []*regexp.Regexp
