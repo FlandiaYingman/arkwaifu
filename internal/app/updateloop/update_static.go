@@ -12,6 +12,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/arkavg"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
@@ -173,7 +174,7 @@ func procCharAsset(ca arkavg.CharAsset, resDir, staticDir string) error {
 func saveIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 	imgStaticDir := filepath.Join(staticDir, "img")
 
-	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), asset.Name+".webp")
+	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), pathutil.ReplaceAllExt(asset.Name, ".webp"))
 	dstFile, err := fileutil.MkFile(dstPath)
 	if err != nil {
 		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
@@ -186,7 +187,7 @@ func saveIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 func saveTIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 	timgStaticDir := filepath.Join(staticDir, "timg")
 
-	dstPath := filepath.Join(timgStaticDir, string(asset.Kind), asset.Name+".webp")
+	dstPath := filepath.Join(timgStaticDir, string(asset.Kind), pathutil.ReplaceAllExt(asset.Name, ".webp"))
 	dstFile, err := fileutil.MkFile(dstPath)
 	if err != nil {
 		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
@@ -200,7 +201,7 @@ func saveTIMG(asset arkavg.Asset, img image.Image, staticDir string) error {
 func saveAlpha(asset arkavg.Asset, img image.Image, staticDir string) error {
 	imgStaticDir := filepath.Join(staticDir, "alpha")
 
-	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), asset.Name+".webp")
+	dstPath := filepath.Join(imgStaticDir, string(asset.Kind), pathutil.ReplaceAllExt(asset.Name, ".webp"))
 	dstFile, err := fileutil.MkFile(dstPath)
 	if err != nil {
 		return errors.Wrapf(err, "cannot create dstFile: %s", dstPath)
