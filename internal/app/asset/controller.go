@@ -148,7 +148,7 @@ func (c *Controller) GetVariantFile(ctx *fiber.Ctx) error {
 	}
 	if vFile != nil {
 		ctx.Attachment(v.Filename)
-		return ctx.SendFile(filepath.Join(lo.Map(pathutil.Splits(*vFile), wrapIter(url.PathEscape))...))
+		return ctx.SendFile(escapePath(*vFile))
 	} else {
 		return ctx.SendStatus(fiber.StatusNotFound)
 	}
@@ -203,4 +203,14 @@ func (c *Controller) PostVariant(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(fiber.StatusCreated)
+}
+
+func escapePath(path string) string {
+	splits := pathutil.Splits(path)
+	return filepath.Join(lo.Map(splits, func(s string, i int) string {
+		if i == 0 && strings.Contains(s, "/") {
+			return s
+		}
+		return url.PathEscape(s)
+	})...)
 }
