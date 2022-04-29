@@ -13,7 +13,17 @@ func RemoveExt(path string) string {
 
 // RemoveAllExt returns the path without all extensions.
 func RemoveAllExt(path string) string {
-	return strings.Split(path, ".")[0]
+	return strings.TrimSuffix(path, AllExt(path))
+}
+
+// AllExt returns all extensions (e.g., ".tar.gz" instead of ".gz") from the file name (including ".").
+func AllExt(path string) string {
+	_, after, found := strings.Cut(filepath.Base(path), ".")
+	if found {
+		return "." + after
+	} else {
+		return ""
+	}
 }
 
 // ReplaceExt replaces the extension of the given path with the given extension.
