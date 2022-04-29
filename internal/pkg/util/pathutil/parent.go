@@ -35,6 +35,20 @@ func MustChangeParent(srcPath string, srcDir string, dstDir string) string {
 const slash = "/"
 
 func Splits(path string) (parts []string) {
-	parts = strings.Split(filepath.ToSlash(path), slash)
+	path = filepath.ToSlash(path)
+	if filepath.IsAbs(path) && filepath.VolumeName(path) != "" {
+		volume := filepath.VolumeName(path) + slash
+		parts = append(parts, volume)
+		path = strings.TrimPrefix(path, volume)
+	} else if filepath.IsAbs(path) {
+		root := slash
+		parts = append(parts, root)
+		path = strings.TrimPrefix(path, root)
+	} else if filepath.VolumeName(path) != "" {
+		volume := filepath.VolumeName(path)
+		parts = append(parts, volume)
+		path = strings.TrimPrefix(path, volume)
+	}
+	parts = append(parts, strings.Split(path, slash)...)
 	return
 }
