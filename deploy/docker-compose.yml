@@ -38,6 +38,8 @@ services:
       - ARKRES_CHAT_MASK
       - RESOURCE_DIR=/var/arkwaifu_resource
       - STATIC_DIR=/var/arkwaifu_static
+      - FORCE_UPDATE=$FORCE_UPDATE
+      - FORCE_SUBMIT=$FORCE_SUBMIT
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
