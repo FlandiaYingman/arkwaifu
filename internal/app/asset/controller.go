@@ -4,12 +4,10 @@ import (
 	"net/url"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/samber/lo"
 )
@@ -24,8 +22,7 @@ func NewController(service *Service) *Controller {
 func RegisterController(v0 *server.V0, c *Controller) {
 	router := v0.
 		Group("asset").
-		Use(newETag()).
-		Use(newCache())
+		Use(newETag())
 
 	router.Get("/assets", c.GetAssets)
 	router.Get("/assets/:kind", c.GetAssets)
@@ -47,27 +44,6 @@ func newETag() fiber.Handler {
 		Next: func(ctx *fiber.Ctx) bool {
 			// skip ETag if it isn't a file request
 			return !strings.HasSuffix(ctx.Path(), "/file")
-		},
-	})
-}
-func newCache() fiber.Handler {
-	return cache.New(cache.Config{
-		CacheControl: true,
-		Next: func(ctx *fiber.Ctx) bool {
-			switch {
-			case strings.HasSuffix(ctx.Path(), "/file"):
-				return ctx.Response().StatusCode() != fiber.StatusOK
-			default:
-				return true
-			}
-		},
-		ExpirationGenerator: func(ctx *fiber.Ctx, config *cache.Config) time.Duration {
-			switch {
-			case strings.HasSuffix(ctx.Path(), "/file"):
-				return 24 * time.Hour
-			default:
-				return 0
-			}
 		},
 	})
 }
