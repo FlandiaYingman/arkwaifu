@@ -1,21 +1,22 @@
 package avg
 
 import (
+	"time"
+
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
-	"time"
 )
 
 type Controller struct {
 	service *Service
 }
 
-func NewController(service *Service) Controller {
-	return Controller{service}
+func NewController(service *Service) *Controller {
+	return &Controller{service}
 }
-func RegisterController(v0 *server.V0, c Controller) {
+func RegisterController(v0 *server.V0, c *Controller) {
 	router := v0.
 		Group("/avg").
 		Use(newCompress()).

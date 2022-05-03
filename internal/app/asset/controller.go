@@ -18,10 +18,10 @@ type Controller struct {
 	service *Service
 }
 
-func NewController(service *Service) Controller {
-	return Controller{service}
+func NewController(service *Service) *Controller {
+	return &Controller{service}
 }
-func RegisterController(v0 *server.V0, c Controller) {
+func RegisterController(v0 *server.V0, c *Controller) {
 	router := v0.
 		Group("asset").
 		Use(newETag()).
