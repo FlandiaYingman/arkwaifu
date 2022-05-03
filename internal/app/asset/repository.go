@@ -26,56 +26,37 @@ func NewRepo(db *bun.DB, conf *config.Config) (*repo, error) {
 		DB:        db,
 		StaticDir: conf.StaticDir,
 	}
-	err := r.DB.RunInTx(context.Background(), nil, func(ctx context.Context, tx bun.Tx) error {
-		var err error
-		_, err = db.NewCreateTable().
-			Model((*modelKindName)(nil)).
-			IfNotExists().
-			Exec(context.Background())
-		if err != nil {
-			return err
-		}
-		_, err = db.NewCreateTable().
-			Model((*modelVariantName)(nil)).
-			IfNotExists().
-			Exec(context.Background())
-		if err != nil {
-			return err
-		}
-		_, err = db.NewCreateTable().
-			Model((*modelAsset)(nil)).
-			IfNotExists().
-			ForeignKey("(kind) REFERENCES asset_kind_names (kind_name) ON DELETE CASCADE").
-			Exec(context.Background())
-		if err != nil {
-			return err
-		}
-		_, err = db.NewCreateTable().
-			Model((*modelVariant)(nil)).
-			IfNotExists().
-			ForeignKey("(variant) REFERENCES asset_variant_names (variant_name) ON DELETE CASCADE").
-			ForeignKey("(asset_kind, asset_name) REFERENCES asset_assets (kind, name) ").
-			Exec(context.Background())
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	return &r, err
+
+	err := r.init()
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
 }
 
 type modelAsset struct {
-	bun.BaseModel `bun:"table:asset_assets"`
-	Kind          string          `bun:"kind,pk"`
-	Name          string          `bun:"name,pk"`
-	Variants      []*modelVariant `bun:"rel:has-many,join:kind=asset_kind,join:name=asset_name"`
+	bun.BaseModel `bun:"table:asset_assets,alias:aa"`
+
+	Kind string `bun:"kind,pk"`
+	Name string `bun:"name,pk"`
+
+	KindSortID int    `bun:"kind_sort_id,type:integer"`
+	NameSortID []byte `bun:"name_sort_id,type:bytea"`
+
+	Variants []*modelVariant `bun:"rel:has-many,join:kind=asset_kind,join:name=asset_name"`
 }
 type modelVariant struct {
 	bun.BaseModel `bun:"table:asset_variants"`
-	AssetKind     string `bun:"asset_kind,pk"`
-	AssetName     string `bun:"asset_name,pk"`
-	Variant       string `bun:"variant,pk"`
-	Filename      string `bun:"filename"`
+
+	AssetKind string `bun:"asset_kind,pk"`
+	AssetName string `bun:"asset_name,pk"`
+	Variant   string `bun:"variant,pk"`
+	Filename  string `bun:"filename"`
+
+	KindSortID    int    `bun:"kind_sort_id,type:integer"`
+	NameSortID    []byte `bun:"name_sort_id,type:bytea"`
+	VariantSortID int    `bun:"variant_sort_id,type:integer"`
 }
 type modelKindName struct {
 	bun.BaseModel `bun:"table:asset_kind_names"`
@@ -171,7 +152,7 @@ func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, er
 	query := r.
 		NewSelect().
 		Model(models).
-		Relation("Variants", SortVariant).
+		Relation("Variants", SortAssetVariant).
 		Apply(SortAsset)
 	if kind != nil {
 		query.Where("kind = ?", *kind)
@@ -184,7 +165,7 @@ func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*modelAsset,
 	err := r.
 		NewSelect().
 		Model(model).
-		Relation("Variants", SortVariant).
+		Relation("Variants", SortAssetVariant).
 		Where("(kind, name) = (?, ?)", kind, name).
 		Scan(ctx)
 	return model, err

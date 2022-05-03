@@ -3,14 +3,13 @@ package asset
 import "github.com/uptrace/bun"
 
 func SortAsset(query *bun.SelectQuery) *bun.SelectQuery {
-	return query.
-		OrderExpr("(SELECT asset_kind_names.sort_id FROM asset_kind_names WHERE kind = asset_kind_names.kind_name)").
-		OrderExpr("(natural_sort(name))")
+	return query.Order("kind_sort_id", "name_sort_id")
 }
 
 func SortVariant(query *bun.SelectQuery) *bun.SelectQuery {
-	return query.
-		OrderExpr("(SELECT asset_kind_names.sort_id FROM asset_kind_names WHERE asset_kind = asset_kind_names.kind_name)").
-		OrderExpr("(natural_sort(asset_name))").
-		OrderExpr("(SELECT asset_variant_names.sort_id FROM asset_variant_names WHERE variant = asset_variant_names.variant_name)")
+	return query.Order("kind_sort_id", "name_sort_id", "variant_sort_id")
+}
+
+func SortAssetVariant(query *bun.SelectQuery) *bun.SelectQuery {
+	return query.Order("variant_sort_id")
 }
