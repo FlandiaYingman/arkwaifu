@@ -24,7 +24,7 @@ func (r *repo) initTables() error {
 	var err error
 
 	_, err = r.NewCreateTable().
-		Model((*modelKindName)(nil)).
+		Model((*mKindName)(nil)).
 		IfNotExists().
 		Exec(context.Background())
 	if err != nil {
@@ -32,7 +32,7 @@ func (r *repo) initTables() error {
 	}
 
 	_, err = r.NewCreateTable().
-		Model((*modelVariantName)(nil)).
+		Model((*mVariantName)(nil)).
 		IfNotExists().
 		Exec(context.Background())
 	if err != nil {
@@ -40,7 +40,7 @@ func (r *repo) initTables() error {
 	}
 
 	_, err = r.NewCreateTable().
-		Model((*modelAsset)(nil)).
+		Model((*mAsset)(nil)).
 		IfNotExists().
 		ForeignKey("(kind) REFERENCES asset_kind_names (kind_name) ON DELETE CASCADE").
 		Exec(context.Background())
@@ -49,7 +49,7 @@ func (r *repo) initTables() error {
 	}
 
 	_, err = r.NewCreateTable().
-		Model((*modelVariant)(nil)).
+		Model((*mVariant)(nil)).
 		IfNotExists().
 		ForeignKey("(variant) REFERENCES asset_variant_names (variant_name) ON DELETE CASCADE").
 		ForeignKey("(asset_kind, asset_name) REFERENCES asset_assets (kind, name) ").

@@ -30,15 +30,15 @@ func (s *Service) PopulateFrom(ctx context.Context, dirPath string) error {
 	return s.repo.Update(ctx, am, vm)
 }
 
-func scanStaticDir(staticDir string) ([]modelAsset, []modelVariant, error) {
+func scanStaticDir(staticDir string) ([]mAsset, []mVariant, error) {
 	scanPattern := filepath.Join(staticDir, "*/*/*")
 	scanFiles, err := filepath.Glob(scanPattern)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "failed to scan the static dir %s by pattern %s", staticDir, scanPattern)
 	}
 
-	assetMap := make(map[string]map[string]modelAsset)
-	variantSlice := make([]modelVariant, 0, len(scanFiles))
+	assetMap := make(map[string]map[string]mAsset)
+	variantSlice := make([]mVariant, 0, len(scanFiles))
 
 	for _, scanFile := range scanFiles {
 		scanFile, err = filepath.Rel(staticDir, scanFile)
@@ -51,15 +51,15 @@ func scanStaticDir(staticDir string) ([]modelAsset, []modelVariant, error) {
 		name := pathutil.RemoveAllExt(filename)
 
 		if _, ok := assetMap[kindName]; !ok {
-			assetMap[kindName] = make(map[string]modelAsset)
+			assetMap[kindName] = make(map[string]mAsset)
 		}
 		if _, ok := assetMap[kindName][name]; !ok {
-			assetMap[kindName][name] = modelAsset{
+			assetMap[kindName][name] = mAsset{
 				Kind: kindName,
 				Name: name,
 			}
 		}
-		variantSlice = append(variantSlice, modelVariant{
+		variantSlice = append(variantSlice, mVariant{
 			AssetKind: kindName,
 			AssetName: name,
 			Variant:   variantName,
@@ -67,7 +67,7 @@ func scanStaticDir(staticDir string) ([]modelAsset, []modelVariant, error) {
 		})
 	}
 
-	assetSlice := make([]modelAsset, 0, len(assetMap))
+	assetSlice := make([]mAsset, 0, len(assetMap))
 	for _, m := range assetMap {
 		for _, asset := range m {
 			assetSlice = append(assetSlice, asset)

@@ -94,7 +94,7 @@ func (s *Service) GetVariantNames(ctx context.Context) ([]string, error) {
 }
 
 func (s *Service) PostVariant(ctx context.Context, kind, name string, variant Variant, file io.Reader) error {
-	vm := modelVariant{
+	vm := mVariant{
 		AssetKind: kind,
 		AssetName: name,
 		Variant:   variant.Variant,

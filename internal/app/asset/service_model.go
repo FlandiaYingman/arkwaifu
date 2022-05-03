@@ -75,14 +75,14 @@ type Variant struct {
 	Asset    *Asset `json:"-"`
 }
 
-func fromAssetModel(model modelAsset) Asset {
+func fromAssetModel(model mAsset) Asset {
 	asset := Asset{
 		Kind:     model.Kind,
 		Name:     model.Name,
 		Variants: nil,
 	}
 	vs := lo.Map(model.Variants,
-		func(vmPtr *modelVariant, _ int) Variant {
+		func(vmPtr *mVariant, _ int) Variant {
 			v := fromVariantModel(*vmPtr)
 			v.Asset = &asset
 			return v
@@ -91,7 +91,7 @@ func fromAssetModel(model modelAsset) Asset {
 	asset.Variants = &vs
 	return asset
 }
-func fromVariantModel(model modelVariant) Variant {
+func fromVariantModel(model mVariant) Variant {
 	return Variant{
 		Variant:  model.Variant,
 		Filename: model.Filename,

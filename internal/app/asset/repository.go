@@ -2,9 +2,7 @@ package asset
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"path/filepath"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
@@ -35,40 +33,6 @@ func NewRepo(db *bun.DB, conf *config.Config) (*repo, error) {
 	return &r, nil
 }
 
-type modelAsset struct {
-	bun.BaseModel `bun:"table:asset_assets,alias:aa"`
-
-	Kind string `bun:"kind,pk"`
-	Name string `bun:"name,pk"`
-
-	KindSortID int    `bun:"kind_sort_id,type:integer"`
-	NameSortID []byte `bun:"name_sort_id,type:bytea"`
-
-	Variants []*modelVariant `bun:"rel:has-many,join:kind=asset_kind,join:name=asset_name"`
-}
-type modelVariant struct {
-	bun.BaseModel `bun:"table:asset_variants"`
-
-	AssetKind string `bun:"asset_kind,pk"`
-	AssetName string `bun:"asset_name,pk"`
-	Variant   string `bun:"variant,pk"`
-	Filename  string `bun:"filename"`
-
-	KindSortID    int    `bun:"kind_sort_id,type:integer"`
-	NameSortID    []byte `bun:"name_sort_id,type:bytea"`
-	VariantSortID int    `bun:"variant_sort_id,type:integer"`
-}
-type modelKindName struct {
-	bun.BaseModel `bun:"table:asset_kind_names"`
-	KindName      string `bun:"kind_name,pk"`
-	SortID        int    `bun:"sort_id,autoincrement"`
-}
-type modelVariantName struct {
-	bun.BaseModel `bun:"table:asset_variant_names"`
-	VariantName   string `bun:"variant_name,pk"`
-	SortID        int    `bun:"sort_id,autoincrement"`
-}
-
 var (
 	ErrExists = errors.New("asset: the asset or variant already exists.")
 )
@@ -78,7 +42,7 @@ func (r *repo) Truncate(ctx context.Context) error {
 		var err error
 		_, err = tx.
 			NewTruncateTable().
-			Model((*modelAsset)(nil)).
+			Model((*mAsset)(nil)).
 			Cascade().
 			Exec(ctx)
 		if err != nil {
@@ -86,7 +50,7 @@ func (r *repo) Truncate(ctx context.Context) error {
 		}
 		_, err = tx.
 			NewTruncateTable().
-			Model((*modelVariant)(nil)).
+			Model((*mVariant)(nil)).
 			Cascade().
 			Exec(ctx)
 		if err != nil {
@@ -96,7 +60,7 @@ func (r *repo) Truncate(ctx context.Context) error {
 	})
 }
 
-func (r *repo) InsertAsset(ctx context.Context, models ...modelAsset) error {
+func (r *repo) InsertAsset(ctx context.Context, models ...mAsset) error {
 	if len(models) == 0 {
 		return nil
 	}
@@ -106,7 +70,7 @@ func (r *repo) InsertAsset(ctx context.Context, models ...modelAsset) error {
 		Exec(ctx)
 	return err
 }
-func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error {
+func (r *repo) InsertVariant(ctx context.Context, models ...mVariant) error {
 	if len(models) == 0 {
 		return nil
 	}
@@ -116,7 +80,7 @@ func (r *repo) InsertVariant(ctx context.Context, models ...modelVariant) error 
 		Exec(ctx)
 	return err
 }
-func (r *repo) InsertVariantFile(ctx context.Context, m modelVariant, f io.Reader) error {
+func (r *repo) InsertVariantFile(ctx context.Context, m mVariant, f io.Reader) error {
 	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		// Insert the variant. The variant is invisible until the transaction is committed.
 		res, err := tx.NewInsert().
@@ -147,8 +111,8 @@ func (r *repo) InsertVariantFile(ctx context.Context, m modelVariant, f io.Reade
 	})
 }
 
-func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, error) {
-	models := new([]modelAsset)
+func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]mAsset, error) {
+	models := new([]mAsset)
 	query := r.
 		NewSelect().
 		Model(models).
@@ -160,8 +124,8 @@ func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]modelAsset, er
 	err := query.Scan(ctx)
 	return *models, err
 }
-func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*modelAsset, error) {
-	model := new(modelAsset)
+func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*mAsset, error) {
+	model := new(mAsset)
 	err := r.
 		NewSelect().
 		Model(model).
@@ -171,8 +135,8 @@ func (r *repo) SelectAsset(ctx context.Context, kind, name string) (*modelAsset,
 	return model, err
 }
 
-func (r *repo) SelectVariants(ctx context.Context, kind, name string) ([]modelVariant, error) {
-	models := new([]modelVariant)
+func (r *repo) SelectVariants(ctx context.Context, kind, name string) ([]mVariant, error) {
+	models := new([]mVariant)
 	err := r.
 		NewSelect().
 		Model(models).
@@ -184,8 +148,8 @@ func (r *repo) SelectVariants(ctx context.Context, kind, name string) ([]modelVa
 	}
 	return *models, err
 }
-func (r *repo) SelectVariant(ctx context.Context, kind, name, variant string) (*modelVariant, error) {
-	model := new(modelVariant)
+func (r *repo) SelectVariant(ctx context.Context, kind, name, variant string) (*mVariant, error) {
+	model := new(mVariant)
 	err := r.
 		NewSelect().
 		Model(model).
@@ -195,14 +159,14 @@ func (r *repo) SelectVariant(ctx context.Context, kind, name, variant string) (*
 }
 
 func (r *repo) InitNames(ctx context.Context, kindNames []string, variantNames []string) error {
-	kms := lo.Map(kindNames, func(s string, _ int) modelKindName { return modelKindName{KindName: s} })
-	vms := lo.Map(variantNames, func(s string, _ int) modelVariantName { return modelVariantName{VariantName: s} })
+	kms := lo.Map(kindNames, func(s string, _ int) mKindName { return mKindName{KindName: s} })
+	vms := lo.Map(variantNames, func(s string, _ int) mVariantName { return mVariantName{VariantName: s} })
 	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		r.IDB = tx
 		var err error
 		_, err = tx.
 			NewTruncateTable().
-			Model((*modelKindName)(nil)).
+			Model((*mKindName)(nil)).
 			Cascade().
 			Exec(ctx)
 		if err != nil {
@@ -210,7 +174,7 @@ func (r *repo) InitNames(ctx context.Context, kindNames []string, variantNames [
 		}
 		_, err = tx.
 			NewTruncateTable().
-			Model((*modelVariantName)(nil)).
+			Model((*mVariantName)(nil)).
 			Cascade().
 			Exec(ctx)
 		if err != nil {
@@ -234,7 +198,7 @@ func (r *repo) InitNames(ctx context.Context, kindNames []string, variantNames [
 	})
 }
 func (r *repo) SelectKindNames(ctx context.Context) ([]string, error) {
-	models := new([]modelKindName)
+	models := new([]mKindName)
 	err := r.
 		NewSelect().
 		Model(models).
@@ -243,10 +207,10 @@ func (r *repo) SelectKindNames(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return lo.Map(*models, func(m modelKindName, _ int) string { return m.KindName }), nil
+	return lo.Map(*models, func(m mKindName, _ int) string { return m.KindName }), nil
 }
 func (r *repo) SelectVariantNames(ctx context.Context) ([]string, error) {
-	models := new([]modelVariantName)
+	models := new([]mVariantName)
 	err := r.
 		NewSelect().
 		Model(models).
@@ -255,10 +219,10 @@ func (r *repo) SelectVariantNames(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return lo.Map(*models, func(m modelVariantName, _ int) string { return m.VariantName }), nil
+	return lo.Map(*models, func(m mVariantName, _ int) string { return m.VariantName }), nil
 }
 
-func (r repo) Update(ctx context.Context, ams []modelAsset, vms []modelVariant) error {
+func (r repo) Update(ctx context.Context, ams []mAsset, vms []mVariant) error {
 	return r.DB.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		r.IDB = tx
 		var err error
@@ -276,19 +240,4 @@ func (r repo) Update(ctx context.Context, ams []modelAsset, vms []modelVariant) 
 		}
 		return nil
 	})
-}
-
-// Path returns the relative path to the variant file.
-//
-// The path of assets is "{variant}/{asset.kind}/{filename}".
-// When the program want to find an asset file in a certain directory, it will check the path relative to the directory.
-func (v modelVariant) Path() string {
-	return fmt.Sprintf("%s/%s/%s", v.Variant, v.AssetKind, v.Filename)
-}
-
-// FilePath returns the absolute path to the variant file.
-//
-// This is a shortcut for filepath.Join(dir, v.Path()).
-func (v modelVariant) FilePath(dirPath string) string {
-	return filepath.Join(dirPath, v.Path())
 }
