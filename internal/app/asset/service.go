@@ -21,9 +21,10 @@ func NewService(conf *config.Config, assetRepo *repo) *Service {
 	}
 }
 
-func (s *Service) GetAssets(ctx context.Context, kind *string) ([]Asset, error) {
-	models, err := s.repo.SelectAssets(ctx, kind)
-	if err != nil {
+func (s *Service) GetAssets(ctx context.Context, kind string) ([]Asset, error) {
+	var models []mAsset
+	var err error
+	if models, err = s.repo.SelectAssets(ctx, kind); err != nil {
 		return nil, err
 	}
 	return lo.Map(models, wrapIter(fromAssetModel)), nil

@@ -8,6 +8,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/app/server"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/samber/lo"
 )
@@ -22,7 +23,8 @@ func NewController(service *Service) *Controller {
 func RegisterController(v0 *server.V0, c *Controller) {
 	router := v0.
 		Group("asset").
-		Use(newETag())
+		Use(newCacheMiddleware()).
+		Use(newETagMiddleware())
 
 	router.Get("/assets", c.GetAssets)
 	router.Get("/assets/:kind", c.GetAssets)
@@ -39,13 +41,32 @@ func RegisterController(v0 *server.V0, c *Controller) {
 	router.Post("/variants/:kind/:name/:variant", c.PostVariant)
 }
 
-func newETag() fiber.Handler {
-	return etag.New(etag.Config{
-		Next: func(ctx *fiber.Ctx) bool {
-			// skip ETag if it isn't a file request
-			return !strings.HasSuffix(ctx.Path(), "/file")
-		},
+func newCacheMiddleware() fiber.Handler {
+	return cache.New(cache.Config{
+		Next: doSkipCacheMiddleware,
 	})
+}
+
+func newETagMiddleware() fiber.Handler {
+	return etag.New(etag.Config{
+		Next: doSkipETagMiddleware,
+	})
+}
+
+// doSkipCacheMiddleware skips (returns true) Cache middleware when any of the following is true:
+//
+// 1. the client is requesting a file.
+// 2. the request contains header `Cache-Control: no-cache`
+func doSkipCacheMiddleware(ctx *fiber.Ctx) bool {
+	return strings.HasSuffix(ctx.Path(), "/file") ||
+		strings.Contains(ctx.GetReqHeaders()["Cache-Control"], "no-cache")
+}
+
+// doSkipETagMiddleware skips (returns true) E-Tag middleware when any of the following is true:
+//
+// 1. the client isn't requesting a file.
+func doSkipETagMiddleware(ctx *fiber.Ctx) bool {
+	return !strings.HasSuffix(ctx.Path(), "/file")
 }
 
 func (c *Controller) GetAsset(ctx *fiber.Ctx) error {
@@ -67,11 +88,7 @@ func (c *Controller) GetAsset(ctx *fiber.Ctx) error {
 }
 func (c *Controller) GetAssets(ctx *fiber.Ctx) error {
 	kind := ctx.Params("kind")
-	kindPtr := &kind
-	if kind == "" {
-		kindPtr = nil
-	}
-	assets, err := c.service.GetAssets(ctx.Context(), kindPtr)
+	assets, err := c.service.GetAssets(ctx.Context(), kind)
 	if err != nil {
 		return err
 	}

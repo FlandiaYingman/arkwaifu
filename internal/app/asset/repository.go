@@ -111,15 +111,15 @@ func (r *repo) InsertVariantFile(ctx context.Context, m mVariant, f io.Reader) e
 	})
 }
 
-func (r *repo) SelectAssets(ctx context.Context, kind *string) ([]mAsset, error) {
+func (r *repo) SelectAssets(ctx context.Context, kind string) ([]mAsset, error) {
 	models := new([]mAsset)
 	query := r.
 		NewSelect().
 		Model(models).
 		Relation("Variants", SortAssetVariant).
 		Apply(SortAsset)
-	if kind != nil {
-		query.Where("kind = ?", *kind)
+	if kind != "" {
+		query.Where("kind = ?", kind)
 	}
 	err := query.Scan(ctx)
 	return *models, err
