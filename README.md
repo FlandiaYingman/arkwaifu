@@ -7,11 +7,23 @@
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
 ![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu?style=flat-square)
 
-A website showing all Arknights assets (including AVG images and backgrounds currently).
+Arkwaifu is a website which, arranges and provides almost all picture assets extracted from Arknights (the game). 
+It also does super-resolution with REAL-ESRGAN and REAL-CUGAN, to enlarge the assets (normally, 4x size).
+
+Currently, only assets, that are present in AVG (the in-game stories), are available. Including: 
+
+- "Images". They are the exquisite arts that appear when something emphasized happen.
+- "Backgrounds". They are backgrounds that always appear on the bottom layer.
+- "Characters". They are the pictures of characters that act in the play, some of them are with different emotions.
+
+I also plan to include the artwork of operators in-game. 
+However, by considering some technical difficulties, especially the animated artwork, the plan is delayed.
+
+This project is now available online! 
+Check it at [arkwaifu.cc](https://arkwaifu.cc/), or the CN mirror [cn.arkwaifu.cc](https://cn.arkwaifu.cc/)! 🎉
+(Though, the CN mirror isn't in CN)
 
 <del>This project is currently under development.</del>
-
-This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc/) (https://arkwaifu.cc/)! 🎉
 
 # TODOs V1 #
 
@@ -25,8 +37,10 @@ This project is now available online! Check it at [ArkWaifu](https://arkwaifu.cc
 - [x] Provide API to manually update resources.
 - [x] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN) (Partially Done)
 - [x] Rewrite controller interface. (Partially Done)
-- [ ] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
-- [ ] <del>Create a statistic module to show how many times the website is requested.</del>
+- [x] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
+- [x] <del>Create a statistic module to show how many times the website is requested.</del>
+- [ ] Optimize frontend UX.
+- [ ] Support searching.
 - [ ] //...
 
 # Design
@@ -35,13 +49,16 @@ For the design documentation, view [here (DESIGN.md)](DESIGN.md).
 
 # Acknowledgements
 
-Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)! He helped me a lot in the front-end development and
-choosing frameworks. I really appreciate the "getting hand dirty" methodology very much.
+Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)! 
+He helped me a lot in the front-end development and choosing frameworks. I really appreciate the "getting hand dirty" methodology very much.
+
+Thanks to my friend [Martin Wang](https://github.com/martinwang2002)! 
+He helped me in extracting the gamedata assets, and also in some details of automatically updating the assets from the game. 
 
 Thanks to my friend Lily! She drew the fascinating [Phantom logo](assets/arkwaifu_phantom.png) of this project.
 
-Thanks to [Penguin Statistics](https://penguin-stats.io/)! The prototype of this project referenced and is inspired by
-Penguin Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
+Thanks to [Penguin Statistics](https://penguin-stats.io/)! 
+The prototype of this project referenced and is inspired by Penguin Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
 
 # License
 
