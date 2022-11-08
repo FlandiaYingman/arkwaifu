@@ -7,23 +7,29 @@
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
 ![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu?style=flat-square)
 
-Arkwaifu is a website which, arranges and provides almost all picture assets extracted from Arknights (the game). 
-It also does super-resolution with REAL-ESRGAN and REAL-CUGAN, to enlarge the assets (normally, 4x size).
+Arkwaifu is a website which, arranges and provides almost all picture assets extracted from Arknights (the game).
 
-Currently, only assets, that are present in AVG (the in-game stories), are available. Including: 
+Arkwaifu also enlarges (4x) the picture assets with super-resolution neural networks, [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
+and [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN).
 
-- "Images". They are the exquisite arts that appear when something emphasized happen.
-- "Backgrounds". They are backgrounds that always appear on the bottom layer.
+Currently, only assets, that appear in the "in-game stories" (what we call it: AVG), are available, including:
+
+- "Images". They are the exquisite arts that appear when some special events happened.
+- "Backgrounds". They are the backgrounds that always appear on the bottom layer, during dialogue.
 - "Characters". They are the pictures of characters that act in the play, some of them are with different emotions.
 
-I also plan to include the artwork of operators in-game. 
-However, by considering some technical difficulties, especially the animated artwork, the plan is delayed.
+I also plan to include the artwork of characters in-game.
+However, by considering some technical difficulties, especially some of the artworks are animated, the plan is delayed.
 
-This project is now available online! 
-Check it at [arkwaifu.cc](https://arkwaifu.cc/), or the CN mirror [cn.arkwaifu.cc](https://cn.arkwaifu.cc/)! 🎉
-(Though, the CN mirror isn't in CN)
+This project is now available online!
+Check it at [arkwaifu.cc](https://arkwaifu.cc/) (main site), or [cn.arkwaifu.cc](https://cn.arkwaifu.cc/) (CN mirror)! 🎉
 
-<del>This project is currently under development.</del>
+# Features
+
+- Assets are kept up-to-date automatically whenever the game is updated.
+- Assets are enlarged with super-resolution neural networks ([Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
+  , [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN)).
+- Assets are classfied into handy categories (AVG, non-AVG; main stories, activities; etc.).
 
 # TODOs V1 #
 
@@ -35,12 +41,12 @@ Check it at [arkwaifu.cc](https://arkwaifu.cc/), or the CN mirror [cn.arkwaifu.c
 - [x] I18N 🌏! Add Chinese support.
 - [x] Extract gamedata directly from resources.
 - [x] Provide API to manually update resources.
-- [x] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN) (Partially Done)
-- [x] Rewrite controller interface. (Partially Done)
-- [x] <del>Advertise ArkWaifu on Bilibili or somewhere...</del>
-- [x] <del>Create a statistic module to show how many times the website is requested.</del>
-- [ ] Optimize frontend UX.
-- [ ] Support searching.
+- [x] Assets image super-resolution. (Real-ESGRAN or Real-CUGAN)
+- [x] Rewrite controller interface.
+- [ ] Optimize the frontend UX.
+- [ ] Support searching assets.
+- [ ] Provide a choice to switch the website language.
+- [ ] Detect the user's language, and automatically switch the website language to it.
 - [ ] //...
 
 # Design
@@ -49,15 +55,15 @@ For the design documentation, view [here (DESIGN.md)](DESIGN.md).
 
 # Acknowledgements
 
-Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)! 
+Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)!
 He helped me a lot in the front-end development and choosing frameworks. I really appreciate the "getting hand dirty" methodology very much.
 
-Thanks to my friend [Martin Wang](https://github.com/martinwang2002)! 
-He helped me in extracting the gamedata assets, and also in some details of automatically updating the assets from the game. 
+Thanks to my friend [Martin Wang](https://github.com/martinwang2002)!
+He helped me in extracting the gamedata assets, and also in some details of automatically updating the assets from the game.
 
 Thanks to my friend Lily! She drew the fascinating [Phantom logo](assets/arkwaifu_phantom.png) of this project.
 
-Thanks to [Penguin Statistics](https://penguin-stats.io/)! 
+Thanks to [Penguin Statistics](https://penguin-stats.io/)!
 The prototype of this project referenced and is inspired by Penguin Statistics' [backend v3](https://github.com/penguin-statistics/backend-next).
 
 # License
