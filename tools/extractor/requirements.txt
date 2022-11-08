@@ -1,7 +1,7 @@
 brotli==1.0.9
 etcpak==0.9.3
 lz4==4.0.0; python_version >= '3.5'
-pillow==9.0.1; python_version >= '3.7'
+pillow==9.3; python_version >= '3.7'
 tabulate==0.8.9
 texture2ddecoder==1.0.2
 unitypy==1.7.28
