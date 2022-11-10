@@ -49,7 +49,7 @@ const store = new Vuex.Store({
           state.storiesMap = _.keyBy(stories, el => el.id)
           state.storiesAssets = stories.flatMap(story => {
             return story.assets.map(asset => ({
-              asset: asset,
+              asset,
               storyId: story.id
             }))
           })

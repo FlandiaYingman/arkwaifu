@@ -54,8 +54,8 @@ export default {
   data () {
     return {
       distinct: true,
-      mdiFingerprint: mdiFingerprint,
-      mdiFingerprintOff: mdiFingerprintOff
+      mdiFingerprint,
+      mdiFingerprintOff
     }
   },
   computed: {

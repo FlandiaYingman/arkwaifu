@@ -31,8 +31,8 @@ export default {
   data () {
     return {
       descending: true,
-      mdiSortCalendarDescending: mdiSortCalendarDescending,
-      mdiSortCalendarAscending: mdiSortCalendarAscending
+      mdiSortCalendarDescending,
+      mdiSortCalendarAscending
     }
   },
   computed: {

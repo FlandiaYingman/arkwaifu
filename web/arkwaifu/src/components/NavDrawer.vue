@@ -189,15 +189,15 @@ export default {
   },
   data: () => ({
     selected: {},
-    mdiHome: mdiHome,
-    mdiCube: mdiCube,
-    mdiMusicClefTreble: mdiMusicClefTreble,
-    mdiMusicClefBass: mdiMusicClefBass,
-    mdiMusicRestQuarter: mdiMusicRestQuarter,
-    mdiTelevision: mdiTelevision,
-    mdiTelevisionOff: mdiTelevisionOff,
-    mdiAllInclusive: mdiAllInclusive,
-    mdiInformation: mdiInformation
+    mdiHome,
+    mdiCube,
+    mdiMusicClefTreble,
+    mdiMusicClefBass,
+    mdiMusicRestQuarter,
+    mdiTelevision,
+    mdiTelevisionOff,
+    mdiAllInclusive,
+    mdiInformation
   })
 }
 </script>
