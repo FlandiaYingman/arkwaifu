@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// Stem returns the name of the path without the extension (e.g. foo.bar.zip -> foo).
+func Stem(path string) string {
+	return RemoveAllExt(filepath.Base(path))
+}
+
 // RemoveExt returns the path without the extension.
 func RemoveExt(path string) string {
 	return strings.TrimSuffix(path, filepath.Ext(path))
