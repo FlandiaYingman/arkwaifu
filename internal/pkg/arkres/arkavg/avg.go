@@ -1,14 +1,15 @@
 package arkavg
 
 import (
+	"encoding/json"
 	"fmt"
+	"golang.org/x/exp/maps"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Avg struct {
@@ -16,10 +17,10 @@ type Avg struct {
 }
 
 type Group struct {
-	ID      string  `bson:"id"`
-	Name    string  `bson:"name"`
-	Type    Type    `bson:"entryType"`
-	Stories []Story `bson:"infoUnlockDatas"`
+	ID      string  `json:"id"`
+	Name    string  `json:"name"`
+	Type    Type    `json:"entryType"`
+	Stories []Story `json:"infoUnlockDatas"`
 }
 
 type Type string
@@ -32,12 +33,12 @@ const (
 )
 
 type Story struct {
-	ID      string `bson:"storyId"`
-	GroupID string `bson:"storyGroup"`
-	Code    string `bson:"storyCode"`
-	Name    string `bson:"storyName"`
-	Txt     string `bson:"storyTxt"`
-	Tag     Tag    `bson:"avgTag"`
+	ID      string `json:"storyId"`
+	GroupID string `json:"storyGroup"`
+	Code    string `json:"storyCode"`
+	Name    string `json:"storyName"`
+	Txt     string `json:"storyTxt"`
+	Tag     Tag    `json:"avgTag"`
 }
 
 type Tag string
@@ -49,33 +50,21 @@ const (
 )
 
 func GetAvg(resDir string, prefix string) (Avg, error) {
-	bsonPath := "gamedata/excel/story_review_table.bson"
-	bsonPath = filepath.Join(resDir, prefix, bsonPath)
+	jsonPath := "gamedata/excel/story_review_table.json"
+	jsonPath = filepath.Join(resDir, prefix, jsonPath)
 
-	bsonContent, err := os.ReadFile(bsonPath)
+	jsonContent, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return Avg{}, errors.WithStack(err)
 	}
 
-	var ordered bson.D
-	err = bson.Unmarshal(bsonContent, &ordered)
+	var dynamicObject map[string]Group
+	err = json.Unmarshal(jsonContent, &dynamicObject)
 	if err != nil {
 		return Avg{}, errors.WithStack(err)
 	}
 
-	b := bson.Raw(bsonContent)
-	values, err := b.Values()
-	groups := make([]Group, len(values))
-	for i, e := range values {
-		var group Group
-		err := bson.Unmarshal(e.Value, &group)
-		if err != nil {
-			return Avg{}, errors.WithStack(err)
-		}
-		groups[i] = group
-	}
-
-	return Avg{Groups: groups}, nil
+	return Avg{Groups: maps.Values(dynamicObject)}, nil
 }
 
 func GetStoryAssets(resDir string, prefix string, story Story) ([]Asset, error) {

@@ -1,4 +1,4 @@
-package arkres
+package hgapi
 
 import (
 	"bufio"

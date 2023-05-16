@@ -2,13 +2,13 @@ package updateloop
 
 import (
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/hgapi"
 	"path/filepath"
 	"time"
 
 	"github.com/flandiayingman/arkwaifu/internal/app/asset"
 	"github.com/flandiayingman/arkwaifu/internal/app/avg"
 	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"go.uber.org/fx"
@@ -57,7 +57,7 @@ func (s *Service) ResVer(ctx context.Context) (ResVersion, ResVersion, error) {
 	if err != nil {
 		return "", "", errors.Wrapf(err, "cannot get local resource version")
 	}
-	remote, err := arkres.GetResVersion()
+	remote, err := hgapi.GetResVersion()
 	if err != nil {
 		return "", "", errors.Wrapf(err, "cannot get remote resource version")
 	}

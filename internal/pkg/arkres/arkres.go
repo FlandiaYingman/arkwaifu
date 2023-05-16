@@ -7,9 +7,9 @@ package arkres
 
 import (
 	"context"
-	"github.com/ahmetb/go-linq/v3"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/agdapi"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/hgapi"
 	"github.com/pkg/errors"
-	"os"
 	"regexp"
 )
 
@@ -17,19 +17,23 @@ const (
 	DefaultPrefix = "assets/torappu/dynamicassets"
 )
 
-func Get(ctx context.Context, resVersion string, dst string, filter ...*regexp.Regexp) error {
-	infos, err := GetResInfos(resVersion)
+func GetLatestResVersion(ctx context.Context) (string, error) {
+	agdapiResVersion, err := agdapi.GetLatestResourceVersion(ctx)
+	if err != nil {
+		return "", err
+	}
+	return agdapiResVersion.ResourceVersion, nil
+}
+
+func GetFromHGAPI(ctx context.Context, resVersion string, dst string, filters ...*regexp.Regexp) error {
+	infos, err := hgapi.GetResInfos(resVersion)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	infos = FilterResInfosRegexp(infos, filter)
+	infos = hgapi.FilterResInfosRegexp(infos, filters)
 
-	err = os.RemoveAll(dst)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	err = GetRes(ctx, infos, dst)
+	err = hgapi.GetRes(ctx, infos, dst)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -37,21 +41,21 @@ func Get(ctx context.Context, resVersion string, dst string, filter ...*regexp.R
 	return nil
 }
 
-func GetIncrementally(ctx context.Context, oldResVer string, newResVer string, dst string, filter ...*regexp.Regexp) error {
-	oldResInfos, err := GetResInfos(oldResVer)
+func GetFromHGAPIIncrementally(ctx context.Context, oldResVer string, newResVer string, dst string, filters ...*regexp.Regexp) error {
+	oldResInfos, err := hgapi.GetResInfos(oldResVer)
 	if err != nil {
 		return errors.WithStack(err)
 	}
-	newResInfos, err := GetResInfos(newResVer)
+	newResInfos, err := hgapi.GetResInfos(newResVer)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	oldResInfos = FilterResInfosRegexp(oldResInfos, filter)
-	newResInfos = FilterResInfosRegexp(newResInfos, filter)
+	oldResInfos = hgapi.FilterResInfosRegexp(oldResInfos, filters)
+	newResInfos = hgapi.FilterResInfosRegexp(newResInfos, filters)
 
-	infos := calcDiff(newResInfos, oldResInfos)
-	err = GetRes(ctx, infos, dst)
+	infos := hgapi.CalculateDifferences(newResInfos, oldResInfos)
+	err = hgapi.GetRes(ctx, infos, dst)
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -59,29 +63,22 @@ func GetIncrementally(ctx context.Context, oldResVer string, newResVer string, d
 	return nil
 }
 
-func SetChatMask(newChatMask []byte) {
-	setChatMask(newChatMask)
-}
-
-// calcDiff returns the infos in "new" but not in "old".
-// It checks only "Name" and "MD5" for equality.
-// The returned res.Info have the same "resVersion" as the res.Info in "new".
-func calcDiff(new []Info, old []Info) []Info {
-	convert := func(i interface{}) interface{} {
-		info := i.(Info)
-		return struct {
-			name string
-			md5  string
-		}{
-			name: info.Name,
-			md5:  info.MD5,
-		}
+func GetFromAGDAPI(ctx context.Context, resVersion string, dst string, filters ...*regexp.Regexp) error {
+	resourceVersion, err := agdapi.GetResourceVersion(ctx, resVersion)
+	if err != nil {
+		return errors.WithStack(err)
 	}
-	newQuery := linq.From(new)
-	oldQuery := linq.From(old)
-	var result []Info
-	newQuery.
-		ExceptBy(oldQuery, convert).
-		ToSlice(&result)
-	return result
+	resourceInfoList, err := agdapi.GetResourceInfoList(ctx, resourceVersion)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	resourceInfoList = agdapi.FilterResInfosRegexp(resourceInfoList, filters)
+
+	err = agdapi.GetRes(ctx, resourceVersion, resourceInfoList, dst)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
 }

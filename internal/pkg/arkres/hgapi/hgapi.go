@@ -1,4 +1,4 @@
-package arkres
+package hgapi
 
 import (
 	"context"
@@ -215,4 +215,27 @@ func FilterResInfosRegexp(infos []Info, r []*regexp.Regexp) []Info {
 				return j.(*regexp.Regexp).MatchString(i.Name)
 			})
 	})
+}
+
+// CalculateDifferences returns the infos in "new" but not in "old".
+// It checks only "Name" and "MD5" for equality.
+// The returned res.Info have the same "resVersion" as the res.Info in "new".
+func CalculateDifferences(new []Info, old []Info) []Info {
+	convert := func(i interface{}) interface{} {
+		info := i.(Info)
+		return struct {
+			name string
+			md5  string
+		}{
+			name: info.Name,
+			md5:  info.MD5,
+		}
+	}
+	newQuery := linq.From(new)
+	oldQuery := linq.From(old)
+	var result []Info
+	newQuery.
+		ExceptBy(oldQuery, convert).
+		ToSlice(&result)
+	return result
 }

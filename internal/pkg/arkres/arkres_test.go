@@ -18,7 +18,7 @@ func TestGet(t *testing.T) {
 	defer cancel()
 
 	dir := t.TempDir()
-	err := Get(ctx, "21-12-31-15-44-39-814f71", dir, filterRegexp)
+	err := GetFromHGAPI(ctx, "21-12-31-15-44-39-814f71", dir, filterRegexp)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -35,17 +35,17 @@ func TestGetUpdate(t *testing.T) {
 	defer cancel()
 
 	dirGet := t.TempDir()
-	err := Get(ctx, "21-12-31-15-44-39-814f71", dirGet, filterRegexp)
+	err := GetFromHGAPI(ctx, "21-12-31-15-44-39-814f71", dirGet, filterRegexp)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
 
 	dirUpdate := t.TempDir()
-	err = Get(ctx, "21-12-01-03-53-27-2e01ea", dirUpdate, filterRegexp)
+	err = GetFromHGAPI(ctx, "21-12-01-03-53-27-2e01ea", dirUpdate, filterRegexp)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
-	err = GetIncrementally(ctx, "21-12-01-03-53-27-2e01ea", "21-12-31-15-44-39-814f71", dirUpdate, filterRegexp)
+	err = GetFromHGAPIIncrementally(ctx, "21-12-01-03-53-27-2e01ea", "21-12-31-15-44-39-814f71", dirUpdate, filterRegexp)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

@@ -1,4 +1,4 @@
-package arkres
+package hgapi
 
 import (
 	"context"
@@ -34,7 +34,7 @@ func decryptPreCheck() error {
 	return nil
 }
 
-func setChatMask(newChatMask []byte) {
+func SetChatMask(newChatMask []byte) {
 	chatMask = make([]byte, len(newChatMask))
 	copy(chatMask, newChatMask)
 }
