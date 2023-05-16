@@ -3,10 +3,12 @@ package arkavg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/facette/natsort"
 	"golang.org/x/exp/maps"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -64,7 +66,13 @@ func GetAvg(resDir string, prefix string) (Avg, error) {
 		return Avg{}, errors.WithStack(err)
 	}
 
-	return Avg{Groups: maps.Values(dynamicObject)}, nil
+	avg := Avg{Groups: maps.Values(dynamicObject)}
+	sort.Slice(avg.Groups, func(i, j int) bool { return natsort.Compare(avg.Groups[i].ID, avg.Groups[j].ID) })
+	for _, group := range avg.Groups {
+		sort.Slice(group.Stories, func(i, j int) bool { return natsort.Compare(group.Stories[i].ID, group.Stories[j].ID) })
+	}
+
+	return avg, nil
 }
 
 func GetStoryAssets(resDir string, prefix string, story Story) ([]Asset, error) {
