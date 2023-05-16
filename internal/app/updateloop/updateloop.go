@@ -2,7 +2,7 @@ package updateloop
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres/hgapi"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
 	"path/filepath"
 	"time"
 
@@ -57,7 +57,7 @@ func (s *Service) ResVer(ctx context.Context) (ResVersion, ResVersion, error) {
 	if err != nil {
 		return "", "", errors.Wrapf(err, "cannot get local resource version")
 	}
-	remote, err := hgapi.GetResVersion()
+	remote, err := arkres.GetLatestResVersion(ctx)
 	if err != nil {
 		return "", "", errors.Wrapf(err, "cannot get remote resource version")
 	}

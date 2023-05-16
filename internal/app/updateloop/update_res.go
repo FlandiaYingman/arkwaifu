@@ -13,24 +13,26 @@ import (
 )
 
 var (
-	// fullResRE are the regular expressions of resources that need to always be fully retrieved.
-	fullResRE = []*regexp.Regexp{
+	// avgResourceRegexp are the regular expressions of resources that need to always be fully retrieved.
+	//
+	// Note that the regexps start with 'gamedata', however, the naming of this variable is correct (starts with 'avg').
+	avgResourceRegexp = []*regexp.Regexp{
 		regexp.MustCompile("^gamedata/excel"),
 		regexp.MustCompile("^gamedata/story"),
 	}
-	// incrementalResRE are the regular expressions of resources that is ok to be retrieved incrementally.
-	incrementalResRE = []*regexp.Regexp{
+	// assetResourceRegexp are the regular expressions of resources that is ok to be retrieved incrementally.
+	assetResourceRegexp = []*regexp.Regexp{
 		regexp.MustCompile("^avg/bg"),
 		regexp.MustCompile("^avg/imgs"),
 		regexp.MustCompile("^avg/characters"),
 	}
-	// allResRE are the regular expressions which consist of fullResRE and incrementalResRE.
+	// allResRE are the regular expressions which consist of avgResourceRegexp and assetResourceRegexp.
 	allResRE []*regexp.Regexp
 )
 
 func init() {
-	allResRE = append(allResRE, fullResRE...)
-	allResRE = append(allResRE, incrementalResRE...)
+	allResRE = append(allResRE, avgResourceRegexp...)
+	allResRE = append(allResRE, assetResourceRegexp...)
 }
 
 // updateRes gets the resources of newResVer into the corresponding resource directory.
@@ -67,15 +69,23 @@ func (s *Service) updateRes(ctx context.Context, oldResVer ResVersion, newResVer
 }
 
 // updateResources simply wraps around the package arkres.
-func updateResources(ctx context.Context, oldResVer string, newResVer string, newResDir string) error {
+func updateResources(ctx context.Context, oldResVer string, newResVer string, newResDir string) (err error) {
 	if oldResVer == "" {
-		return arkres.Get(ctx, newResVer, newResDir, allResRE...)
-	} else {
-		err := arkres.Get(ctx, newResVer, newResDir, fullResRE...)
+		err = arkres.GetFromHGAPI(ctx, newResVer, newResDir, assetResourceRegexp...)
 		if err != nil {
 			return err
 		}
-		err = arkres.GetIncrementally(ctx, oldResVer, newResVer, newResDir, incrementalResRE...)
+		err = arkres.GetFromAGDAPI(ctx, newResVer, newResDir, avgResourceRegexp...)
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		err = arkres.GetFromHGAPIIncrementally(ctx, oldResVer, newResVer, newResDir, assetResourceRegexp...)
+		if err != nil {
+			return err
+		}
+		err = arkres.GetFromAGDAPI(ctx, newResVer, newResDir, avgResourceRegexp...)
 		if err != nil {
 			return err
 		}
