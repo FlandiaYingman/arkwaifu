@@ -141,7 +141,7 @@ var (
 	//
 	// Example: for text "[largebg(imagegroup="bg_beach_1/bg_beach_2", solidwidth="920/920", solidheight=720,x=-180)]"
 	//  - CaptureGroup 1: the raw string of image group, which is "bg_beach_1/bg_beach_2" in case.
-	largebgRegexp = regexp.MustCompile(`(?i)(?U)\[largebg\(.*imagegroup="(.*)".*\)\]`)
+	largebgRegexp = regexp.MustCompile(`(?i)(?U)\[(?:largebg|gridbg)\(.*imagegroup="(.*)".*\)\]`)
 
 	// characterRegexp matches the character or charslot directive in the story text.
 	//
