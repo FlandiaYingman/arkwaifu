@@ -152,7 +152,7 @@ var (
 	// Example: "[charslot(slot="m",name="avg_npc_820_1#6$1",posfrom="300,0",posto="0,0",afrom=0,ato=1,duration=1,isblock=true)]"
 	// - CaptureGroup 1: the name (including # and $ of the character, which in case is "avg_npc_820_1#6$1")
 	// - CaptureGroup 2: empty
-	characterRegexp = regexp.MustCompile(`(?i)(?U)\[(?:character|charslot)\(.*name="(.*)".*(?:name2="(.*)".*)?\)\]`)
+	characterRegexp = regexp.MustCompile(`(?i)(?U)\[(?:character|charslot)\(.*name\s*=\s*"(.*)".*(?:name2\s*=\s*"(.*)".*)?\)\]`)
 
 	// characterNameRegexp matches the name of a character.
 	//
