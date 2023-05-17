@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -84,6 +85,7 @@ func GetStoryAssets(resDir string, prefix string, story Story) ([]Asset, error) 
 	var assets []Asset
 	assets = append(assets, findPicAssetsFromTxt(txt, KindImage, imageRegexp)...)
 	assets = append(assets, findPicAssetsFromTxt(txt, KindBackground, backgroundRegexp)...)
+	assets = append(assets, findLargebgAssetsFromTxt(txt, KindBackground)...)
 
 	charAssets, err := findCharAssetsFromTxt(txt)
 	if err != nil {
@@ -117,9 +119,29 @@ func findPicAssetsFromTxt(txt string, kind Kind, regexp *regexp.Regexp) []Asset 
 	return assets
 }
 
+func findLargebgAssetsFromTxt(txt string, kind Kind) []Asset {
+	var assets []Asset
+	matches := largebgRegexp.FindAllStringSubmatch(txt, -1)
+	for _, match := range matches {
+		for _, split := range strings.Split(match[1], "/") {
+			assets = append(assets, Asset{
+				Name: split,
+				Kind: kind,
+			})
+		}
+	}
+	return assets
+}
+
 var (
 	imageRegexp      = regexp.MustCompile(`(?i)\[Image\(.*?image="(.*?)".*?\)]`)
 	backgroundRegexp = regexp.MustCompile(`(?i)\[Background\(.*?image="(.*?)".*?\)]`)
+
+	// largebgRegexp matches the "largebg" directive in the story text.
+	//
+	// Example: for text "[largebg(imagegroup="bg_beach_1/bg_beach_2", solidwidth="920/920", solidheight=720,x=-180)]"
+	//  - CaptureGroup 1: the raw string of image group, which is "bg_beach_1/bg_beach_2" in case.
+	largebgRegexp = regexp.MustCompile(`(?i)(?U)\[largebg\(.*imagegroup="(.*)".*\)\]`)
 
 	// characterRegexp matches the character or charslot directive in the story text.
 	//
