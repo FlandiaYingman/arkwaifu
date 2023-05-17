@@ -121,11 +121,16 @@ var (
 	imageRegexp      = regexp.MustCompile(`(?i)\[Image\(.*?image="(.*?)".*?\)]`)
 	backgroundRegexp = regexp.MustCompile(`(?i)\[Background\(.*?image="(.*?)".*?\)]`)
 
-	// characterRegexp matches the character directive in the story text.
-	// 	Example: "[character(name="avg_npc_415_1#5$1",name2="char_011_talula_1#3",focus=2)]"
-	//  group 1: the name (including # and $) of the 1st character, which is "avg_npc_415_1#5$1".
-	//	group 2 (optional): the name (including # and $) of the 2nd character, which is "char_011_talula_1#3".
-	characterRegexp = regexp.MustCompile(`(?i)(?U)\[Character\(.*name="(.*)".*(?:name2="(.*)".*)?\)\]`)
+	// characterRegexp matches the character or charslot directive in the story text.
+	//
+	// Example: "[character(name="avg_npc_415_1#5$1",name2="char_011_talula_1#3",focus=2)]"
+	// - CaptureGroup 1: the name (including # and $) of the 1st character, which is "avg_npc_415_1#5$1".
+	// - CaptureGroup 2 (optional): the name (including # and $) of the 2nd character, which is "char_011_talula_1#3".
+	//
+	// Example: "[charslot(slot="m",name="avg_npc_820_1#6$1",posfrom="300,0",posto="0,0",afrom=0,ato=1,duration=1,isblock=true)]"
+	// - CaptureGroup 1: the name (including # and $ of the character, which in case is "avg_npc_820_1#6$1")
+	// - CaptureGroup 2: empty
+	characterRegexp = regexp.MustCompile(`(?i)(?U)\[(?:character|charslot)\(.*name="(.*)".*(?:name2="(.*)".*)?\)\]`)
 
 	// characterNameRegexp matches the name of a character.
 	//
