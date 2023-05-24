@@ -42,16 +42,20 @@ func GetLatestResourceVersion(ctx context.Context) (*ResourceVersion, error) {
 	}
 
 	for _, commit := range commits {
-		result := RepoCommitMessageRegex.FindStringSubmatch(commit.GetCommit().GetMessage())
-		if result == nil {
+		regexResult := RepoCommitMessageRegex.FindStringSubmatch(commit.GetCommit().GetMessage())
+		if regexResult == nil {
 			continue
 		}
-		return &ResourceVersion{
-			GameServer:      arkconsts.MustParseServer(result[1]),
-			ClientVersion:   result[2],
-			ResourceVersion: result[3],
+		result := ResourceVersion{
+			GameServer:      arkconsts.MustParseServer(regexResult[1]),
+			ClientVersion:   regexResult[2],
+			ResourceVersion: regexResult[3],
 			CommitSHA:       commit.GetSHA(),
-		}, nil
+		}
+		if result.GameServer != arkconsts.CN {
+			continue
+		}
+		return &result, nil
 	}
 
 	return nil, errors.New("Cannot find a commit in the first 30 commits of the repo that matches the regex.")
