@@ -2,7 +2,7 @@ version: "3.9"
 services:
 
   frontend:
-    image: ghcr.io/flandiayingman/arkwaifu/frontend:latest
+    image: ghcr.io/flandiayingman/arkwaifu-frontend:latest
     ports:
       - "7081:80"
 
