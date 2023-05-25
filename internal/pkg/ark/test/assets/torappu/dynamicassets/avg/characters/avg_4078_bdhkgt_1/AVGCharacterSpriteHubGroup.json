@@ -1,0 +1,642 @@
+{
+    "m_GameObject": {
+        "m_FileID": 0,
+        "m_PathID": 5593994909064558383
+    },
+    "m_Enabled": 1,
+    "m_Script": {
+        "m_FileID": 0,
+        "m_PathID": 5130390945902405706
+    },
+    "m_Name": "",
+    "spriteGroups": [
+        {
+            "sprites": [
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -3919190660055902729
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -8529316634049215885
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5633893454029296744
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 1581372930745421728
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5346805165319197701
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5016954866510838310
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -3839522170015598418
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5929006356533316226
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -8141082608119903249
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -7434240050997225140
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5255345133345752589
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 1567036846877755281
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -4149357868929211630
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 775762672026650531
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                }
+            ],
+            "facePos": {
+                "x": 572.0,
+                "y": 71.0,
+                "z": 0.0
+            },
+            "faceSize": {
+                "x": 104.0,
+                "y": 123.0
+            }
+        },
+        {
+            "sprites": [
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 3406540625314811582
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 7343246960495428251
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -8828410711849920971
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 4785210260903890020
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -8283684544093810793
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 155862319297001612
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -5012049343937211081
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 1489583832517709665
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 6403289827985451657
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 4080732056022309092
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 3234344085371400273
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4392493192283399146
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 5566119970770116927
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 6192062200912091891
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                }
+            ],
+            "facePos": {
+                "x": 572.0,
+                "y": 71.0,
+                "z": 0.0
+            },
+            "faceSize": {
+                "x": 104.0,
+                "y": 123.0
+            }
+        },
+        {
+            "sprites": [
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 8566211882620967486
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 9144932191536953831
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 3981116813003135564
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 2867146789918092199
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 3427510906249674363
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -4989238438792525324
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 6457038328259242371
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 4096908010087982749
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -5375269794966978479
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 4360941547071487419
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -195056242760057601
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -7231545529706059975
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -3892761432499115159
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -851827506759960177
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                }
+            ],
+            "facePos": {
+                "x": 572.0,
+                "y": 71.0,
+                "z": 0.0
+            },
+            "faceSize": {
+                "x": 104.0,
+                "y": 123.0
+            }
+        },
+        {
+            "sprites": [
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -4252837924280160963
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -5437713808837778107
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 2852832788567471524
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -1566638254875441686
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -4245181707033447773
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 3856129234020354312
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 1255166411975309121
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -388152400627682431
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -7446873678918511946
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -238036002209987306
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": -4659684679275226879
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": -2319654077855837788
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                },
+                {
+                    "sprite": {
+                        "m_FileID": 0,
+                        "m_PathID": 934211735279445263
+                    },
+                    "alphaTex": {
+                        "m_FileID": 0,
+                        "m_PathID": 4718007345313189506
+                    },
+                    "alias": "",
+                    "isWholeBody": 0
+                }
+            ],
+            "facePos": {
+                "x": 572.0,
+                "y": 71.0,
+                "z": 0.0
+            },
+            "faceSize": {
+                "x": 104.0,
+                "y": 123.0
+            }
+        }
+    ]
+}

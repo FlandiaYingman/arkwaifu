@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"golang.org/x/sync/errgroup"
 	"io"
 	"io/fs"
 	"os"
@@ -274,6 +275,22 @@ func MkFileFromReader(filePath string, r io.Reader) error {
 // MkFileFromBytes calls MkFile and then writes the content of the bytes to the file.
 func MkFileFromBytes(filePath string, b []byte) error {
 	return MkFileFromReader(filePath, bytes.NewReader(b))
+}
+
+type PathWithContent struct {
+	FilePath string
+	Content  []byte
+}
+
+func MkFilesFromBytes(goroutines int, s ...PathWithContent) error {
+	eg := errgroup.Group{}
+	eg.SetLimit(goroutines)
+	for i := range s {
+		pwc := s[i]
+		work := func() error { return MkFileFromBytes(pwc.FilePath, pwc.Content) }
+		eg.Go(work)
+	}
+	return eg.Wait()
 }
 
 func CloseIfIsCloser(r any) error {

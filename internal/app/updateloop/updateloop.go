@@ -1,185 +1,112 @@
+// Package updateloop provide functionalities to keep the local assets
+// up-to-date.
+//
+// The operation "update" contains 3 sub-operations, and the subject of update
+// can be either PictureArt module or Story module.
+//
+// Pull. It pulls the assets from the remote API, either the HyperGryph API or
+// the ArknightsGameData GitHub repository API. It also unpacks or decompresses
+// the assets from the downloaded files, therefore, whether the assets are
+// pulled from either API, the result directory structure will turn out the
+// same.
+//
+// Preprocess. It converts the pulled assets to the form which the submitter of
+// the "submit" sub-operation can recognize. Moreover, it does some image
+// preprocessing such as merge the alpha channel and merge the different faces
+// onto the body for characters (合并差分).
+//
+// Submit. It parses the preprocessed assets and submits them to the art service
+// and the story service.
+//
+// After the above sub-operations, all intermediate files shall be deleted to
+// preserve the disk space.
 package updateloop
 
 import (
 	"context"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/arkres"
-	"path/filepath"
-	"time"
-
-	"github.com/flandiayingman/arkwaifu/internal/app/asset"
-	"github.com/flandiayingman/arkwaifu/internal/app/avg"
-	"github.com/flandiayingman/arkwaifu/internal/app/config"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/flandiayingman/arkwaifu/internal/app/art"
+	"github.com/flandiayingman/arkwaifu/internal/app/story"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"go.uber.org/fx"
+	"os"
+	"time"
 )
 
-func Module() fx.Option {
+func init() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+}
+
+func FxModule() fx.Option {
 	return fx.Module("updateloop",
 		fx.Provide(
-			ProvideConfig,
-			NewService,
+			newRepo,
+			newService,
+		),
+		fx.Invoke(
+			registerService,
 		),
 	)
 }
 
+// Service provides all functionalities of update.
 type Service struct {
-	MainResDir      string
-	MainStaticDir   string
-	ForceUpdate     bool
-	ForceSubmit     bool
-	ForceResVersion string
+	repo *repo
 
-	AvgService   *avg.Service
-	AssetService *asset.Service
+	artService   *art.Service
+	storyService *story.Service
 }
-type ResVersion string
 
-func NewService(
-	avgS *avg.Service,
-	assetS *asset.Service,
-	appConf *config.Config,
-	conf *Config,
+func newService(
+	artService *art.Service,
+	storyService *story.Service,
+	repo *repo,
 ) *Service {
 	return &Service{
-		MainResDir:      appConf.ResourceDir,
-		MainStaticDir:   appConf.StaticDir,
-		ForceUpdate:     conf.ForceUpdate,
-		ForceSubmit:     conf.ForceSubmit,
-		ForceResVersion: conf.ForceResVersion,
-		AvgService:      avgS,
-		AssetService:    assetS,
+		artService:   artService,
+		storyService: storyService,
+		repo:         repo,
 	}
 }
 
-func (s *Service) ResVer(ctx context.Context) (ResVersion, ResVersion, error) {
-	local, err := s.AvgService.GetVersion(ctx)
-	if err != nil {
-		return "", "", errors.Wrapf(err, "cannot get local resource version")
-	}
-	remote, err := arkres.GetLatestResVersion(ctx)
-	if err != nil {
-		return "", "", errors.Wrapf(err, "cannot get remote resource version")
-	}
-	if s.ForceResVersion != "" {
-		log.WithFields(log.Fields{"local": local, "remote": remote, "forceResVersion": s.ForceResVersion}).
-			Warn("force res version is set, ignoring res remote version and use the force res version")
-		remote = s.ForceResVersion
-		defer func() { s.ForceResVersion = "" }()
-	}
-	return ResVersion(local), ResVersion(remote), nil
+func registerService(service *Service, lc fx.Lifecycle) {
+	loopCtx, cancelLoop := context.WithCancel(context.Background())
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			go service.Loop(loopCtx)
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			cancelLoop()
+			return nil
+		},
+	})
 }
 
-func (s *Service) VersioningDir(r ResVersion) string {
-	return filepath.Join(s.MainResDir, string(r))
-}
-func (s *Service) ResDir(r ResVersion) string {
-	return filepath.Join(s.VersioningDir(r), "res")
-}
-func (s *Service) StaticDir(r ResVersion) string {
-	return filepath.Join(s.VersioningDir(r), "static")
+func (s *Service) Loop(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			s.AttemptUpdate(ctx, ark.CnServer)
+		}
+		time.Sleep(5 * time.Minute)
+	}
 }
 
 // AttemptUpdate attempts to update the resources.
-func (s *Service) AttemptUpdate(ctx context.Context) error {
-	log.Info("attempt to update the resources")
+func (s *Service) AttemptUpdate(ctx context.Context, server ark.Server) {
+	log := log.With().
+		Str("server", server).
+		Logger()
+	log.Info().Msg("Update loop is attempting to update the assets of the server... ")
 
-	current, latest, err := s.ResVer(ctx)
-	if err != nil {
-		return errors.Wrapf(err, "failed to retrieve the current and latest version")
-	}
-	log.WithFields(log.Fields{
-		"current": current,
-		"latest":  latest,
-	}).Debug("retrieved the current and latest versions")
+	s.attemptUpdateArt(ctx)
+	s.attemptUpdateArtThumbnails(ctx)
 
-	err = s.update(ctx, current, latest)
-	if err != nil {
-		return err
-	}
-	err = s.submit(ctx, current, latest)
-	if err != nil {
-		return err
-	}
+	s.attemptUpdateStory(ctx, server)
 
-	return nil
-}
-
-// update updates the resources and static files from the old ResVersion to the new ResVersion.
-func (s *Service) update(ctx context.Context, old ResVersion, new ResVersion) error {
-	if old == new && !s.ForceUpdate {
-		log.WithFields(log.Fields{
-			"old":         old,
-			"new":         new,
-			"ForceUpdate": s.ForceUpdate,
-		}).Info("skipping update phase, since the resource versions are the same, and ForceUpdate is not set")
-		return nil
-	}
-	if s.ForceUpdate {
-		log.Warn("forcing update since ForceUpdate is set; setting old resVersion to empty to force update")
-		old = ""
-		defer func() { s.ForceUpdate = false }()
-	}
-	log.WithFields(log.Fields{
-		"old": old,
-		"new": new,
-	}).Info("updating the resources and static files from old to new")
-
-	begin := time.Now()
-
-	var err error
-	err = s.updateRes(ctx, old, new)
-	if err != nil {
-		return errors.Wrapf(err, "failed to update resources from %v to %v", old, new)
-	}
-	err = s.updateStatic(ctx, new)
-	if err != nil {
-		return errors.Wrapf(err, "failed to update static files from %v to %v", old, new)
-	}
-
-	elapsed := time.Since(begin)
-	log.WithFields(log.Fields{
-		"old":     old,
-		"new":     new,
-		"elapsed": elapsed,
-	}).Info("updated the resources and static files from old to new")
-	return nil
-}
-
-// update submits the resources and static files of the new ResVersion to the services.
-func (s *Service) submit(ctx context.Context, old ResVersion, new ResVersion) error {
-	if old == new && !s.ForceSubmit {
-		log.WithFields(log.Fields{
-			"old":         old,
-			"new":         new,
-			"ForceSubmit": s.ForceSubmit,
-		}).Info("skipping submit phase, since the resource versions are the same, and ForceSubmit is not set")
-		return nil
-	}
-	if s.ForceSubmit {
-		log.Warn("forcing submit, since ForceSubmit is set")
-		defer func() { s.ForceSubmit = false }()
-	}
-	log.WithFields(log.Fields{
-		"new": new,
-	}).Info("submitting the resources and static files of new to services")
-
-	begin := time.Now()
-
-	var err error
-	err = s.submitAvg(ctx, new)
-	if err != nil {
-		return errors.Wrapf(err, "failed to submit the resources and static files of %v to AVG service", new)
-	}
-	err = s.submitAsset(ctx, new)
-	if err != nil {
-		return errors.Wrapf(err, "failed to submit the resources and static files of %v to Asset service", new)
-	}
-
-	elapsed := time.Since(begin)
-	log.WithFields(log.Fields{
-		"new":     new,
-		"elapsed": elapsed,
-	}).Info("submitted the resources and static files of new to the services")
-	return nil
+	log.Info().Msg("Update loop has completed this attempt to update the assets of the server.")
 }
