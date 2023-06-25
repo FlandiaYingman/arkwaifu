@@ -15,6 +15,8 @@ from UnityPy.classes import Object
 from UnityPy.classes import PPtr
 from UnityPy.classes.Object import NodeHelper
 
+print(file=sys.stderr)
+
 # flush every line to prevent blocking outputs
 # noinspection PyShadowingBuiltins
 print = functools.partial(print, flush=True)
@@ -37,27 +39,30 @@ def list_assets(src: Path, filters: List[str]):
 
 
 def unpack(src: Path, dst: Path, filters: List[str], workers=None):
-    if src.is_dir():
-        print(f"searching files in {src}...")
-        with ProcessPoolExecutor(max_workers=workers) as executor:
-            for it in src.glob('**/*'):
-                if it.is_file():
-                    print(f"found {it} in {src}...")
-                    executor.submit(unpack, it, dst, filters)
-    elif src.is_file():
-        env = UnityPy.load(str(src))
-        for container, obj_reader in env.container.items():
-            if any(container.startswith(f) for f in filters):
-                obj = obj_reader.read()
-                container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
-                path_id_path = dst / os.path.normpath(os.path.join(obj.container, '..', f"{obj.name}.json"))
-                path_id_dict = export(obj, dst, container_path)
-                if len(path_id_dict) > 0:
-                    with open(path_id_path, "w", encoding="utf8") as file:
-                        json.dump(path_id_dict, file, ensure_ascii=False, indent=4)
+    try:
+        if src.is_dir():
+            print(f"searching files in {src}...")
+            with ProcessPoolExecutor(max_workers=workers) as executor:
+                for it in src.glob('**/*'):
+                    if it.is_file():
+                        print(f"found {it} in {src}...")
+                        executor.submit(unpack, it, dst, filters)
+        elif src.is_file():
+            env = UnityPy.load(str(src))
+            for container, obj_reader in env.container.items():
+                if any(container.startswith(f) for f in filters):
+                    obj = obj_reader.read()
+                    container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
+                    path_id_path = dst / os.path.normpath(os.path.join(obj.container, '..', f"{obj.name}.json"))
+                    path_id_dict = export(obj, dst, container_path)
+                    if len(path_id_dict) > 0:
+                        with open(path_id_path, "w", encoding="utf8") as file:
+                            json.dump(path_id_dict, file, ensure_ascii=False, indent=4)
 
-    else:
-        print(f"WARN: {src} is not dir neither file; skipping")
+        else:
+            print(f"WARN: {src} is not dir neither file; skipping")
+    except Exception as e:
+        print(f"failed to unpack {src} to {dst}: {e}", file=sys.stderr)
 
 
 def export(obj: Object, dst: Path, container_path: str, path_id_dict: Dict[int, str] = None) -> Dict[int, str]:
