@@ -55,6 +55,19 @@ func unpack(ctx context.Context, src string, dst string) error {
 				Msg("Unpacked the resource src to dst. ")
 		}
 	}(scanner)
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
+	errScanner := bufio.NewScanner(stderr)
+	go func(errScanner *bufio.Scanner) {
+		for errScanner.Scan() {
+			t := errScanner.Text()
+			log.Warn().
+				Str("output", t).
+				Msg("Output from stderr of the extractor... ")
+		}
+	}(errScanner)
 
 	err = cmd.Start()
 	if err != nil {
