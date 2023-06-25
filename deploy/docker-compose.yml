@@ -7,7 +7,6 @@ services:
     build: ./reverse_proxy
     ports:
       - 80:80
-      - 443:443
     environment:
       - FRONTEND_ADDRESS=frontend:80
       - BACKEND_ADDRESS=backend:7080
