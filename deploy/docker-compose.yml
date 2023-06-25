@@ -1,45 +1,59 @@
-version: "3.9"
 services:
+
+  reverse_proxy:
+    depends_on:
+      - frontend
+      - backend
+    build: ./reverse_proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - FRONTEND_ADDRESS=frontend:80
+      - BACKEND_ADDRESS=backend:7080
 
   frontend:
     image: ghcr.io/flandiayingman/arkwaifu-frontend:latest
-    ports:
-      - "7081:80"
 
-  service:
+  backend:
+    depends_on:
+      database:
+        condition: service_healthy
     image: ghcr.io/flandiayingman/arkwaifu/service:latest
-    ports:
-      - "7080:7080"
     volumes:
       - type: bind
-        source: ./arkwaifu_resource
-        target: /var/arkwaifu_resource
-      - type: bind
-        source: ./arkwaifu_static
-        target: /var/arkwaifu_static
+        source: ./arkwaifu-root
+        target: /var/arkwaifu-root
     environment:
-      - POSTGRES_DSN
-      - RESOURCE_DIR=/var/arkwaifu_resource
-      - STATIC_DIR=/var/arkwaifu_static
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - POSTGRES_DSN=postgres://postgres@database
+      - ROOT=/var/arkwaifu-root
+    restart: always
 
   updateloop:
+    depends_on:
+      database:
+        condition: service_healthy
     image: ghcr.io/flandiayingman/arkwaifu/updateloop:latest
     volumes:
       - type: bind
-        source: ./arkwaifu_resource
-        target: /var/arkwaifu_resource
-      - type: bind
-        source: ./arkwaifu_static
-        target: /var/arkwaifu_static
+        source: ./arkwaifu-root
+        target: /var/arkwaifu-root
     environment:
-      - POSTGRES_DSN
-      - ARKRES_CHAT_MASK
-      - RESOURCE_DIR=/var/arkwaifu_resource
-      - STATIC_DIR=/var/arkwaifu_static
-      - FORCE_UPDATE=$FORCE_UPDATE
-      - FORCE_SUBMIT=$FORCE_SUBMIT
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - POSTGRES_DSN=postgres://postgres@database
+      - ROOT=/var/arkwaifu-root
+    restart: always
 
+  database:
+    image: postgres:15.3-alpine
+    environment:
+      # Since the database is not exposed, it is considered safe to trust.
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    # Persist the data.
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    # We do not know when the Postgres is ready for listening connections, so we use pg_isready utility to check it.
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 3s
+      timeout: 3s
+      retries: 10
