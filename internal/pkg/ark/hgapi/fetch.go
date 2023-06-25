@@ -43,7 +43,7 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 			Str("dst", dstFile).
 			Int("num", num).
 			Int("total", total).
-			Str("percent", fmt.Sprintf("%.2f%", float64(num)/float64(total))).
+			Str("percent", fmt.Sprintf("%.2f%%", float64(num)/float64(total))).
 			Logger()
 
 		err := response.Err()
