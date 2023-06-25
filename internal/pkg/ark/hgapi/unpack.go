@@ -43,6 +43,10 @@ func unpack(ctx context.Context, src string, dst string) error {
 	go func(scanner *bufio.Scanner) {
 		for scanner.Scan() {
 			t := scanner.Text()
+			// TODO: Info -> Debug
+			log.Info().
+				Str("output", t).
+				Msg("Output from stdout of the extractor... ")
 			split := strings.SplitN(t, "=>", 2)
 			if len(split) != 2 {
 				continue
