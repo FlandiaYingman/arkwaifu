@@ -15,8 +15,6 @@ from UnityPy.classes import Object
 from UnityPy.classes import PPtr
 from UnityPy.classes.Object import NodeHelper
 
-print(file=sys.stderr)
-
 # flush every line to prevent blocking outputs
 # noinspection PyShadowingBuiltins
 print = functools.partial(print, flush=True)
