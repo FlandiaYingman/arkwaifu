@@ -57,8 +57,11 @@ def unpack(src: Path, dst: Path, filters: List[str], workers: int | None, tasks_
         for container, obj_reader in env.container.items():
             if any(container.startswith(f) for f in filters):
                 obj = obj_reader.read()
-                container_path = os.path.normpath(os.path.join(container, '..', obj.name))
-                path_id_path = dst / os.path.normpath(os.path.join(container, '..', f"{obj.name}.json"))
+                container = container.lower()
+                obj_name = obj.name.lower()
+                container_path = os.path.normpath(os.path.join(container, '..', obj_name))
+                path_id_path = dst / os.path.normpath(os.path.join(container, '..', f"{obj_name}.json"))
+
                 path_id_dict = export(obj, dst, container, container_path)
                 if len(path_id_dict) > 0:
                     with open(path_id_path, "w", encoding="utf8") as file:
@@ -73,8 +76,15 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
 
     obj_name = getattr(obj, 'name', '')
     obj_path = obj_container or f"{container_path}/{obj_name}"
+
+    if obj_container is not None:
+        obj_container = obj_container.lower()
+    container_path = container_path.lower()
+    obj_name = obj_name.lower()
+    obj_path = obj_path.lower()
+
     if obj.type.name in ["Texture2D", "Sprite"]:
-        dest = dst / obj_container if obj_container else dst / container_path / f"{obj.name}.png"
+        dest = dst / obj_container if obj_container else dst / container_path / f"{obj_name}.png"
         dest.parent.mkdir(parents=True, exist_ok=True)
         path_id_dict[obj.path_id] = str(dest.name)
         if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
@@ -84,7 +94,7 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
             print(f"cannot export {obj_path}({obj.type.name}), format is not supported", file=sys.stderr)
 
     if obj.type.name in ["TextAsset"]:
-        dest = dst / obj_container if obj_container else dst / container_path / f"{obj.name}.txt"
+        dest = dst / obj_container if obj_container else dst / container_path / f"{obj_name}.txt"
         dest.parent.mkdir(parents=True, exist_ok=True)
         path_id_dict[obj.path_id] = str(dest.name)
         with open(dest, "wb") as file:
@@ -103,7 +113,7 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
 
     if obj.type.name in ["GameObject"]:
         nodes = traverse(obj)
-        container_path = os.path.normpath(os.path.join(container_path, '..', obj.name))
+        container_path = os.path.normpath(os.path.join(container_path, '..', obj_name))
         for node in nodes:
             export(node, dst, None, container_path, path_id_dict)
 
