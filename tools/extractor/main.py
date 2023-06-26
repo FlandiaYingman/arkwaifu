@@ -37,15 +37,15 @@ def list_assets(src: Path, filters: List[str]):
                 list_assets(it, filters)
 
 
-def unpack(src: Path, dst: Path, filters: List[str], workers: int | None):
+def unpack(src: Path, dst: Path, filters: List[str], workers: int | None, tasks_per_child: int | None):
     if src.is_dir():
         print(f"searching files in {src}...")
-        with ProcessPoolExecutor(max_workers=workers) as executor:
+        with ProcessPoolExecutor(max_workers=workers, max_tasks_per_child=tasks_per_child) as executor:
             futures = []
             for subSrc in src.glob('**/*'):
                 if subSrc.is_file():
                     print(f"found {subSrc} in {src}...")
-                    futures.append(executor.submit(unpack, subSrc, dst, filters, None))
+                    futures.append(executor.submit(unpack, subSrc, dst, filters, None, None))
             (done_futures, _) = concurrent.futures.wait(futures, return_when='FIRST_EXCEPTION')
             for future in done_futures:
                 future: concurrent.futures.Future
@@ -180,6 +180,10 @@ def main():
         "-w", "--workers", nargs="?", default=None,
         help="Specify the concurrency workers count."
     )
+    unpack_parser.add_argument(
+        "-t", "--tasks_per_child", nargs="?", default=None,
+        help="Specify the tasks per child workers count."
+    )
     parser.add_argument(
         "-f", "--filter", nargs="+", default=[""],
         help="Specify a path prefix. Only process the assets which match the prefix."
@@ -192,7 +196,8 @@ def main():
         case "unpack":
             for src in args.src:
                 unpack(Path(src), Path(args.dst), filters=args.filter,
-                       workers=int(args.workers) if args.workers else None)
+                       workers=int(args.workers) if args.workers else None,
+                       tasks_per_child=int(args.tasks_per_child) if args.tasks_per_child else None)
 
 
 if __name__ == '__main__':

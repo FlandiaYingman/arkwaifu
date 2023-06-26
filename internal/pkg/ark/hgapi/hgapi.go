@@ -15,11 +15,15 @@ import (
 
 func init() {
 	conf := struct {
-		ExtractorLocation *string `env:"ARKRES_EXTRACTOR_LOCATION"`
-		ChatMask          *string `env:"ARKRES_CHAT_MASK"`
+		ExtractorLocation        *string `env:"ARKRES_EXTRACTOR_LOCATION"`
+		ChatMask                 *string `env:"ARKRES_CHAT_MASK"`
+		ExtractorMaxWorkers      *int    `env:"EXTRACTOR_MAX_WORKERS"`
+		ExtractorMaxTaskPerChild *int    `env:"EXTRACTOR_MAX_TASK_PER_CHILD"`
 	}{
-		ExtractorLocation: nil,
-		ChatMask:          nil,
+		ExtractorLocation:        nil,
+		ChatMask:                 nil,
+		ExtractorMaxWorkers:      nil,
+		ExtractorMaxTaskPerChild: nil,
 	}
 	err := env.Parse(&conf)
 	if err != nil {
@@ -32,6 +36,8 @@ func init() {
 	if conf.ExtractorLocation != nil {
 		extractorLocation = *conf.ExtractorLocation
 	}
+	maxWorkers = conf.ExtractorMaxWorkers
+	maxTasksPerChild = conf.ExtractorMaxTaskPerChild
 }
 
 type Info struct {

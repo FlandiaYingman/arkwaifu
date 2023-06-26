@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"strconv"
 
 	"os"
 	"os/exec"
@@ -14,6 +15,9 @@ import (
 
 var (
 	extractorLocation = "./tools/extractor"
+
+	maxWorkers       *int = nil
+	maxTasksPerChild *int = nil
 )
 
 // TODO: Change to a direct call of Python API.
@@ -32,7 +36,14 @@ func unpack(ctx context.Context, src string, dst string) error {
 		return errors.WithStack(err)
 	}
 
-	cmd := exec.CommandContext(ctx, "python", "-u", "main.py", "unpack", srcAbs, dstAbs)
+	args := []string{"-u", "main.py", "unpack", srcAbs, dstAbs}
+	if maxWorkers != nil {
+		args = append(args, "-w", strconv.Itoa(*maxWorkers))
+	}
+	if maxTasksPerChild != nil {
+		args = append(args, "-t", strconv.Itoa(*maxTasksPerChild))
+	}
+	cmd := exec.CommandContext(ctx, "python", args...)
 	cmd.Dir = extractorLocation
 
 	stdout, err := cmd.StdoutPipe()
