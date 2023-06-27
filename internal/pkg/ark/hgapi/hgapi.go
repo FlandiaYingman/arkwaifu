@@ -7,32 +7,9 @@ import (
 	"strings"
 
 	"github.com/ahmetb/go-linq/v3"
-	"github.com/caarlos0/env/v6"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
-
-func init() {
-	conf := struct {
-		ExtractorLocation *string `env:"ARKRES_EXTRACTOR_LOCATION"`
-		ChatMask          *string `env:"ARKRES_CHAT_MASK"`
-	}{
-		ExtractorLocation: nil,
-		ChatMask:          nil,
-	}
-	err := env.Parse(&conf)
-	if err != nil {
-		log.Error().
-			Err(err).
-			Msg("Failed to parse environment variables. ")
-		return
-	}
-
-	if conf.ExtractorLocation != nil {
-		extractorLocation = *conf.ExtractorLocation
-	}
-}
 
 type Info struct {
 	Name       string
@@ -110,19 +87,7 @@ func GetRes(ctx context.Context, infos []Info, dst string) error {
 		_ = os.RemoveAll(tmpUnpack)
 	}()
 
-	tmpDecrypt, err := decryptRes(ctx, tmpUnpack)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = os.RemoveAll(tmpDecrypt)
-	}()
-
 	err = fileutil.MoveAllContent(tmpUnpack, dst)
-	if err != nil {
-		return err
-	}
-	err = fileutil.MoveAllContent(tmpDecrypt, dst)
 	if err != nil {
 		return err
 	}
@@ -165,13 +130,6 @@ func unpackRes(ctx context.Context, tmpUnzip string) (string, error) {
 		return "", err
 	}
 	err = unpack(ctx, tmpUnzip, tmp)
-	if err != nil {
-		return "", err
-	}
-	return tmp, nil
-}
-func decryptRes(ctx context.Context, tmpUnpack string) (string, error) {
-	tmp, err := os.MkdirTemp("", "arkwaifu-ark-decrypt-*")
 	if err != nil {
 		return "", err
 	}
