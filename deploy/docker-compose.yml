@@ -20,9 +20,7 @@ services:
         condition: service_healthy
     image: ghcr.io/flandiayingman/arkwaifu/service:latest
     volumes:
-      - type: bind
-        source: ./arkwaifu-root
-        target: /var/arkwaifu-root
+      - ./arkwaifu-root:/var/arkwaifu-root
     environment:
       - POSTGRES_DSN=postgres://postgres@database
       - ROOT=/var/arkwaifu-root
@@ -34,9 +32,7 @@ services:
         condition: service_healthy
     image: ghcr.io/flandiayingman/arkwaifu/updateloop:latest
     volumes:
-      - type: bind
-        source: ./arkwaifu-root
-        target: /var/arkwaifu-root
+      - ./arkwaifu-root:/var/arkwaifu-root
     environment:
       - POSTGRES_DSN=postgres://postgres@database
       - ROOT=/var/arkwaifu-root
