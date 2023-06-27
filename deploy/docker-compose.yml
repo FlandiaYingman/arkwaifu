@@ -26,6 +26,8 @@ services:
     environment:
       - POSTGRES_DSN=postgres://postgres@database
       - ROOT=/var/arkwaifu-root
+      - EXTRACTOR_MAX_WORKERS
+      - EXTRACTOR_MAX_TASK_PER_CHILD
     restart: always
 
   updateloop:
