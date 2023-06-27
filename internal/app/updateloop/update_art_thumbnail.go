@@ -59,17 +59,12 @@ func (s *Service) updateArtsThumbnail(ctx context.Context, arts []*art.Art) erro
 }
 
 func (s *Service) updateArtThumbnail(ctx context.Context, a *art.Art) error {
-	variant := art.VariantContent{
-		ArtID:     a.ID,
-		Variation: "origin",
-	}
-	err := s.artService.TakeStatics(&variant)
+	content, err := s.artService.TakeContent(a.ID, art.VariationOrigin)
 	if err != nil {
 		return err
 	}
 
-	content := bytes.NewReader(variant.Content)
-	img, _, err := image.Decode(content)
+	img, _, err := image.Decode(bytes.NewReader(content))
 	if err != nil {
 		return err
 	}
@@ -86,19 +81,12 @@ func (s *Service) updateArtThumbnail(ctx context.Context, a *art.Art) error {
 		return err
 	}
 
-	err = s.artService.UpsertVariants(&art.Variant{
-		ArtID:     a.ID,
-		Variation: "thumbnail",
-	})
+	err = s.artService.UpsertVariants(art.NewVariant(a.ID, art.VariationThumbnail))
 	if err != nil {
 		return err
 	}
 
-	err = s.artService.StoreStatics(&art.VariantContent{
-		ArtID:     a.ID,
-		Variation: "thumbnail",
-		Content:   buf.Bytes(),
-	})
+	err = s.artService.StoreContent(a.ID, art.VariationThumbnail, buf.Bytes())
 	if err != nil {
 		return err
 	}

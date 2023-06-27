@@ -33,33 +33,17 @@ func (s *Service) SelectVariant(id string, kind string) (*Variant, error) {
 }
 
 func (s *Service) UpsertArts(arts ...*Art) error {
-	for i := range arts {
-		for j := range arts[i].Variants {
-			if !arts[i].Variants[j].ContentPresent {
-				arts[i].Variants[j].ContentPath = arts[i].Variants[j].ToStatic().PathRel()
-				arts[i].Variants[j].ContentWidth = nil
-				arts[i].Variants[j].ContentHeight = nil
-			}
-		}
-	}
 	return s.repo.UpsertArts(arts...)
 }
 func (s *Service) UpsertVariants(variants ...*Variant) error {
-	for i := range variants {
-		if !variants[i].ContentPresent {
-			variants[i].ContentPath = variants[i].ToStatic().PathRel()
-			variants[i].ContentWidth = nil
-			variants[i].ContentHeight = nil
-		}
-	}
 	return s.repo.UpsertVariants(variants...)
 }
 
-func (s *Service) StoreStatics(statics ...*VariantContent) error {
-	return s.repo.StoreStatics(statics...)
+func (s *Service) StoreContent(id string, variation string, content []byte) (err error) {
+	return s.repo.StoreContent(id, variation, content)
 }
-func (s *Service) TakeStatics(statics ...*VariantContent) error {
-	return s.repo.TakeStatics(statics...)
+func (s *Service) TakeContent(id string, variation string) (content []byte, err error) {
+	return s.repo.TakeContent(id, variation)
 }
 
 func (s *Service) SelectArtsWhoseVariantAbsent(variation string) ([]*Art, error) {

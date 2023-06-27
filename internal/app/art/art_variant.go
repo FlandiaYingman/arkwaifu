@@ -8,10 +8,9 @@ type Variant struct {
 	ArtID     string `gorm:"primaryKey;type:text COLLATE numeric" json:"artID"`
 	Variation string `gorm:"primaryKey" json:"variation,omitempty"`
 
-	ContentPresent bool   `gorm:"" json:"contentPresent,omitempty"`
-	ContentPath    string `gorm:"" json:"contentPath,omitempty"`
-	ContentWidth   *int   `gorm:"" json:"contentWidth,omitempty"`
-	ContentHeight  *int   `gorm:"" json:"contentHeight,omitempty"`
+	ContentPresent bool `gorm:"" json:"contentPresent"`
+	ContentWidth   *int `gorm:"" json:"contentWidth,omitempty"`
+	ContentHeight  *int `gorm:"" json:"contentHeight,omitempty"`
 }
 
 const (
@@ -22,19 +21,14 @@ const (
 
 func NewVariant(id string, variation string) *Variant {
 	return &Variant{
-		ArtID:     id,
-		Variation: variation,
+		ArtID:          id,
+		Variation:      variation,
+		ContentPresent: false,
+		ContentWidth:   nil,
+		ContentHeight:  nil,
 	}
 }
 
 func (v *Variant) String() string {
 	return fmt.Sprintf("%s/%s", v.Variation, v.ArtID)
-}
-
-func (v *Variant) ToStatic() *VariantContent {
-	return &VariantContent{
-		ArtID:     v.ArtID,
-		Variation: v.Variation,
-		Content:   nil,
-	}
 }

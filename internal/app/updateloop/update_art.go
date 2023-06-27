@@ -158,11 +158,7 @@ func (s *Service) submitPictureArt(root string, pic *ark.PictureArt) error {
 	if err != nil {
 		return err
 	}
-	err = s.artService.StoreStatics(&art.VariantContent{
-		ArtID:     img.Art.ID,
-		Variation: art.VariationOrigin,
-		Content:   buf.Bytes(),
-	})
+	err = s.artService.StoreContent(img.Art.ID, art.VariationOrigin, buf.Bytes())
 	if err != nil {
 		return err
 	}
@@ -221,11 +217,7 @@ func (s *Service) submitCharacterArt(root string, char *ark.CharacterArt) error 
 		if err != nil {
 			return err
 		}
-		err = s.artService.StoreStatics(&art.VariantContent{
-			ArtID:     img.ID(),
-			Variation: art.VariationOrigin,
-			Content:   buf.Bytes(),
-		})
+		err = s.artService.StoreContent(img.ID(), art.VariationOrigin, buf.Bytes())
 		if err != nil {
 			return err
 		}

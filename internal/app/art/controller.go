@@ -24,8 +24,8 @@ func registerController(c *controller, router fiber.Router) {
 
 	router.Put("arts/:id/variants/:variation", c.PutVariant)
 
-	router.Get("arts/:id/variants/:variation/content", c.GetVariantContent)
-	router.Put("arts/:id/variants/:variation/content", c.PutVariantContent)
+	router.Get("arts/:id/variants/:variation/content", c.GetContent)
+	router.Put("arts/:id/variants/:variation/content", c.PutContent)
 }
 
 func (c *controller) GetArts(ctx *fiber.Ctx) error {
@@ -119,30 +119,34 @@ func (c *controller) PutVariant(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 
-func (c *controller) GetVariantContent(ctx *fiber.Ctx) error {
-	static := VariantContent{}
-	err := ctx.ParamsParser(&static)
+type ContentParams struct {
+	ID        string `param:"id"`
+	Variation string `param:"variation"`
+}
+
+func (c *controller) GetContent(ctx *fiber.Ctx) error {
+	params := ContentParams{}
+	err := ctx.ParamsParser(&params)
 	if err != nil {
 		return err
 	}
 
-	err = c.service.TakeStatics(&static)
+	content, err := c.service.TakeContent(params.ID, params.Variation)
 	if err != nil {
 		return err
 	}
 
 	ctx.Type("webp")
-	return ctx.Send(static.Content)
+	return ctx.Send(content)
 }
-func (c *controller) PutVariantContent(ctx *fiber.Ctx) error {
-	static := VariantContent{}
-	err := ctx.ParamsParser(&static)
+func (c *controller) PutContent(ctx *fiber.Ctx) error {
+	params := ContentParams{}
+	err := ctx.ParamsParser(&params)
 	if err != nil {
 		return err
 	}
-	static.Content = ctx.Body()
 
-	err = c.service.StoreStatics(&static)
+	err = c.service.StoreContent(params.ID, params.Variation, ctx.Body())
 	if err != nil {
 		return err
 	}

@@ -2,22 +2,24 @@ package art
 
 import (
 	"errors"
+	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"os"
+	"path/filepath"
 )
 
 type repository struct {
-	db        *gorm.DB
-	staticDir string
+	db         *gorm.DB
+	ContentDir string
 }
 
 func newRepo(conf *infra.Config, db *gorm.DB, _ *infra.NumericCollate) (*repository, error) {
 	r := repository{
-		db:        db,
-		staticDir: conf.Root,
+		db:         db,
+		ContentDir: filepath.Join(conf.Root, "arts-content"),
 	}
 	err := r.init()
 	if err != nil {
@@ -112,77 +114,99 @@ func (r *repository) UpsertVariants(variants ...*Variant) error {
 	return nil
 }
 
-func (r *repository) StoreStatics(statics ...*VariantContent) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		for _, static := range statics {
-			var err error
-
-			// Select the corresponding variant and check whether it exists
-			v := Variant{}
-			err = r.db.
-				Clauses(clause.Locking{Strength: "UPDATE"}).
-				Where("(art_id, variation) = (?, ?)", static.ArtID, static.Variation).
-				Take(&v).
-				Error
-			if err != nil {
-				return err
-			}
-
-			// Check whether static is valid
-			config, err := static.Check()
-			if err != nil {
-				return err
-			}
-
-			// Update the corresponding variant
-			v.ContentPresent = true
-			v.ContentPath = static.PathRel()
-			v.ContentWidth, v.ContentHeight = &config.Width, &config.Height
-
-			// Write to file system
-			path := static.Path(r.staticDir)
-			err = fileutil.MkFileFromBytes(path, static.Content)
-			if err != nil {
-				return err
-			}
-
-			// Write change to database
-			err = r.UpsertVariants(&v)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-}
-func (r *repository) TakeStatics(statics ...*VariantContent) error {
-	var err error
-	for _, static := range statics {
-		// Select the corresponding variant and check whether it exists
-		v := Variant{}
+func (r *repository) StoreContent(id string, variation string, content []byte) (err error) {
+	err = r.db.Transaction(func(tx *gorm.DB) (err error) {
+		// If the corresponding art exists, select it.
+		art := Art{}
 		err = r.db.
-			Model(&Variant{}).
-			Select("").
-			Where("(art_id, variation) = (?, ?)", static.ArtID, static.Variation).
-			Take(&v).
+			Where("id = ?", id).
+			Take(&art).
 			Error
 		if err != nil {
 			return err
 		}
 
-		// Read the static file
-		static.Content, err = os.ReadFile(static.Path(r.staticDir))
+		// If the corresponding variant exists, select it.
+		variant := Variant{}
+		err = r.db.
+			Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("(art_id, variation) = (?, ?)", id, variation).
+			Take(&variant).
+			Error
 		if err != nil {
 			return err
 		}
 
-		// Check whether static is valid
-		_, err = static.Check()
+		contentObj := Content{
+			ID:        art.ID,
+			Category:  art.Category,
+			Variation: variant.Variation,
+			Content:   content,
+		}
+
+		// Check whether the content object is valid.
+		config, err := contentObj.Check()
 		if err != nil {
 			return err
 		}
+
+		// Update the corresponding variant.
+		variant.ContentPresent = true
+		variant.ContentWidth = &config.Width
+		variant.ContentHeight = &config.Height
+
+		// Write content's change on variant to database
+		err = r.UpsertVariants(&variant)
+		if err != nil {
+			return err
+		}
+
+		// Write content to filesystem.
+		path := filepath.Join(r.ContentDir, contentObj.PathRel())
+		err = fileutil.MkFileFromBytes(path, contentObj.Content)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return
+}
+func (r *repository) TakeContent(id string, variation string) (content []byte, err error) {
+	// If the corresponding art exists, select it.
+	art := Art{}
+	err = r.db.
+		Where("id = ?", id).
+		Take(&art).
+		Error
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	// If the corresponding variant exists, select it.
+	variant := Variant{}
+	err = r.db.
+		Where("(art_id, variation) = (?, ?)", id, variation).
+		Take(&variant).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	if variant.ContentPresent {
+		contentObj := Content{
+			ID:        art.ID,
+			Category:  art.Category,
+			Variation: variant.Variation,
+			Content:   nil,
+		}
+		// Read content from the filesystem.
+		path := filepath.Join(r.ContentDir, contentObj.PathRel())
+		return os.ReadFile(path)
+	} else {
+		// Error because content is not present.
+		return nil, fmt.Errorf("content id=%s variation=%s is not present", id, variation)
+	}
 }
 
 func (r *repository) SelectArtsWhereVariantAbsent(variation string) ([]*Art, error) {
