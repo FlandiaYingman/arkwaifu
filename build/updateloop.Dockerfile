@@ -14,7 +14,7 @@ COPY ./cmd  ./cmd
 COPY ./internal ./internal
 RUN go build -o updateloop github.com/flandiayingman/arkwaifu/cmd/updateloop
 
-FROM python:3.11-slim-bullseye AS deploy
+FROM python:3.10-slim-bullseye AS deploy
 
 WORKDIR /app
 COPY ./tools/extractor ./tools/extractor

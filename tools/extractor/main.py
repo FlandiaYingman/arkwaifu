@@ -1,5 +1,4 @@
 import argparse
-import concurrent.futures
 import functools
 import json
 import os.path
@@ -37,54 +36,37 @@ def list_assets(src: Path, filters: List[str]):
                 list_assets(it, filters)
 
 
-def unpack(src: Path, dst: Path, filters: List[str], workers: int | None, tasks_per_child: int | None):
+def unpack(src: Path, dst: Path, filters: List[str], workers=None):
     if src.is_dir():
         print(f"searching files in {src}...")
-        with ProcessPoolExecutor(max_workers=workers, max_tasks_per_child=tasks_per_child) as executor:
-            futures = []
-            for subSrc in src.glob('**/*'):
-                if subSrc.is_file():
-                    print(f"found {subSrc} in {src}...")
-                    futures.append(executor.submit(unpack, subSrc, dst, filters, None, None))
-            (done_futures, _) = concurrent.futures.wait(futures, return_when='FIRST_EXCEPTION')
-            for future in done_futures:
-                future: concurrent.futures.Future
-                e = future.exception()
-                if e is not None:
-                    print(f"exception occurs during concurrently unpacking: {e}", file=sys.stderr)
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            for it in src.glob('**/*'):
+                if it.is_file():
+                    print(f"found {it} in {src}...")
+                    executor.submit(unpack, it, dst, filters)
     elif src.is_file():
         env = UnityPy.load(str(src))
         for container, obj_reader in env.container.items():
             if any(container.startswith(f) for f in filters):
                 obj = obj_reader.read()
-                container = container.lower()
-                obj_name = obj.name.lower()
-                container_path = os.path.normpath(os.path.join(container, '..', obj_name))
-                path_id_path = dst / os.path.normpath(os.path.join(container, '..', f"{obj_name}.json"))
-
-                path_id_dict = export(obj, dst, container, container_path)
+                container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
+                path_id_path = dst / os.path.normpath(os.path.join(obj.container, '..', f"{obj.name}.json"))
+                path_id_dict = export(obj, dst, container_path)
                 if len(path_id_dict) > 0:
                     with open(path_id_path, "w", encoding="utf8") as file:
                         json.dump(path_id_dict, file, ensure_ascii=False, indent=4)
+
     else:
         print(f"WARN: {src} is not dir neither file; skipping")
 
 
-def export(obj: Object, dst: Path, obj_container: str | None, container_path: str,
-           path_id_dict: Dict[int, str] = None) -> Dict[int, str]:
+def export(obj: Object, dst: Path, container_path: str, path_id_dict: Dict[int, str] = None) -> Dict[int, str]:
     path_id_dict = {} if path_id_dict is None else path_id_dict
 
     obj_name = getattr(obj, 'name', '')
-    obj_path = obj_container or f"{container_path}/{obj_name}"
-
-    if obj_container is not None:
-        obj_container = obj_container.lower()
-    container_path = container_path.lower()
-    obj_name = obj_name.lower()
-    obj_path = obj_path.lower()
-
+    obj_path = obj.container or f"{container_path}/{obj_name}"
     if obj.type.name in ["Texture2D", "Sprite"]:
-        dest = dst / obj_container if obj_container else dst / container_path / f"{obj_name}.png"
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.png"
         dest.parent.mkdir(parents=True, exist_ok=True)
         path_id_dict[obj.path_id] = str(dest.name)
         if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
@@ -94,7 +76,7 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
             print(f"cannot export {obj_path}({obj.type.name}), format is not supported", file=sys.stderr)
 
     if obj.type.name in ["TextAsset"]:
-        dest = dst / obj_container if obj_container else dst / container_path / f"{obj_name}.txt"
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.txt"
         dest.parent.mkdir(parents=True, exist_ok=True)
         path_id_dict[obj.path_id] = str(dest.name)
         with open(dest, "wb") as file:
@@ -104,7 +86,7 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
     if obj.type.name in ["MonoBehaviour"]:
         script = obj.m_Script.read()
         obj_name = script.name
-        dest = dst / obj_container if obj_container else dst / container_path / f"{obj_name}.json"
+        dest = dst / obj.container if obj.container else dst / container_path / f"{obj_name}.json"
         dest.parent.mkdir(parents=True, exist_ok=True)
         path_id_dict[obj.path_id] = str(dest.name)
         with open(dest, "w", encoding="utf8") as file:
@@ -113,9 +95,9 @@ def export(obj: Object, dst: Path, obj_container: str | None, container_path: st
 
     if obj.type.name in ["GameObject"]:
         nodes = traverse(obj)
-        container_path = os.path.normpath(os.path.join(container_path, '..', obj_name))
+        container_path = os.path.normpath(os.path.join(container_path, '..', obj.name))
         for node in nodes:
-            export(node, dst, None, container_path, path_id_dict)
+            export(node, dst, container_path, path_id_dict)
 
     return path_id_dict
 
@@ -190,10 +172,6 @@ def main():
         "-w", "--workers", nargs="?", default=None,
         help="Specify the concurrency workers count."
     )
-    unpack_parser.add_argument(
-        "-t", "--tasks_per_child", nargs="?", default=None,
-        help="Specify the tasks per child workers count."
-    )
     parser.add_argument(
         "-f", "--filter", nargs="+", default=[""],
         help="Specify a path prefix. Only process the assets which match the prefix."
@@ -206,8 +184,7 @@ def main():
         case "unpack":
             for src in args.src:
                 unpack(Path(src), Path(args.dst), filters=args.filter,
-                       workers=int(args.workers) if args.workers else None,
-                       tasks_per_child=int(args.tasks_per_child) if args.tasks_per_child else None)
+                       workers=int(args.workers) if args.workers else None)
 
 
 if __name__ == '__main__':
