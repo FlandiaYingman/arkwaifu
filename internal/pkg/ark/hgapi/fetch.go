@@ -43,7 +43,7 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 			Str("dst", dstFile).
 			Int("num", num).
 			Int("total", total).
-			Str("percent", fmt.Sprintf("%.2f%%", float64(num)/float64(total))).
+			Str("progress", fmt.Sprintf("%.3f", float64(num)/float64(total))).
 			Logger()
 
 		err := response.Err()
@@ -75,7 +75,7 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 			Str("dst", dstFile).
 			Int("num", num).
 			Int("total", total).
-			Str("percent", fmt.Sprintf("%.2f%", float64(num)/float64(total))).
+			Str("progress", fmt.Sprintf("%.3f", float64(num)/float64(total))).
 			Msg("Fetched resource in retry queue.")
 		num++
 	}
