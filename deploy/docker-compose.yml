@@ -45,7 +45,7 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     # Persist the data.
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./arkwaifu-root/postgres-data:/var/lib/postgresql/data
     # We do not know when the Postgres is ready for listening connections, so we use pg_isready utility to check it.
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
