@@ -1,3 +1,6 @@
+### The Docker Compose file for deploying Arkwaifu on the official server.
+### Others may modify the file to fit their condition.
+
 services:
 
   reverse_proxy:
