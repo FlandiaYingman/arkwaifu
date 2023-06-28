@@ -2,7 +2,9 @@ package art
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type controller struct {
@@ -17,6 +19,8 @@ func registerController(c *controller, router fiber.Router) {
 	if router == nil {
 		return
 	}
+
+	router.Use("arts", c.Authenticator)
 
 	router.Get("arts", c.GetArts)
 	router.Get("arts/:id", c.GetArt)
@@ -79,8 +83,6 @@ func (c *controller) GetVariant(ctx *fiber.Ctx) error {
 }
 
 func (c *controller) PutArt(ctx *fiber.Ctx) error {
-	// TODO: Authorization
-
 	id := ctx.Params("id")
 
 	art := new(Art)
@@ -98,8 +100,6 @@ func (c *controller) PutArt(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(fiber.StatusOK)
 }
 func (c *controller) PutVariant(ctx *fiber.Ctx) error {
-	// TODO: Authorization
-
 	id := ctx.Params("id")
 	kind := ctx.Params("kind")
 
@@ -159,4 +159,36 @@ type artQueryFilter struct {
 }
 
 type variantQueryFilter struct {
+}
+
+func (c *controller) Authenticator(ctx *fiber.Ctx) error {
+	if c.SkipAuthentication(ctx) {
+		return ctx.Next()
+	}
+	return c.Authenticate(ctx)
+}
+func (c *controller) SkipAuthentication(ctx *fiber.Ctx) bool {
+	return ctx.Method() != fiber.MethodPut
+}
+
+func (c *controller) Authenticate(ctx *fiber.Ctx) error {
+	idStr := ctx.Query("user", "")
+	if idStr == "" {
+		return ctx.
+			Status(fiber.StatusUnauthorized).
+			SendString("no user credential provided")
+	}
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return ctx.
+			Status(fiber.StatusBadRequest).
+			SendString(fmt.Sprintf("cannot parse id of user: %s", idStr))
+	}
+	user := c.service.Authenticate(id)
+	if user == nil {
+		return ctx.
+			Status(fiber.StatusUnauthorized).
+			SendString(fmt.Sprintf("cannot find user with id: %s", id))
+	}
+	return ctx.Next()
 }

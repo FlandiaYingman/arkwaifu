@@ -2,14 +2,21 @@ package art
 
 import (
 	"errors"
+	"github.com/flandiayingman/arkwaifu/internal/app/infra"
+	"github.com/google/uuid"
 )
 
 type Service struct {
 	repo *repository
+
+	users []infra.User
 }
 
-func newService(repo *repository) *Service {
-	return &Service{repo}
+func newService(config *infra.Config, repo *repository) *Service {
+	return &Service{
+		repo:  repo,
+		users: config.Users,
+	}
 }
 
 var (
@@ -48,4 +55,13 @@ func (s *Service) TakeContent(id string, variation string) (content []byte, err 
 
 func (s *Service) SelectArtsWhoseVariantAbsent(variation string) ([]*Art, error) {
 	return s.repo.SelectArtsWhereVariantAbsent(variation)
+}
+
+func (s *Service) Authenticate(uuid uuid.UUID) *infra.User {
+	for _, user := range s.users {
+		if user.ID == uuid {
+			return &user
+		}
+	}
+	return nil
 }
