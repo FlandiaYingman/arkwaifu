@@ -18,6 +18,9 @@ also enlarges (4x) the artworks with super-resolution neural networks - Real-ESR
 
 🇨🇳 The China mirror has been suspended due to the v0 → v1 upgrade. We will make our best efforts to get it back soon.
 
+For more information of the frontend of Arkwaifu, please refer to
+the [frontend repo](https://github.com/FlandiaYingman/arkwaifu-frontend).
+
 ## Features
 
 - The arts are automatically updated as soon as the game updates.
