@@ -90,23 +90,28 @@ func (s *Service) Loop(ctx context.Context) {
 		case <-ctx.Done():
 			break
 		default:
-			s.AttemptUpdate(ctx, ark.CnServer)
+			s.AttemptUpdate(ctx)
 		}
 		time.Sleep(5 * time.Minute)
 	}
 }
 
 // AttemptUpdate attempts to update the resources.
-func (s *Service) AttemptUpdate(ctx context.Context, server ark.Server) {
+func (s *Service) AttemptUpdate(ctx context.Context) {
 	log := log.With().
-		Str("server", server).
 		Logger()
-	log.Info().Msg("Update loop is attempting to update the assets of the server... ")
+	log.Info().Msg("Update loop is attempting to update the assets... ")
 
 	s.attemptUpdateArt(ctx)
 	s.attemptUpdateArtThumbnails(ctx)
 
-	s.attemptUpdateStory(ctx, server)
+	for _, server := range ark.Servers {
+		// Skip TW server, since we haven't implemented it yet.
+		if server == ark.TwServer {
+			continue
+		}
+		s.attemptUpdateStory(ctx, server)
+	}
 
-	log.Info().Msg("Update loop has completed this attempt to update the assets of the server.")
+	log.Info().Msg("Update loop has completed this attempt to update the assets..")
 }
