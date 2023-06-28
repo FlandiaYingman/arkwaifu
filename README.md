@@ -6,6 +6,7 @@
 [![](https://pkg.go.dev/badge/github.com/flandiayingman/arkwaifu.svg)](https://pkg.go.dev/github.com/flandiayingman/arkwaifu)
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
 ![](https://img.shields.io/github/v/release/FlandiaYingman/arkwaifu?style=flat-square)
+
 ![](https://img.shields.io/github/actions/workflow/status/FlandiaYingman/arkwaifu/docker-image-service.yml?style=flat-square&label=build%3A%20service)
 ![](https://img.shields.io/github/actions/workflow/status/FlandiaYingman/arkwaifu/docker-image-updateloop.yml?style=flat-square&label=build%3A%20updateloop)
 ![](https://img.shields.io/website?style=flat-square&url=https%3A%2F%2Farkwaifu.cc%2F)
