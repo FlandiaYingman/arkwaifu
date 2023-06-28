@@ -1,7 +1,7 @@
 <!--suppress ALL -->
 <img src="assets/arkwaifu_phantom@0.25x.png" alt="logo" align="right" height="224" width="224"/>
 
-# ArkWaifu (arkwaifu)
+# Arkwaifu (arkwaifu)
 
 [![](https://pkg.go.dev/badge/github.com/flandiayingman/arkwaifu.svg)](https://pkg.go.dev/github.com/flandiayingman/arkwaifu)
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
