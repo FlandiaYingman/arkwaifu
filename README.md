@@ -22,9 +22,9 @@ Currently, only assets, that appear in the "in-game stories" (what we call: AVG)
 I also plan to include the artwork of characters in-game.
 However, by considering some technical difficulties, especially there are some animated artworks, the plan is delayed.
 
-This project is now available online!
-Check it at [arkwaifu.cc](https://arkwaifu.cc/) (main site), or [cn.arkwaifu.cc](https://cn.arkwaifu.cc/) (CN mirror)!
-🎉
+🎉 Arkwaifu v1 has released! Check it at [arkwaifu.cc](https://arkwaifu.cc/)!
+
+🇨🇳 The China mirror has been suspended due to the v0 → v1 upgrade. We will make our best efforts to get it back soon.
 
 # Features
 
