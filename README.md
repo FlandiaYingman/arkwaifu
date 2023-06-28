@@ -7,58 +7,48 @@
 ![](https://img.shields.io/github/license/FlandiaYingman/arkwaifu?style=flat-square)
 ![](https://img.shields.io/github/last-commit/FlandiaYingman/arkwaifu?style=flat-square)
 
-Arkwaifu is a website which, arranges and provides almost all picture assets extracted from Arknights (the game).
-
-Arkwaifu also enlarges (4x) the picture assets with super-resolution neural
-networks, [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
-and [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN).
-
-Currently, only assets, that appear in the "in-game stories" (what we call: AVG), are available, including:
-
-- "Images". They are the exquisite arts that appear when some special events happened.
-- "Backgrounds". They are the backgrounds that always appear on the bottom layer, during dialogue.
-- "Characters". They are the pictures of characters that act in the play, some of them are with different emotions.
-
-I also plan to include the artwork of characters in-game.
-However, by considering some technical difficulties, especially there are some animated artworks, the plan is delayed.
+Arkwaifu is a website which, arranges and provides almost all artworks extracted from Arknights (the game). Arkwaifu
+also enlarges (4x) the artworks with super-resolution neural networks - Real-ESRGAN.
 
 🎉 Arkwaifu v1 has released! Check it at [arkwaifu.cc](https://arkwaifu.cc/)!
 
 🇨🇳 The China mirror has been suspended due to the v0 → v1 upgrade. We will make our best efforts to get it back soon.
 
-# Features
+## Features
 
-- Assets are kept up-to-date automatically whenever the game is updated.
-- Assets are enlarged with super-resolution neural networks ([Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
-  , [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN)).
-- Assets are classified into handy categories (AVG, non-AVG; main stories, activities; etc.).
-- Containerized backend (microservices) and frontend.
-- The backend follows microservice architecture and is split into two services: 'service', which serves the data, and
-  'updateloop' which updates the data automatically.
+- The arts are automatically updated as soon as the game updates.
+- Assets are enlarged with super-resolution neural networks (Real-ESRGAN).
 
-# V1 Roadmap #
+## Available Arts
 
-- [x] Beautify the frontend.
-- [x] List assets which aren't included in AVGs.
-- [x] Use cache to speed up the website (backend).
-- [x] Use cache to speed up the website (frontend).
-- [x] Pull only differences in every update loop.
-- [x] I18N 🌏! Add Chinese support.
-- [x] Extract gamedata directly from the game resources.
-- [x] Create API to manually update the resources.
-- [x] Support enlarging picture assets with neural networks.
-- [x] Redesign & Rewrite the controller interface.
-- [ ] Redesign the frontend UX.
-- [ ] Support assets searching.
-- [ ] Provide a choice to switch the website language.
-- [ ] Automatically switch the website language to user's language automatically.
-- [ ] //...
+Now, only arts that appear in the "in-game stories", are available, including **images**, **backgrounds** and *
+*characters**.
 
-# Design
+### Images
 
-For the design documentation, see [here (DESIGN.md)](DESIGN.md).
+Images are the exquisite artworks that appear when some special events in the stories happen.
 
-# Acknowledgements
+
+<img src="https://arkwaifu.cc/api/v1/arts/32_i18/variants/origin/content" width="800"/>
+
+### Backgrounds
+
+Backgrounds are the artworks that always appear during dialogue between characters.
+
+<img src="https://arkwaifu.cc/api/v1/arts/bg_courtyard/variants/origin/content" width="800"/>
+
+### Characters
+
+Characters are the artworks that represents characters that appear during dialogue.
+
+<img src="https://arkwaifu.cc/api/v1/arts/char_250_phantom_1%233%241/variants/origin/content" width="800"/>
+
+## V1 Roadmap
+
+- [ ] Support searching.
+- [ ] Switchable language.
+
+## Acknowledgements
 
 Thanks to my friend [Galvin Gao](https://github.com/GalvinGao)!
 He helped me a lot in the front-end development and choosing frameworks. I really appreciate the "getting hands dirty"
@@ -79,7 +69,7 @@ of [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)
 and [Real-CUGAN](https://github.com/bilibili/ailab/tree/main/Real-CUGAN)! They created the neural networks this project
 utilizes for enlarging assets.
 
-# License
+## License
 
 The source code of this project is licensed under the [MIT License](LICENSE).
 
