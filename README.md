@@ -52,8 +52,8 @@ Characters are the artworks that represents characters that appear during dialog
 
 ## V1 Roadmap
 
+- [x] Switchable language.
 - [ ] Support searching.
-- [ ] Switchable language.
 
 ## Acknowledgements
 
