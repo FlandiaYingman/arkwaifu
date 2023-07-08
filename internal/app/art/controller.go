@@ -101,17 +101,17 @@ func (c *controller) PutArt(ctx *fiber.Ctx) error {
 }
 func (c *controller) PutVariant(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	kind := ctx.Params("kind")
+	variation := ctx.Params("variation")
 
-	variant := new(Variant)
+	variant := Variant{}
 	err := ctx.BodyParser(&variant)
 	if err != nil {
 		return errors.Join(fiber.ErrBadRequest, err)
 	}
 	variant.ArtID = id
-	variant.Variation = kind
+	variant.Variation = variation
 
-	err = c.service.UpsertVariants(variant)
+	err = c.service.UpsertVariants(&variant)
 	if err != nil {
 		return err
 	}
