@@ -43,8 +43,12 @@ services:
 
   database:
     image: postgres:15.3-alpine
+    ports:
+      # Only expose the port on localhost. That should prevent unauthorized accesses.
+      # This is for administrators to manage the database, not for other containers to access.
+      - 127.0.0.1:5432:5432
     environment:
-      # Since the database is not exposed, it is considered safe to trust.
+      # Since the database is not exposed to public, it is considered safe to trust.
       - POSTGRES_HOST_AUTH_METHOD=trust
     # Persist the data.
     volumes:
