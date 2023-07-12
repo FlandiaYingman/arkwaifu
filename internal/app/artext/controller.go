@@ -25,5 +25,5 @@ func (c *Controller) register(params RegisterParams) {
 		return
 	}
 
-	router.Get("arts", c.GetArtsOfStoryGroup, c.GetArtsOfStory)
+	router.Get("arts", c.GetArtsOfStoryGroup, c.GetArtsOfStory, c.GetArtsExceptForStoryArts)
 }
