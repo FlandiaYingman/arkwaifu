@@ -10,4 +10,6 @@ type PictureArt struct {
 
 	Title    string `json:"title" gorm:""`
 	Subtitle string `json:"subtitle" gorm:""`
+
+	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }

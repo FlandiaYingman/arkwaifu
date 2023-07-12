@@ -82,6 +82,7 @@ func (c *objectConverter) convertStoryGroup(rawGroup *arkparser.StoryGroup) (Gro
 		Name:    rawGroup.Name,
 		Type:    "",
 		Stories: nil,
+		SortID:  nil, // SortID is auto-increment, no need to handle it.
 	}
 
 	var err error
@@ -122,6 +123,7 @@ func (c *objectConverter) convertStory(rawStory *arkparser.Story) (Story, error)
 		Name:          rawStory.Name,
 		Info:          rawStory.Info,
 		GroupID:       rawStory.GroupID,
+		SortID:        nil, // SortID is auto-increment, no need to handle it.
 		PictureArts:   cols.Map(rawStory.Pictures, c.convertPictureArt),
 		CharacterArts: cols.Map(rawStory.Characters, c.convertCharacterArt),
 	}
@@ -156,6 +158,8 @@ func (c *objectConverter) convertPictureArt(rawPicture *arkparser.StoryPicture) 
 
 		Title:    rawPicture.Title,
 		Subtitle: rawPicture.Subtitle,
+
+		SortID: nil, // SortID is auto-increment, no need to handle it.
 	}
 }
 func (c *objectConverter) convertCharacterArt(rawCharacter *arkparser.StoryCharacter) CharacterArt {
@@ -166,5 +170,7 @@ func (c *objectConverter) convertCharacterArt(rawCharacter *arkparser.StoryChara
 		Category: art.CategoryCharacter,
 
 		Names: rawCharacter.Names,
+
+		SortID: nil, // SortID is auto-increment, no need to handle it.
 	}
 }

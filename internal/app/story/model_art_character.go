@@ -12,4 +12,6 @@ type CharacterArt struct {
 	Category string     `json:"category" gorm:""`
 
 	Names pq.StringArray `json:"names" gorm:"type:text[]"`
+
+	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }

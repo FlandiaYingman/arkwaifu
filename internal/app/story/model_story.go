@@ -12,7 +12,8 @@ type Story struct {
 	Name    string `json:"name" gorm:""`
 	Info    string `json:"info" gorm:""`
 
-	GroupID string `json:"groupID" gorm:"collate:numeric"`
+	GroupID string  `json:"groupID" gorm:"collate:numeric"`
+	SortID  *uint64 `json:"-" gorm:"unique;autoIncrement"`
 
 	PictureArts   []PictureArt   `json:"pictureArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID)"`
 	CharacterArts []CharacterArt `json:"characterArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID)"`
