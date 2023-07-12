@@ -1,7 +1,6 @@
 package story
 
 import (
-	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"gorm.io/gorm"
 )
@@ -54,7 +53,7 @@ END$$;`)
 	return nil
 }
 
-func newRepo(db *gorm.DB, _ *infra.NumericCollate) (*repo, error) {
+func newRepo(db *gorm.DB) (*repo, error) {
 	r := repo{db}
 	err := r.init()
 	if err != nil {
