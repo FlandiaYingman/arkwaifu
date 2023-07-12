@@ -66,19 +66,19 @@ func newRepo(db *gorm.DB, _ *infra.NumericCollate) (*repo, error) {
 func (r *repo) SelectStories(server ark.Server) ([]*Story, error) {
 	stories := make([]*Story, 0)
 	result := r.db.
-		Preload("PictureArts").
-		Preload("CharacterArts").
+		Preload("PictureArts", func(db *gorm.DB) *gorm.DB { return db.Order("picture_arts.sort_id") }).
+		Preload("CharacterArts", func(db *gorm.DB) *gorm.DB { return db.Order("character_arts.sort_id") }).
+		Order("sort_id").
 		Select("id, server, tag, tag_text, code, name, info, group_id").
 		Where("server = ?", server).
-		Order("id").
 		Find(&stories)
 	return stories, result.Error
 }
 func (r *repo) SelectStory(id string, server ark.Server) (*Story, error) {
 	story := new(Story)
 	result := r.db.
-		Preload("PictureArts").
-		Preload("CharacterArts").
+		Preload("PictureArts", func(db *gorm.DB) *gorm.DB { return db.Order("picture_arts.sort_id") }).
+		Preload("CharacterArts", func(db *gorm.DB) *gorm.DB { return db.Order("character_arts.sort_id") }).
 		Select("id, server, tag, tag_text, code, name, info, group_id").
 		Take(&story, "id = ? AND server = ?", id, server)
 	return story, result.Error
@@ -87,12 +87,14 @@ func (r *repo) SelectStoryGroups(server ark.Server) ([]*Group, error) {
 	groups := make([]*Group, 0)
 	result := r.db.
 		Where("server = ?", server).
-		Order("id").
 		Preload("Stories", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, server, tag, tag_text, code, name, info, group_id")
+			return db.
+				Order("stories.sort_id").
+				Select("id, server, tag, tag_text, code, name, info, group_id")
 		}).
-		Preload("Stories.PictureArts").
-		Preload("Stories.CharacterArts").
+		Preload("Stories.PictureArts", func(db *gorm.DB) *gorm.DB { return db.Order("picture_arts.sort_id") }).
+		Preload("Stories.CharacterArts", func(db *gorm.DB) *gorm.DB { return db.Order("character_arts.sort_id") }).
+		Order("sort_id").
 		Find(&groups)
 	return groups, result.Error
 }
@@ -100,12 +102,14 @@ func (r *repo) SelectStoryGroupsByType(server ark.Server, groupType GroupType) (
 	groups := make([]*Group, 0)
 	result := r.db.
 		Where("server = ? AND type = ?", server, groupType).
-		Order("id").
 		Preload("Stories", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, server, tag, tag_text, code, name, info, group_id")
+			return db.
+				Order("stories.sort_id").
+				Select("id, server, tag, tag_text, code, name, info, group_id")
 		}).
-		Preload("Stories.PictureArts").
-		Preload("Stories.CharacterArts").
+		Preload("Stories.PictureArts", func(db *gorm.DB) *gorm.DB { return db.Order("picture_arts.sort_id") }).
+		Preload("Stories.CharacterArts", func(db *gorm.DB) *gorm.DB { return db.Order("character_arts.sort_id") }).
+		Order("sort_id").
 		Find(&groups)
 	return groups, result.Error
 }
@@ -113,10 +117,12 @@ func (r *repo) SelectStoryGroup(id string, server ark.Server) (*Group, error) {
 	group := new(Group)
 	result := r.db.
 		Preload("Stories", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, server, tag, tag_text, code, name, info, group_id")
+			return db.
+				Order("stories.sort_id").
+				Select("id, server, tag, tag_text, code, name, info, group_id")
 		}).
-		Preload("Stories.PictureArts").
-		Preload("Stories.CharacterArts").
+		Preload("Stories.PictureArts", func(db *gorm.DB) *gorm.DB { return db.Order("picture_arts.sort_id") }).
+		Preload("Stories.CharacterArts", func(db *gorm.DB) *gorm.DB { return db.Order("character_arts.sort_id") }).
 		Take(&group, "id = ? AND server = ?", id, server)
 	return group, result.Error
 }
@@ -125,7 +131,7 @@ func (r *repo) SelectPictureArts(server ark.Server) ([]*PictureArt, error) {
 	arts := make([]*PictureArt, 0)
 	return arts, r.db.
 		Where("server = ?", server).
-		Order("id").
+		Order("sort_id").
 		Find(&arts).Error
 }
 func (r *repo) SelectPictureArt(server ark.Server, id string) (*PictureArt, error) {
@@ -138,7 +144,7 @@ func (r *repo) SelectCharacterArts(server ark.Server) ([]*CharacterArt, error) {
 	arts := make([]*CharacterArt, 0)
 	return arts, r.db.
 		Where("server = ?", server).
-		Order("id").
+		Order("sort_id").
 		Find(&arts).Error
 }
 func (r *repo) SelectCharacterArt(server ark.Server, id string) (*CharacterArt, error) {
