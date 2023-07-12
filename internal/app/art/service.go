@@ -29,6 +29,9 @@ func (s *Service) SelectArts(category *string) ([]*Art, error) {
 	}
 	return s.repo.SelectArts()
 }
+func (s *Service) SelectArtsByIDs(ids []string) ([]*Art, error) {
+	return s.repo.SelectArtsByIDs(ids)
+}
 func (s *Service) SelectArt(id string) (*Art, error) {
 	return s.repo.SelectArt(id)
 }

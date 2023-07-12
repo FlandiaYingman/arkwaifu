@@ -51,6 +51,18 @@ func (r *repository) SelectArts() ([]*Art, error) {
 	}
 	return arts, nil
 }
+func (r *repository) SelectArtsByIDs(ids []string) ([]*Art, error) {
+	arts := make([]*Art, 0)
+	result := r.db.
+		Preload("Variants").
+		Joins("JOIN UNNEST(?) WITH ORDINALITY t(id, ord) USING (id)", clause.Expr{SQL: "ARRAY[?]", Vars: []any{ids}, WithoutParentheses: true}).
+		Order("t.ord").
+		Find(&arts, ids)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return arts, nil
+}
 func (r *repository) SelectArtsByCategory(category string) ([]*Art, error) {
 	arts := make([]*Art, 0)
 	result := r.db.
