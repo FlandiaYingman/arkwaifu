@@ -7,7 +7,7 @@ type Group struct {
 	ID      string     `json:"id" gorm:"primaryKey;collate:numeric;check:id=lower(id)"`
 	Name    string     `json:"name" gorm:""`
 	Type    GroupType  `json:"type" gorm:"type:story_group_type"`
-	Stories []Story    `json:"stories" gorm:"foreignKey:Server,GroupID;reference:Server,ID"`
+	Stories []Story    `json:"stories" gorm:"foreignKey:Server,GroupID;reference:Server,ID;constraint:OnDelete:CASCADE"`
 
 	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }

@@ -15,8 +15,8 @@ type Story struct {
 	GroupID string  `json:"groupID" gorm:"collate:numeric"`
 	SortID  *uint64 `json:"-" gorm:"unique;autoIncrement"`
 
-	PictureArts   []PictureArt   `json:"pictureArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID)"`
-	CharacterArts []CharacterArt `json:"characterArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID)"`
+	PictureArts   []PictureArt   `json:"pictureArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID);constraint:OnDelete:CASCADE"`
+	CharacterArts []CharacterArt `json:"characterArts" gorm:"foreignKey:Server,StoryID;reference:(Server,ID);constraint:OnDelete:CASCADE"`
 }
 
 type Tag = string

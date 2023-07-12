@@ -4,7 +4,6 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type repo struct {
@@ -150,7 +149,18 @@ func (r *repo) SelectCharacterArt(server ark.Server, id string) (*CharacterArt, 
 }
 
 func (r *repo) UpsertStoryGroups(groups []Group) error {
-	return r.db.
-		Clauses(clause.OnConflict{UpdateAll: true}).
-		Create(&groups).Error
+	// UpsertStoryGroups does not actually upsert values.
+	// Because of the existence of SortID (we want to re-generate it), values are deleted and then inserted.
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		var err error
+		err = tx.Delete(&groups).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Create(&groups).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
