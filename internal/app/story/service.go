@@ -59,6 +59,8 @@ func (s *Service) PopulateFrom(rawTree *arkparser.StoryTree, server ark.Server) 
 	}
 
 	for _, group := range tree {
+		// Prevent error: extended protocol limited to 65535 parameters
+		// TODO: Find a more efficient way to prevent error.
 		err = s.r.UpsertStoryGroups([]Group{group})
 		if err != nil {
 			return err
