@@ -11,7 +11,6 @@ func main() {
 		fx.Provide(
 			infra.ProvideConfig,
 			infra.ProvideGorm,
-			infra.ProvideGormNumericCollate,
 		),
 		app.FxOptions(),
 	)
