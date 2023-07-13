@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/google/uuid"
+	"strings"
 )
 
 type Service struct {
@@ -30,30 +31,39 @@ func (s *Service) SelectArtsByCategory(category Category) ([]*Art, error) {
 	return s.repo.SelectArtsByCategory(string(category))
 }
 func (s *Service) SelectArtsByIDs(ids []string) ([]*Art, error) {
+	for i, id := range ids {
+		ids[i] = strings.ToLower(id)
+	}
 	return s.repo.SelectArtsByIDs(ids)
 }
 func (s *Service) SelectArt(id string) (*Art, error) {
-	return s.repo.SelectArt(id)
+	return s.repo.SelectArt(strings.ToLower(id))
 }
 func (s *Service) SelectVariants(id string) ([]*Variant, error) {
-	return s.repo.SelectVariants(id)
+	return s.repo.SelectVariants(strings.ToLower(id))
 }
 func (s *Service) SelectVariant(id string, variation Variation) (*Variant, error) {
-	return s.repo.SelectVariant(id, string(variation))
+	return s.repo.SelectVariant(strings.ToLower(id), string(variation))
 }
 
 func (s *Service) UpsertArts(arts ...*Art) error {
+	for _, art := range arts {
+		art.ID = strings.ToLower(art.ID)
+	}
 	return s.repo.UpsertArts(arts...)
 }
 func (s *Service) UpsertVariants(variants ...*Variant) error {
+	for _, variant := range variants {
+		variant.ArtID = strings.ToLower(variant.ArtID)
+	}
 	return s.repo.UpsertVariants(variants...)
 }
 
 func (s *Service) StoreContent(id string, variation Variation, content []byte) (err error) {
-	return s.repo.StoreContent(id, string(variation), content)
+	return s.repo.StoreContent(strings.ToLower(id), string(variation), content)
 }
 func (s *Service) TakeContent(id string, variation Variation) (content []byte, err error) {
-	return s.repo.TakeContent(id, string(variation))
+	return s.repo.TakeContent(strings.ToLower(id), string(variation))
 }
 
 func (s *Service) SelectArtsWhoseVariantAbsent(variation Variation) ([]*Art, error) {
