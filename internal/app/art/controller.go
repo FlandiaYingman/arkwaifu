@@ -33,20 +33,33 @@ func registerController(c *controller, router fiber.Router) {
 }
 
 func (c *controller) GetArts(ctx *fiber.Ctx) error {
-	filter := artQueryFilter{}
-	err := ctx.QueryParser(&filter)
-	if err != nil {
-		return err
-	}
-
+	categoryString := ctx.Query("category")
+	variationString := ctx.Query("absent-variation")
 	var arts []*Art
-	if variation := ctx.Query("absent-variation", ""); variation != "" {
+	var err error
+	if variationString != "" {
+		variation, err := ParseVariation(variationString)
+		if err != nil {
+			return errors.Join(fiber.ErrBadRequest, err)
+		}
 		arts, err = c.service.SelectArtsWhoseVariantAbsent(variation)
+		if err != nil {
+			return err
+		}
+	} else if categoryString != "" {
+		category, err := ParseCategory(categoryString)
+		if err != nil {
+			return errors.Join(fiber.ErrBadRequest, err)
+		}
+		arts, err = c.service.SelectArtsByCategory(category)
+		if err != nil {
+			return err
+		}
 	} else {
-		arts, err = c.service.SelectArts(filter.category)
-	}
-	if err != nil {
-		return err
+		arts, err = c.service.SelectArts()
+		if err != nil {
+			return err
+		}
 	}
 	return ctx.JSON(arts)
 }
@@ -72,9 +85,12 @@ func (c *controller) GetVariants(ctx *fiber.Ctx) error {
 }
 func (c *controller) GetVariant(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	kind := ctx.Params("variation")
+	variation, err := ParseVariation(ctx.Params("variation"))
+	if err != nil {
+		return errors.Join(fiber.ErrBadRequest, err)
+	}
 
-	variants, err := c.service.SelectVariant(id, kind)
+	variants, err := c.service.SelectVariant(id, variation)
 	if err != nil {
 		return err
 	}
@@ -109,7 +125,10 @@ func (c *controller) PutVariant(ctx *fiber.Ctx) error {
 		return errors.Join(fiber.ErrBadRequest, err)
 	}
 	variant.ArtID = id
-	variant.Variation = variation
+	variant.Variation, err = ParseVariation(variation)
+	if err != nil {
+		return errors.Join(fiber.ErrBadRequest, err)
+	}
 
 	err = c.service.UpsertVariants(&variant)
 	if err != nil {
@@ -120,8 +139,8 @@ func (c *controller) PutVariant(ctx *fiber.Ctx) error {
 }
 
 type ContentParams struct {
-	ID        string `param:"id"`
-	Variation string `param:"variation"`
+	ID        string    `param:"id"`
+	Variation Variation `param:"variation"`
 }
 
 func (c *controller) GetContent(ctx *fiber.Ctx) error {
@@ -152,10 +171,6 @@ func (c *controller) PutContent(ctx *fiber.Ctx) error {
 	}
 
 	return nil
-}
-
-type artQueryFilter struct {
-	category *string `query:"category"`
 }
 
 type variantQueryFilter struct {

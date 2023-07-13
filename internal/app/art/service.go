@@ -23,11 +23,11 @@ var (
 	ErrNotFound = errors.New("the resource with the identifier(s) is not found")
 )
 
-func (s *Service) SelectArts(category *string) ([]*Art, error) {
-	if category != nil {
-		return s.repo.SelectArtsByCategory(*category)
-	}
+func (s *Service) SelectArts() ([]*Art, error) {
 	return s.repo.SelectArts()
+}
+func (s *Service) SelectArtsByCategory(category Category) ([]*Art, error) {
+	return s.repo.SelectArtsByCategory(string(category))
 }
 func (s *Service) SelectArtsByIDs(ids []string) ([]*Art, error) {
 	return s.repo.SelectArtsByIDs(ids)
@@ -38,8 +38,8 @@ func (s *Service) SelectArt(id string) (*Art, error) {
 func (s *Service) SelectVariants(id string) ([]*Variant, error) {
 	return s.repo.SelectVariants(id)
 }
-func (s *Service) SelectVariant(id string, kind string) (*Variant, error) {
-	return s.repo.SelectVariant(id, kind)
+func (s *Service) SelectVariant(id string, variation Variation) (*Variant, error) {
+	return s.repo.SelectVariant(id, string(variation))
 }
 
 func (s *Service) UpsertArts(arts ...*Art) error {
@@ -49,15 +49,15 @@ func (s *Service) UpsertVariants(variants ...*Variant) error {
 	return s.repo.UpsertVariants(variants...)
 }
 
-func (s *Service) StoreContent(id string, variation string, content []byte) (err error) {
-	return s.repo.StoreContent(id, variation, content)
+func (s *Service) StoreContent(id string, variation Variation, content []byte) (err error) {
+	return s.repo.StoreContent(id, string(variation), content)
 }
-func (s *Service) TakeContent(id string, variation string) (content []byte, err error) {
-	return s.repo.TakeContent(id, variation)
+func (s *Service) TakeContent(id string, variation Variation) (content []byte, err error) {
+	return s.repo.TakeContent(id, string(variation))
 }
 
-func (s *Service) SelectArtsWhoseVariantAbsent(variation string) ([]*Art, error) {
-	return s.repo.SelectArtsWhereVariantAbsent(variation)
+func (s *Service) SelectArtsWhoseVariantAbsent(variation Variation) ([]*Art, error) {
+	return s.repo.SelectArtsWhereVariantAbsent(string(variation))
 }
 
 func (s *Service) Authenticate(uuid uuid.UUID) *infra.User {

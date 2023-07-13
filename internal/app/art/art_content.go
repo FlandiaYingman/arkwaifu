@@ -11,8 +11,8 @@ import (
 // filesystem.
 type Content struct {
 	ID        string
-	Category  string
-	Variation string
+	Category  Category
+	Variation Variation
 	Content   []byte
 }
 
@@ -25,7 +25,7 @@ func (s *Content) String() string {
 }
 
 func (s *Content) PathRel() string {
-	return path.Join(s.Category, s.String()+".webp")
+	return path.Join(string(s.Category), s.String()+".webp")
 }
 
 func (s *Content) Check() (*image.Config, error) {

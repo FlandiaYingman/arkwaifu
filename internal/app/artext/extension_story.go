@@ -128,7 +128,7 @@ func (service *Service) GetArtsExceptForStoryArts(server ark.Server) ([]*art.Art
 		storyArtsIDSet[characterArt.ID] = true
 	}
 
-	arts, err := service.art.SelectArts(nil)
+	arts, err := service.art.SelectArts()
 	if err != nil {
 		return nil, err
 	}
