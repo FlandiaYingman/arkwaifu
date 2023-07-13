@@ -69,12 +69,12 @@ func (s *Service) updateArtThumbnail(ctx context.Context, a *art.Art) error {
 		return err
 	}
 
-	img = imaging.Fit(img, 240, 240, imaging.Lanczos)
+	img = imaging.Fit(img, 360, 360*4, imaging.Lanczos)
 
 	buf := bytes.Buffer{}
 	err = webp.Encode(&buf, img, &webp.Options{
 		Lossless: false,
-		Quality:  50,
+		Quality:  75,
 		Exact:    false,
 	})
 	if err != nil {
