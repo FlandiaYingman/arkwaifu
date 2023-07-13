@@ -1,16 +1,25 @@
 package story
 
 import (
+	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"gorm.io/gorm"
 )
 
 type repo struct {
-	db *gorm.DB
+	db *infra.Gorm
 }
 
 func (r *repo) init() (err error) {
-	err = r.createEnums()
+	err = r.db.CreateEnum("game_server", "CN", "EN", "JP", "KR", "TW")
+	if err != nil {
+		return err
+	}
+	err = r.db.CreateEnum("story_tag", "before", "after", "interlude")
+	if err != nil {
+		return err
+	}
+	err = r.db.CreateEnum("story_group_type", "main-story", "major-event", "minor-event", "other")
 	if err != nil {
 		return err
 	}
@@ -33,27 +42,7 @@ func (r *repo) init() (err error) {
 	return nil
 }
 
-func (r *repo) createEnums() error {
-	var result *gorm.DB
-	result = r.db.Exec(`DO
-$$BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'game_server') THEN
-        CREATE TYPE game_server AS ENUM ('CN','EN','JP','KR','TW');
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'story_tag') THEN
-        CREATE TYPE story_tag AS ENUM ('before','after','interlude');
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'story_group_type') THEN
-        CREATE TYPE story_group_type AS ENUM ('main-story','major-event','minor-event','other');
-    END IF;
-END$$;`)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
-}
-
-func newRepo(db *gorm.DB) (*repo, error) {
+func newRepo(db *infra.Gorm) (*repo, error) {
 	r := repo{db}
 	err := r.init()
 	if err != nil {

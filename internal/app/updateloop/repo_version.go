@@ -1,6 +1,7 @@
 package updateloop
 
 import (
+	"github.com/flandiayingman/arkwaifu/internal/app/infra"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -17,7 +18,7 @@ type storyVersion struct {
 }
 
 type repo struct {
-	*gorm.DB
+	*infra.Gorm
 }
 
 var zeroPtr = func() *int {
@@ -25,7 +26,7 @@ var zeroPtr = func() *int {
 	return &zero
 }()
 
-func newRepo(db *gorm.DB) (*repo, error) {
+func newRepo(db *infra.Gorm) (*repo, error) {
 	var err error
 	repo := &repo{db}
 	err = repo.initArtVersionTable()

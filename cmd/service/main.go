@@ -14,7 +14,6 @@ func main() {
 			infra.ProvideConfig,
 			infra.ProvideFiber,
 			infra.ProvideGorm,
-			infra.ProvideGormNumericCollate,
 		),
 		artext.FxModule(),
 		art.FxModule(),

@@ -12,11 +12,11 @@ import (
 )
 
 type repository struct {
-	db         *gorm.DB
+	db         *infra.Gorm
 	ContentDir string
 }
 
-func newRepo(conf *infra.Config, db *gorm.DB, _ *infra.NumericCollate) (*repository, error) {
+func newRepo(conf *infra.Config, db *infra.Gorm) (*repository, error) {
 	r := repository{
 		db:         db,
 		ContentDir: filepath.Join(conf.Root, "arts-content"),
@@ -29,6 +29,10 @@ func newRepo(conf *infra.Config, db *gorm.DB, _ *infra.NumericCollate) (*reposit
 }
 
 func (r *repository) init() (err error) {
+	err = r.db.CreateCollateNumeric()
+	if err != nil {
+		return err
+	}
 	err = r.db.AutoMigrate(&Art{})
 	if err != nil {
 		return err
