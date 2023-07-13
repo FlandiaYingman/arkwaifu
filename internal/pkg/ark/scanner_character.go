@@ -72,6 +72,9 @@ var (
 func (scanner *Scanner) ScanForCharacterArts() ([]*CharacterArt, error) {
 	rootCharacterArts := filepath.Join(scanner.Root, characterPrefix)
 	characterEntries, err := os.ReadDir(rootCharacterArts)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
