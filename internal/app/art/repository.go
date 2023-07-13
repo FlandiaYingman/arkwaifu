@@ -33,6 +33,24 @@ func (r *repository) init() (err error) {
 	if err != nil {
 		return err
 	}
+	err = r.db.CreateEnum("art_category",
+		string(CategoryImage),
+		string(CategoryBackground),
+		string(CategoryItem),
+		string(CategoryCharacter),
+	)
+	if err != nil {
+		return err
+	}
+	err = r.db.CreateEnum("art_variation",
+		string(VariationOrigin),
+		string(VariationRealEsrganX4Plus),
+		string(VariationRealEsrganX4PlusAnime),
+		string(VariationThumbnail),
+	)
+	if err != nil {
+		return err
+	}
 	err = r.db.AutoMigrate(&Art{})
 	if err != nil {
 		return err

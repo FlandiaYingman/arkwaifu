@@ -143,7 +143,7 @@ func (s *Service) submitPictureArt(root string, pic *ark.PictureArt) error {
 		return err
 	}
 
-	err = s.artService.UpsertArts(art.NewArt(img.Art.ID, img.Art.Kind))
+	err = s.artService.UpsertArts(art.NewArt(img.Art.ID, art.MustParseCategory(img.Art.Kind)))
 	if err != nil {
 		return err
 	}
@@ -198,7 +198,7 @@ func (s *Service) submitCharacterArt(root string, char *ark.CharacterArt) error 
 	}
 
 	err = s.artService.UpsertArts(cols.Map(imgs, func(img ark.CharacterArtImage) *art.Art {
-		return art.NewArt(img.ID(), string(img.Art.Kind))
+		return art.NewArt(img.ID(), art.MustParseCategory(img.Art.Kind))
 	})...)
 	if err != nil {
 		return err
