@@ -65,8 +65,8 @@ func (r *repository) init() (err error) {
 func (r *repository) SelectArts() ([]*Art, error) {
 	arts := make([]*Art, 0)
 	result := r.db.
-		Preload("Variants").
-		Order("id").
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
+		Order("category, id").
 		Find(&arts)
 	if result.Error != nil {
 		return nil, result.Error
@@ -76,7 +76,7 @@ func (r *repository) SelectArts() ([]*Art, error) {
 func (r *repository) SelectArtsByIDs(ids []string) ([]*Art, error) {
 	arts := make([]*Art, 0)
 	result := r.db.
-		Preload("Variants").
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
 		Joins("JOIN UNNEST(?) WITH ORDINALITY t(id, ord) USING (id)", clause.Expr{SQL: "ARRAY[?]", Vars: []any{ids}, WithoutParentheses: true}).
 		Order("t.ord").
 		Find(&arts, ids)
@@ -88,9 +88,9 @@ func (r *repository) SelectArtsByIDs(ids []string) ([]*Art, error) {
 func (r *repository) SelectArtsByCategory(category string) ([]*Art, error) {
 	arts := make([]*Art, 0)
 	result := r.db.
-		Preload("Variants").
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
 		Where("category = ?", category).
-		Order("id").
+		Order("category, id").
 		Find(&arts)
 	if result.Error != nil {
 		return nil, result.Error
@@ -99,7 +99,9 @@ func (r *repository) SelectArtsByCategory(category string) ([]*Art, error) {
 }
 func (r *repository) SelectArt(id string) (*Art, error) {
 	art := new(Art)
-	result := r.db.Preload("Variants").Take(&art, "id = ?", id)
+	result := r.db.
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
+		Take(&art, "id = ?", id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.Join(ErrNotFound, result.Error)
 	}
@@ -113,8 +115,7 @@ func (r *repository) SelectVariants(id string) ([]*Variant, error) {
 	variants := make([]*Variant, 0)
 	result := r.db.
 		Where("art_id = ?", id).
-		Order("art_id").
-		Order("kind").
+		Order("variation").
 		Find(&variants)
 	if result.Error != nil {
 		return nil, result.Error
@@ -246,8 +247,8 @@ func (r *repository) TakeContent(id string, variation string) (content []byte, e
 func (r *repository) SelectArtsWhereVariantAbsent(variation string) ([]*Art, error) {
 	arts := make([]*Art, 0)
 	err := r.db.
-		Preload("Variants").
-		Order("id").
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
+		Order("category, id").
 		Not("EXISTS (SELECT 1 FROM variants WHERE (arts.id, ?) = (variants.art_id, variants.variation))", variation).
 		Find(&arts).
 		Error
