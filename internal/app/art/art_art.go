@@ -1,7 +1,7 @@
 package art
 
 type Art struct {
-	ID       string `gorm:"primaryKey;type:text COLLATE numeric" json:"id"`
+	ID       string `gorm:"primaryKey;type:text COLLATE numeric;check:id=lower(id)" json:"id"`
 	Category string `gorm:"" json:"category"`
 
 	Variants []Variant `gorm:"" json:"variants,omitempty" validate:""`

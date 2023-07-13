@@ -5,7 +5,7 @@ import (
 )
 
 type Variant struct {
-	ArtID     string `gorm:"primaryKey;type:text COLLATE numeric" json:"artID"`
+	ArtID     string `gorm:"primaryKey;type:text COLLATE numeric;check:art_id=lower(art_id)" json:"artID"`
 	Variation string `gorm:"primaryKey" json:"variation,omitempty"`
 
 	ContentPresent bool `gorm:"" json:"contentPresent"`
