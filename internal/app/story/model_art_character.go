@@ -15,3 +15,11 @@ type CharacterArt struct {
 
 	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }
+
+type AggregatedCharacterArt struct {
+	Server   ark.Server `json:"server"`
+	ID       string     `json:"id"`
+	Category string     `json:"category"`
+
+	Names pq.StringArray `json:"names" gorm:"type:text[]"`
+}

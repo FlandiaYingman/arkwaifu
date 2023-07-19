@@ -39,14 +39,15 @@ func (s *Service) GetStoryGroup(server ark.Server, id string) (*Group, error) {
 func (s *Service) GetPictureArts(server ark.Server) ([]*PictureArt, error) {
 	return s.r.SelectPictureArts(server)
 }
-func (s *Service) GetPictureArt(server ark.Server, id string) (*PictureArt, error) {
-	return s.r.SelectPictureArt(server, id)
+func (s *Service) GetAggregatedPictureArt(server ark.Server, id string) (*AggregatedPictureArt, error) {
+	return s.r.SelectAggregatedPictureArtByID(server, id)
 }
+
 func (s *Service) GetCharacterArts(server ark.Server) ([]*CharacterArt, error) {
 	return s.r.SelectCharacterArts(server)
 }
-func (s *Service) GetCharacterArt(server ark.Server, id string) (*CharacterArt, error) {
-	return s.r.SelectCharacterArt(server, id)
+func (s *Service) GetAggregatedCharacterArt(server ark.Server, id string) (*AggregatedCharacterArt, error) {
+	return s.r.SelectAggregatedCharacterArtByID(server, id)
 }
 
 func (s *Service) PopulateFrom(rawTree *arkparser.StoryTree, server ark.Server) error {

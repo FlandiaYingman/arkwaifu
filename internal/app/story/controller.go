@@ -20,6 +20,9 @@ func registerController(c *controller, router fiber.Router) {
 	router.Get(":server/story-groups/:id", c.GetGroup)
 	router.Get(":server/stories", c.GetStories)
 	router.Get(":server/stories/:id", c.GetStory)
+
+	router.Get(":server/aggregated-picture-arts/:id", c.GetAggregatedPictureArt)
+	router.Get(":server/aggregated-character-arts/:id", c.GetAggregatedCharacterArt)
 }
 
 func (c *controller) GetGroups(ctx *fiber.Ctx) error {
@@ -87,4 +90,35 @@ func (c *controller) GetStory(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(story)
+}
+
+func (c *controller) GetAggregatedPictureArt(ctx *fiber.Ctx) error {
+	server, err := ark.ParseServer(ctx.Params("server"))
+	if err != nil {
+		return err
+	}
+
+	id := ctx.Params("id")
+
+	art, err := c.service.GetAggregatedPictureArt(server, id)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(art)
+}
+func (c *controller) GetAggregatedCharacterArt(ctx *fiber.Ctx) error {
+	server, err := ark.ParseServer(ctx.Params("server"))
+	if err != nil {
+		return err
+	}
+
+	id := ctx.Params("id")
+
+	art, err := c.service.GetAggregatedCharacterArt(server, id)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(art)
 }
