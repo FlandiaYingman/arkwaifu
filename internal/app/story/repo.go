@@ -104,10 +104,16 @@ func (r *repo) SelectPictureArts(server ark.Server) ([]*PictureArt, error) {
 		Order("sort_id").
 		Find(&arts, "server = ?", server).Error
 }
-func (r *repo) SelectPictureArt(server ark.Server, id string) (*PictureArt, error) {
-	art := &PictureArt{}
-	return art, r.db.
-		Take(&art, "(server, id) = (?, ?)", server, id).Error
+func (r *repo) SelectAggregatedPictureArtByID(server ark.Server, id string) (*AggregatedPictureArt, error) {
+	art := &AggregatedPictureArt{}
+	err := r.db.
+		Model(&PictureArt{}).
+		Take(&art, "(server, id) = (?, ?)", server, id).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return art, nil
 }
 func (r *repo) SelectCharacterArts(server ark.Server) ([]*CharacterArt, error) {
 	arts := make([]*CharacterArt, 0)
@@ -115,10 +121,33 @@ func (r *repo) SelectCharacterArts(server ark.Server) ([]*CharacterArt, error) {
 		Order("sort_id").
 		Find(&arts, "server = ?", server).Error
 }
-func (r *repo) SelectCharacterArt(server ark.Server, id string) (*CharacterArt, error) {
-	art := &CharacterArt{}
-	return art, r.db.
-		Take(&art, "(server, id) = (?, ?)", server, id).Error
+func (r *repo) SelectAggregatedCharacterArtByID(server ark.Server, id string) (*AggregatedCharacterArt, error) {
+	var err error
+	art := &AggregatedCharacterArt{}
+
+	err = r.db.
+		Model(&CharacterArt{}).
+		Take(&art, "(server, id) = (?, ?)", server, id).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.db.
+		Table("(?) as dt(aggregated_names)",
+			r.db.
+				Model(&CharacterArt{}).
+				Select("unnest(names)").
+				Where("(server, id) = (?, ?)", server, id),
+		).
+		Select("array_agg(DISTINCT aggregated_names) as names").
+		Scan(&art).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return art, nil
 }
 
 func (r *repo) UpsertStoryGroups(groups []Group) error {

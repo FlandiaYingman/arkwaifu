@@ -13,3 +13,12 @@ type PictureArt struct {
 
 	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }
+
+type AggregatedPictureArt struct {
+	Server   ark.Server `json:"server"`
+	ID       string     `json:"id"`
+	Category string     `json:"category"`
+
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
+}
