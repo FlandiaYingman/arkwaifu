@@ -3,25 +3,24 @@ package updateloop
 import (
 	"context"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/ark/agdapi"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/ark/arkparser"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkdata"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkparser"
 	"github.com/rs/zerolog/log"
 	_ "image/jpeg" // register jpeg codec
 	_ "image/png"  // register png codec
 	"os"
-	"regexp"
 	"time"
 )
 
 var (
-	storyRegexp = []*regexp.Regexp{
-		regexp.MustCompile("^gamedata/excel"),
-		regexp.MustCompile("^gamedata/story"),
+	storyPatterns = []string{
+		"gamedata/excel/**",
+		"gamedata/story/**",
 	}
 )
 
 func (s *Service) getRemoteStoryVersion(ctx context.Context, server ark.Server) (ark.Version, error) {
-	resourceVersion, err := agdapi.GetLatestResourceVersion(ctx, server)
+	resourceVersion, err := arkdata.GetLatestDataVersion(ctx, server)
 	if err != nil {
 		return "", err
 	}
@@ -82,9 +81,9 @@ func (s *Service) updateStories(ctx context.Context, server ark.Server, version 
 	if err != nil {
 		return err
 	}
-	defer func() { _ = os.RemoveAll(root) }()
+	defer os.RemoveAll(root)
 
-	err = agdapi.GetFromAGDAPI(ctx, version, root, storyRegexp...)
+	err = arkdata.GetGameData(ctx, server, version, storyPatterns, root)
 	if err != nil {
 		return err
 	}

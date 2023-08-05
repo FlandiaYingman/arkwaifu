@@ -8,24 +8,29 @@ import (
 	"github.com/chai2010/webp"
 	"github.com/flandiayingman/arkwaifu/internal/app/art"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/ark/hgapi"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkassets"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkprocessor"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkscanner"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/cols"
 	"github.com/rs/zerolog/log"
 	"os"
-	"regexp"
 	"runtime"
 	"time"
 )
 
 var (
-	artRegexp = regexp.MustCompile("^avg/(imgs|bg|items|characters)")
-	// artRegexp = regexp.MustCompile(`^avg/((imgs/avg_img_0_0\.ab)|(bg/avg_bkg_h1_bg_0_0\.ab)|(items/item_36_eu1\.ab)|(characters/(avg_npc_034\.ab|avg_4078_bdhkgt_1\.ab|avg_123_fang_1\.ab)))`)
+	artPatterns = []string{
+		"avg/imgs/**",
+		"avg/bg/**",
+		"avg/items/**",
+		"avg/characters/**",
+	}
 )
 
 type task func() error
 
 func (s *Service) getRemoteArtVersion() (ark.Version, error) {
-	return hgapi.GetResVersion()
+	return arkassets.GetLatestVersion()
 }
 func (s *Service) getLocalArtVersion() (ark.Version, error) {
 	return s.repo.selectArtVersion()
@@ -67,7 +72,7 @@ func (s *Service) updateArts(ctx context.Context, oldVersion, newVersion string)
 	}
 	defer func() { _ = os.RemoveAll(root) }()
 
-	err = hgapi.GetFromHGAPI(context.Background(), oldVersion, newVersion, root, artRegexp)
+	err = arkassets.UpdateGameAssets(ctx, oldVersion, newVersion, root, artPatterns)
 	if err != nil {
 		return err
 	}
@@ -113,7 +118,7 @@ func (s *Service) updateArts(ctx context.Context, oldVersion, newVersion string)
 }
 
 func (s *Service) createPictureArtSubmitTasks(root string) (tasks []task, err error) {
-	scanner := ark.Scanner{Root: root}
+	scanner := arkscanner.Scanner{Root: root}
 
 	pictureArts, err := scanner.ScanForPictureArts()
 	if err != nil {
@@ -126,7 +131,7 @@ func (s *Service) createPictureArtSubmitTasks(root string) (tasks []task, err er
 
 	return
 }
-func (s *Service) createPictureArtSubmitTask(root string, art *ark.PictureArt) task {
+func (s *Service) createPictureArtSubmitTask(root string, art *arkscanner.PictureArt) task {
 	return func() error {
 		log.Info().Msgf("Submitting the picture art %v...", *art)
 		err := s.submitPictureArt(root, art)
@@ -136,9 +141,9 @@ func (s *Service) createPictureArtSubmitTask(root string, art *ark.PictureArt) t
 		return nil
 	}
 }
-func (s *Service) submitPictureArt(root string, pic *ark.PictureArt) error {
-	processor := ark.Processor{Root: root}
-	img, err := processor.ProcessPictureArt(pic)
+func (s *Service) submitPictureArt(root string, pic *arkscanner.PictureArt) error {
+	processor := arkprocessor.Processor{Root: root}
+	img, err := processor.ProcessPictureArt((*arkprocessor.PictureArt)(pic))
 	if err != nil {
 		return err
 	}
@@ -167,7 +172,7 @@ func (s *Service) submitPictureArt(root string, pic *ark.PictureArt) error {
 }
 
 func (s *Service) createCharacterArtSubmitTasks(root string) (tasks []task, err error) {
-	scanner := ark.Scanner{Root: root}
+	scanner := arkscanner.Scanner{Root: root}
 
 	characterArts, err := scanner.ScanForCharacterArts()
 	if err != nil {
@@ -180,7 +185,7 @@ func (s *Service) createCharacterArtSubmitTasks(root string) (tasks []task, err 
 
 	return
 }
-func (s *Service) createCharacterArtSubmitTask(root string, art *ark.CharacterArt) task {
+func (s *Service) createCharacterArtSubmitTask(root string, art *arkscanner.CharacterArt) task {
 	return func() error {
 		log.Info().Msgf("Submitting the character art %v...", *art)
 		err := s.submitCharacterArt(root, art)
@@ -190,21 +195,21 @@ func (s *Service) createCharacterArtSubmitTask(root string, art *ark.CharacterAr
 		return nil
 	}
 }
-func (s *Service) submitCharacterArt(root string, char *ark.CharacterArt) error {
-	processor := ark.Processor{Root: root}
-	imgs, err := processor.ProcessCharacterArt(char)
+func (s *Service) submitCharacterArt(root string, char *arkscanner.CharacterArt) error {
+	processor := arkprocessor.Processor{Root: root}
+	imgs, err := processor.ProcessCharacterArt((*arkprocessor.CharacterArt)(char))
 	if err != nil {
 		return err
 	}
 
-	err = s.artService.UpsertArts(cols.Map(imgs, func(img ark.CharacterArtImage) *art.Art {
+	err = s.artService.UpsertArts(cols.Map(imgs, func(img arkprocessor.CharacterArtImage) *art.Art {
 		return art.NewArt(img.ID(), art.MustParseCategory(img.Art.Kind))
 	})...)
 	if err != nil {
 		return err
 	}
 
-	err = s.artService.UpsertVariants(cols.Map(imgs, func(img ark.CharacterArtImage) *art.Variant {
+	err = s.artService.UpsertVariants(cols.Map(imgs, func(img arkprocessor.CharacterArtImage) *art.Variant {
 		return art.NewVariant(img.ID(), art.VariationOrigin)
 	})...)
 	if err != nil {

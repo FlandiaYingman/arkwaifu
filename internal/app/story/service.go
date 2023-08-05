@@ -3,7 +3,7 @@ package story
 import (
 	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
-	"github.com/flandiayingman/arkwaifu/internal/pkg/ark/arkparser"
+	arkparser2 "github.com/flandiayingman/arkwaifu/internal/pkg/arkparser"
 	cols "github.com/flandiayingman/arkwaifu/internal/pkg/cols"
 	"strings"
 )
@@ -50,7 +50,7 @@ func (s *Service) GetAggregatedCharacterArt(server ark.Server, id string) (*Aggr
 	return s.r.SelectAggregatedCharacterArtByID(server, id)
 }
 
-func (s *Service) PopulateFrom(rawTree *arkparser.StoryTree, server ark.Server) error {
+func (s *Service) PopulateFrom(rawTree *arkparser2.StoryTree, server ark.Server) error {
 	converter := objectConverter{server: server}
 
 	tree, err := converter.convertStoryTree(rawTree)
@@ -74,10 +74,10 @@ type objectConverter struct {
 	server ark.Server
 }
 
-func (c *objectConverter) convertStoryTree(tree *arkparser.StoryTree) (Tree, error) {
+func (c *objectConverter) convertStoryTree(tree *arkparser2.StoryTree) (Tree, error) {
 	return cols.MapErr(tree.StoryGroups, c.convertStoryGroup)
 }
-func (c *objectConverter) convertStoryGroup(rawGroup *arkparser.StoryGroup) (Group, error) {
+func (c *objectConverter) convertStoryGroup(rawGroup *arkparser2.StoryGroup) (Group, error) {
 	group := Group{
 		Server:  c.server,
 		ID:      strings.ToLower(rawGroup.ID),
@@ -103,19 +103,19 @@ func (c *objectConverter) convertStoryGroup(rawGroup *arkparser.StoryGroup) (Gro
 }
 func (c *objectConverter) convertGroupType(rawType string) (GroupType, error) {
 	switch rawType {
-	case arkparser.TypeMain:
+	case arkparser2.TypeMain:
 		return GroupTypeMainStory, nil
-	case arkparser.TypeActivity:
+	case arkparser2.TypeActivity:
 		return GroupTypeMajorEvent, nil
-	case arkparser.TypeMiniActivity:
+	case arkparser2.TypeMiniActivity:
 		return GroupTypeMinorEvent, nil
-	case arkparser.TypeNone:
+	case arkparser2.TypeNone:
 		return GroupTypeOther, nil
 	default:
 		return "", fmt.Errorf("unknown story group type: %v", rawType)
 	}
 }
-func (c *objectConverter) convertStory(rawStory *arkparser.Story) (Story, error) {
+func (c *objectConverter) convertStory(rawStory *arkparser2.Story) (Story, error) {
 	story := Story{
 		Server:        c.server,
 		ID:            strings.ToLower(rawStory.ID),
@@ -141,17 +141,17 @@ func (c *objectConverter) convertStory(rawStory *arkparser.Story) (Story, error)
 }
 func (c *objectConverter) convertStoryTagType(rawType string) (Tag, error) {
 	switch rawType {
-	case arkparser.TagBefore:
+	case arkparser2.TagBefore:
 		return TagBefore, nil
-	case arkparser.TagAfter:
+	case arkparser2.TagAfter:
 		return TagAfter, nil
-	case arkparser.TagInterlude:
+	case arkparser2.TagInterlude:
 		return TagInterlude, nil
 	default:
 		return "", fmt.Errorf("unknown arkparser story group type: %v", rawType)
 	}
 }
-func (c *objectConverter) convertPictureArt(rawPicture *arkparser.StoryPicture) PictureArt {
+func (c *objectConverter) convertPictureArt(rawPicture *arkparser2.StoryPicture) PictureArt {
 	return PictureArt{
 		Server:   c.server,
 		ID:       strings.ToLower(rawPicture.ID),
@@ -164,7 +164,7 @@ func (c *objectConverter) convertPictureArt(rawPicture *arkparser.StoryPicture) 
 		SortID: nil, // SortID is auto-increment, no need to handle it.
 	}
 }
-func (c *objectConverter) convertCharacterArt(rawCharacter *arkparser.StoryCharacter) CharacterArt {
+func (c *objectConverter) convertCharacterArt(rawCharacter *arkparser2.StoryCharacter) CharacterArt {
 	return CharacterArt{
 		Server:   c.server,
 		ID:       strings.ToLower(rawCharacter.ID),
