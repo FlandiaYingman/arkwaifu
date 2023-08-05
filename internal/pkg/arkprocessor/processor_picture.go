@@ -1,14 +1,17 @@
-package ark
+package arkprocessor
 
 import (
 	"fmt"
 	_ "github.com/chai2010/webp"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkscanner"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
 	"path/filepath"
 )
+
+type PictureArt arkscanner.PictureArt
 
 type PictureArtImage struct {
 	Image image.Image
@@ -32,7 +35,7 @@ func (p *Processor) ProcessPictureArt(art *PictureArt) (*PictureArtImage, error)
 }
 
 func (a *PictureArt) decode(root string) (image.Image, error) {
-	artPath := filepath.Join(root, a.Path())
+	artPath := filepath.Join(root, (*arkscanner.PictureArt)(a).Path())
 
 	artFile, err := os.Open(artPath)
 	if err != nil {

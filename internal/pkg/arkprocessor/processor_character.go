@@ -1,9 +1,10 @@
-package ark
+package arkprocessor
 
 import (
 	"fmt"
 	_ "github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/arkscanner"
 	"image"
 	"image/color"
 	"image/draw"
@@ -12,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 )
+
+type CharacterArt arkscanner.CharacterArt
 
 type CharacterArtImage struct {
 	Image   image.Image
@@ -63,11 +66,11 @@ func (p *Processor) ProcessCharacterArt(art *CharacterArt) ([]CharacterArtImage,
 func (a *CharacterArt) decode(root string, bodyNum, faceNum int) (image.Image, error) {
 	var filePath, filePathAlpha string
 	if faceNum > 0 {
-		filePath = filepath.Join(root, a.FacePath(bodyNum, faceNum))
-		filePathAlpha = filepath.Join(root, a.FacePathAlpha(bodyNum, faceNum))
+		filePath = filepath.Join(root, (*arkscanner.CharacterArt)(a).FacePath(bodyNum, faceNum))
+		filePathAlpha = filepath.Join(root, (*arkscanner.CharacterArt)(a).FacePathAlpha(bodyNum, faceNum))
 	} else {
-		filePath = filepath.Join(root, a.BodyPath(bodyNum))
-		filePathAlpha = filepath.Join(root, a.BodyPathAlpha(bodyNum))
+		filePath = filepath.Join(root, (*arkscanner.CharacterArt)(a).BodyPath(bodyNum))
+		filePathAlpha = filepath.Join(root, (*arkscanner.CharacterArt)(a).BodyPathAlpha(bodyNum))
 	}
 	if filePath == root {
 		return nil, nil

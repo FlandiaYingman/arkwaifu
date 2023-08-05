@@ -1,4 +1,4 @@
-package ark
+package arkprocessor
 
 // Processor provides functionalities for processing art. The term "process"
 // here refers to merging color channel and alpha channel of arts together,
