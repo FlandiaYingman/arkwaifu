@@ -18,7 +18,7 @@ const retryWorkers = 1
 func fetch(ctx context.Context, infoList []Info) (string, error) {
 	tempDir, err := os.MkdirTemp("", "arkassets_fetch-*")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -27,7 +27,7 @@ func fetch(ctx context.Context, infoList []Info) (string, error) {
 	requests, err := cols.MapErr(infoList, func(i Info) (*grab.Request, error) {
 		request, err := grab.NewRequest(tempDir, i.Url())
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		request = request.WithContext(ctx)
 		return request, nil

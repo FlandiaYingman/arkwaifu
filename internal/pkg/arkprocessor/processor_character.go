@@ -5,6 +5,7 @@ import (
 	_ "github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkscanner"
+	"github.com/pkg/errors"
 	"image"
 	"image/color"
 	"image/draw"
@@ -39,17 +40,17 @@ func (p *Processor) ProcessCharacterArt(art *CharacterArt) ([]CharacterArtImage,
 	for i, body := range art.BodyVariations {
 		bodyImage, err := art.decode(p.Root, i+1, 0)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		for j, face := range body.FaceVariations {
 			faceImage, err := art.decode(p.Root, i+1, j+1)
 			if err != nil {
-				return nil, err
+				return nil, errors.WithStack(err)
 			}
 			if !face.WholeBody {
 				faceImage, err = mergeCharacterFace(bodyImage, faceImage, body.FaceRectangle)
 				if err != nil {
-					return nil, err
+					return nil, errors.WithStack(err)
 				}
 			}
 			result = append(result, CharacterArtImage{
@@ -80,19 +81,19 @@ func (a *CharacterArt) decode(root string, bodyNum, faceNum int) (image.Image, e
 	var err error
 	img, err = decode(filePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	if filePathAlpha != "" {
 		imgAlpha, err = decode(filePathAlpha)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 	}
 
 	if imgAlpha != nil {
 		img, err = mergeAlphaChannel(img, imgAlpha)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 	}
 
@@ -102,13 +103,13 @@ func (a *CharacterArt) decode(root string, bodyNum, faceNum int) (image.Image, e
 func decode(filePath string) (image.Image, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	defer func() { _ = file.Close() }()
 
 	img, _, err := image.Decode(file)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	return img, nil
 }
@@ -131,7 +132,7 @@ func mergeAlphaChannel(base image.Image, alpha image.Image) (*image.NRGBA, error
 
 func mergeCharacterFace(body image.Image, face image.Image, faceRect image.Rectangle) (*image.NRGBA, error) {
 	if !faceRect.In(body.Bounds()) {
-		return nil, fmt.Errorf("merge character face: face rectangle %v is not in the body's bounds %v", faceRect, body.Bounds())
+		return nil, errors.Errorf("merge character face: face rectangle %v is not in the body's bounds %v", faceRect, body.Bounds())
 	}
 	face = imaging.Resize(face, faceRect.Dx(), faceRect.Dy(), imaging.Lanczos)
 

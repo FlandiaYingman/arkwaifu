@@ -3,6 +3,7 @@ package arkparser
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/wk8/go-ordered-map/v2"
 	"os"
 	"path"
@@ -33,7 +34,7 @@ func (t *JsonStoryTag) UnmarshalJSON(data []byte) error {
 	var s string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	switch s {
 	case TagBeforeCN, TagBeforeEN, TagBeforeJP, TagBeforeKR:
@@ -52,7 +53,7 @@ func (t *JsonStoryTag) UnmarshalJSON(data []byte) error {
 			Text: s,
 		}
 	default:
-		return fmt.Errorf("unknown story tag: %s", s)
+		return errors.Errorf("unknown story tag: %s", s)
 	}
 	return nil
 }
@@ -85,14 +86,14 @@ func (p *Parser) ParseStoryReviewTable() ([]*JsonStoryGroup, error) {
 	jsonPath := filepath.Join(p.Root, p.Prefix, "gamedata/excel/story_review_table.json")
 	jsonData, err := os.ReadFile(jsonPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	// key: story group id; value: story group
 	dynamicJsonObject := orderedmap.New[string, JsonStoryGroup]()
 	err = json.Unmarshal(jsonData, &dynamicJsonObject)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	result := make([]*JsonStoryGroup, 0, dynamicJsonObject.Len())
@@ -109,7 +110,7 @@ func (p *Parser) GetInfo(infoPath string) (string, error) {
 
 	bytes, err := os.ReadFile(infoPath)
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	return string(bytes), nil
@@ -120,7 +121,7 @@ func (p *Parser) GetText(textPath string) (string, error) {
 
 	bytes, err := os.ReadFile(textPath)
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	return string(bytes), nil

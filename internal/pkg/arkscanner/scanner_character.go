@@ -2,10 +2,10 @@ package arkscanner
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/cols"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
+	"github.com/pkg/errors"
 	"image"
 	"math"
 	"os"
@@ -76,14 +76,14 @@ func (scanner *Scanner) ScanForCharacterArts() ([]*CharacterArt, error) {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	characterEntries = cols.Filter(characterEntries, func(element os.DirEntry) bool { return element.IsDir() })
 	characterIDs := cols.Map(characterEntries, func(i os.DirEntry) (o string) { return pathutil.Stem(i.Name()) })
 	characterArts, err := cols.MapErr(characterIDs, scanner.ScanCharacter)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return characterArts, nil
@@ -91,18 +91,18 @@ func (scanner *Scanner) ScanForCharacterArts() ([]*CharacterArt, error) {
 func (scanner *Scanner) ScanCharacter(id string) (*CharacterArt, error) {
 	hubGroupArt, err := scanner.scanHubGroupOfCharacter(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	hubArt, err := scanner.scanHubOfCharacter(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	if hubGroupArt == nil && hubArt == nil {
-		return nil, fmt.Errorf("scan character %s: neither the hub group nor the hub exist", id)
+		return nil, errors.Errorf("scan character %s: neither the hub group nor the hub exist", id)
 	}
 	if hubGroupArt != nil && hubArt != nil {
-		return nil, fmt.Errorf("scan character %s: both the hub group and the hub exist", id)
+		return nil, errors.Errorf("scan character %s: both the hub group and the hub exist", id)
 	}
 
 	if hubGroupArt != nil {
@@ -119,18 +119,18 @@ func (scanner *Scanner) scanHubGroupOfCharacter(id string) (*CharacterArt, error
 		return nil, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var hubGroup CharacterSpriteHubGroup
 	err = json.Unmarshal(hubJson, &hubGroup)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	pathIDMap, err := scanner.scanPathIDMapOfCharacter(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	art := hubGroup.toArt(id, pathIDMap)
@@ -143,18 +143,18 @@ func (scanner *Scanner) scanHubOfCharacter(id string) (*CharacterArt, error) {
 		return nil, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var hub CharacterSpriteHub
 	err = json.Unmarshal(hubJson, &hub)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	pathIDMap, err := scanner.scanPathIDMapOfCharacter(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	hubGroup := CharacterSpriteHubGroup{SpriteGroups: []CharacterSpriteHub{hub}}
@@ -165,13 +165,13 @@ func (scanner *Scanner) scanPathIDMapOfCharacter(id string) (map[int64]string, e
 	mapPath := filepath.Join(scanner.Root, characterPrefix, fmt.Sprintf("%s.json", id))
 	mapJson, err := os.ReadFile(mapPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	pathIDMap := make(map[int64]string)
 	err = json.Unmarshal(mapJson, &pathIDMap)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return pathIDMap, nil

@@ -1,9 +1,9 @@
 package arkprocessor
 
 import (
-	"fmt"
 	_ "github.com/chai2010/webp"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/arkscanner"
+	"github.com/pkg/errors"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -25,7 +25,7 @@ type PictureArtImage struct {
 func (p *Processor) ProcessPictureArt(art *PictureArt) (*PictureArtImage, error) {
 	img, err := art.decode(p.Root)
 	if err != nil {
-		return nil, fmt.Errorf("process picture art %s: %w", art.ID, err)
+		return nil, errors.Wrapf(err, "process picture art %s", art.ID)
 	} else {
 		return &PictureArtImage{
 			Image: img,
@@ -39,13 +39,13 @@ func (a *PictureArt) decode(root string) (image.Image, error) {
 
 	artFile, err := os.Open(artPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	defer func() { _ = artFile.Close() }()
 
 	img, _, err := image.Decode(artFile)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return img, nil

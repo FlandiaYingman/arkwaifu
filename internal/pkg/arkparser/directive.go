@@ -2,6 +2,7 @@ package arkparser
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 	"path"
 	"regexp"
@@ -80,7 +81,7 @@ func (p *Parser) ParseStoryText(storyTextPath string) ([]Directive, error) {
 	storyTextPath = path.Join(p.Root, p.Prefix, "gamedata/story", storyTextPath)
 	storyTextData, err := os.ReadFile(storyTextPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return ParseDirectives(string(storyTextData)), nil

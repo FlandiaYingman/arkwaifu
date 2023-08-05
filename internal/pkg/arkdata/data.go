@@ -2,10 +2,10 @@ package arkdata
 
 import (
 	"context"
-	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/google/go-github/v52/github"
+	"github.com/pkg/errors"
 	"os"
 	"regexp"
 )
@@ -65,32 +65,32 @@ func getGameData(ctx context.Context, server ark.Server, version ark.Version, re
 	if version != "" {
 		dataVersion, err := getDataVersion(ctx, server, version, repoOwner, repoName)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		sha = dataVersion.CommitSHA
 	} else {
 		dataVersion, err := getLatestDataVersion(ctx, server, repoOwner, repoName)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		sha = dataVersion.CommitSHA
 	}
 
 	zipball, err := download(ctx, repoOwner, repoName, sha)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer os.RemoveAll(zipball)
 
 	data, err := unzip(ctx, zipball, patterns, server)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	defer os.RemoveAll(data)
 
 	err = fileutil.MoveAllContent(data, dst)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 
 	return nil
@@ -101,7 +101,7 @@ func getLatestDataVersion(ctx context.Context, server ark.Server, repoOwner stri
 		return version != nil && version.GameServer == server
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot find latest DataVersion: %w", err)
+		return nil, errors.Wrapf(err, "cannot find latest DataVersion")
 	}
 	return parseCommit(commit), nil
 }
@@ -111,10 +111,10 @@ func getDataVersion(ctx context.Context, server ark.Server, resVer string, repoO
 		return version != nil && version.GameServer == server && version.ResourceVersion == resVer
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cannot find DataVersion by %s: %w", resVer, err)
+		return nil, errors.Wrapf(err, "cannot find DataVersion by %s", resVer)
 	}
 	if commit == nil {
-		return nil, fmt.Errorf("no DataVersion can be found by %s", resVer)
+		return nil, errors.Errorf("no DataVersion can be found by %s", resVer)
 	}
 	return parseCommit(commit), nil
 }
@@ -143,7 +143,7 @@ func findCommit(ctx context.Context, owner, repo string, predicate func(*github.
 
 		commits, _, err := githubClient.Repositories.ListCommits(ctx, owner, repo, opts)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 
 		for _, commit := range commits {

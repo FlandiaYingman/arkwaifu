@@ -1,5 +1,7 @@
 package arkparser
 
+import "github.com/pkg/errors"
+
 type Parser struct {
 	Root   string
 	Prefix string
@@ -70,7 +72,7 @@ func (p *Parser) setCharacter(id string, character *StoryCharacter) {
 func (p *Parser) Parse() (*StoryTree, error) {
 	jsonStoryReviewTable, err := p.ParseStoryReviewTable()
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	tree := StoryTree{}
@@ -86,11 +88,11 @@ func (p *Parser) Parse() (*StoryTree, error) {
 		for _, jsonStory := range jsonGroup.Stories {
 			info, err := p.GetInfo(jsonStory.Info)
 			if err != nil {
-				return nil, err
+				return nil, errors.WithStack(err)
 			}
 			directives, err := p.ParseStoryText(jsonStory.Text)
 			if err != nil {
-				return nil, err
+				return nil, errors.WithStack(err)
 			}
 
 			pictures := p.ParsePictures(directives)
@@ -121,7 +123,7 @@ func (p *Parser) Parse() (*StoryTree, error) {
 
 	storyReviewMetaTable, err := p.ParseStoryReviewMetaTable()
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	for pair := storyReviewMetaTable.ActArchiveResData.Pics.Oldest(); pair != nil; pair = pair.Next() {
 		pic := pair.Value

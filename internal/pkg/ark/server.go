@@ -1,7 +1,7 @@
 package ark
 
 import (
-	"fmt"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -53,7 +53,7 @@ func ParseServer(s string) (Server, error) {
 	if EqualFolds(s, "TW", "zh-TW") {
 		return TwServer, nil
 	}
-	return "", fmt.Errorf("unknown server: %v", s)
+	return "", errors.Errorf("unknown server: %v", s)
 }
 
 func MustParseServer(s string) Server {

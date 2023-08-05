@@ -19,12 +19,12 @@ const (
 func unpack(ctx context.Context, src string) (string, error) {
 	tempDir, err := os.MkdirTemp("", "arkassets_unpack-*")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	err = findExtractor()
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	srcAbs, err := filepath.Abs(src)
@@ -42,7 +42,7 @@ func unpack(ctx context.Context, src string) (string, error) {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	scanner := bufio.NewScanner(stdout)
 	go func(scanner *bufio.Scanner) {
@@ -65,7 +65,7 @@ func unpack(ctx context.Context, src string) (string, error) {
 	}(scanner)
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	errScanner := bufio.NewScanner(stderr)
 	go func(errScanner *bufio.Scanner) {
@@ -93,7 +93,7 @@ func unpack(ctx context.Context, src string) (string, error) {
 func findExtractor() error {
 	exists, err := fileutil.Exists(extractorLocation)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	if !exists {
 		return errors.New("cannot find extractor")

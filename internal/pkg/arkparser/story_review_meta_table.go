@@ -2,6 +2,7 @@ package arkparser
 
 import (
 	"encoding/json"
+	"github.com/pkg/errors"
 	"github.com/wk8/go-ordered-map/v2"
 	"os"
 	"path/filepath"
@@ -38,13 +39,13 @@ func (p *Parser) ParseStoryReviewMetaTable() (*JsonStoryReviewMetaTable, error) 
 	jsonPath := filepath.Join(p.Root, p.Prefix, "gamedata/excel/story_review_meta_table.json")
 	jsonData, err := os.ReadFile(jsonPath)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var obj JsonStoryReviewMetaTable
 	err = json.Unmarshal(jsonData, &obj)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	return &obj, nil

@@ -8,6 +8,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/mholt/archiver/v4"
+	"github.com/pkg/errors"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,7 +17,7 @@ import (
 func unzip(ctx context.Context, zipball string, patterns []string, server ark.Server) (string, error) {
 	temp, err := os.MkdirTemp("", "arkdata_unzip")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	// Since the zipball contains a directory directly named by the stem of the zipball,
@@ -27,7 +28,7 @@ func unzip(ctx context.Context, zipball string, patterns []string, server ark.Se
 
 	reader, err := os.Open(zipball)
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 	defer cloze.IgnoreErr(reader)
 
@@ -39,7 +40,7 @@ func unzip(ctx context.Context, zipball string, patterns []string, server ark.Se
 
 		match, err := pathutil.MatchAny(patterns, file.NameInArchive)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 		if !match {
 			return nil
@@ -50,12 +51,12 @@ func unzip(ctx context.Context, zipball string, patterns []string, server ark.Se
 
 		reader, err := file.Open()
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 
 		err = fileutil.MkFileFromReader(filePath, reader)
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 
 		return nil

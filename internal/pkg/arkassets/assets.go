@@ -36,7 +36,7 @@ func GetGameAssets(ctx context.Context, version ark.Version, dst string, pattern
 	if version == "" {
 		version, err = GetLatestVersion()
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 
@@ -66,7 +66,7 @@ func UpdateGameAssets(ctx context.Context, oldResVer string, newResVer string, d
 	if newResVer == "" {
 		newResVer, err = GetLatestVersion()
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
 	}
 
@@ -100,7 +100,7 @@ func UpdateGameAssets(ctx context.Context, oldResVer string, newResVer string, d
 func GetLatestVersion() (string, error) {
 	version, err := GetRawVersion()
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	return version.ResVersion, nil
@@ -109,7 +109,7 @@ func GetLatestVersion() (string, error) {
 func GetInfoList(version ark.Version) ([]Info, error) {
 	resources, err := GetRawResources(version)
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	infos := make([]Info, len(resources.AbInfos))
@@ -135,19 +135,19 @@ func filter(infoList []Info, patterns []string) ([]Info, error) {
 func get(ctx context.Context, infoList []Info, dst string) error {
 	fetch, err := fetch(ctx, infoList)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	unzip, err := unzip(ctx, fetch)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	unpack, err := unpack(ctx, unzip)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	err = fileutil.MoveAllContent(unpack, dst)
 	if err != nil {
-		return err
+		return errors.WithStack(err)
 	}
 	return nil
 }

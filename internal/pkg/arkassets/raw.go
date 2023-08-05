@@ -3,6 +3,7 @@ package arkassets
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
@@ -52,14 +53,14 @@ type PackInfo struct {
 func GetRawVersion() (Version, error) {
 	resp, err := http.Get("https://ak-conf.hypergryph.com/config/prod/official/Android/version")
 	if err != nil {
-		return Version{}, err
+		return Version{}, errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 
 	arkVersion := Version{}
 	err = json.NewDecoder(resp.Body).Decode(&arkVersion)
 	if err != nil {
-		return Version{}, err
+		return Version{}, errors.WithStack(err)
 	}
 	return arkVersion, nil
 }
@@ -70,14 +71,14 @@ func GetRawResources(resVersion string) (HotUpdateList, error) {
 
 	resp, err := http.Get(urlResourceList)
 	if err != nil {
-		return HotUpdateList{}, err
+		return HotUpdateList{}, errors.WithStack(err)
 	}
 	defer resp.Body.Close()
 
 	resourcesList := HotUpdateList{}
 	err = json.NewDecoder(resp.Body).Decode(&resourcesList)
 	if err != nil {
-		return HotUpdateList{}, err
+		return HotUpdateList{}, errors.WithStack(err)
 	}
 	return resourcesList, nil
 }

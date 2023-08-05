@@ -3,6 +3,7 @@ package arkscanner
 import (
 	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
+	"github.com/pkg/errors"
 	"path"
 	"path/filepath"
 )
@@ -37,15 +38,15 @@ func (scanner *Scanner) ScanForPictureArts() ([]*PictureArt, error) {
 	baseDir := filepath.Join(scanner.Root, PictureArtPath)
 	imageArts, err := scanner.scanPictures(baseDir, "images", "image")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	backgroundArts, err := scanner.scanPictures(baseDir, "backgrounds", "background")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 	itemArts, err := scanner.scanPictures(baseDir, "items", "item")
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var arts []*PictureArt
@@ -59,7 +60,7 @@ func (scanner *Scanner) ScanForPictureArts() ([]*PictureArt, error) {
 func (scanner *Scanner) scanPictures(base string, sub string, kind string) ([]*PictureArt, error) {
 	files, err := filepath.Glob(filepath.Join(base, sub, "*.png"))
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	var pictures []*PictureArt

@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/cavaliergopher/grab/v3"
+	"github.com/pkg/errors"
 	"os"
 )
 
 func download(ctx context.Context, repoOwner, repoName, sha string) (string, error) {
 	temp, err := os.MkdirTemp("", "arkdata_download")
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -18,7 +19,7 @@ func download(ctx context.Context, repoOwner, repoName, sha string) (string, err
 
 	request, err := grab.NewRequest(temp, urlOfZipball(repoOwner, repoName, sha))
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
 
 	request = request.WithContext(ctx)
