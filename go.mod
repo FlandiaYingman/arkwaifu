@@ -3,6 +3,7 @@ module github.com/flandiayingman/arkwaifu
 go 1.20
 
 require (
+	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/ahmetb/go-linq/v3 v3.2.0
 	github.com/alitto/pond v1.8.3
 	github.com/caarlos0/env/v6 v6.10.1
