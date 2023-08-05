@@ -1,4 +1,4 @@
-package ark
+package arkscanner
 
 import (
 	"fmt"
