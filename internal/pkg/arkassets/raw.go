@@ -1,4 +1,4 @@
-package hgapi
+package arkassets
 
 import (
 	"encoding/json"

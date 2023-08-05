@@ -1,4 +1,4 @@
-package hgapi
+package arkassets
 
 import (
 	"context"
@@ -12,8 +12,13 @@ import (
 	"path/filepath"
 )
 
-func unzip(ctx context.Context, src string, dst string) error {
-	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
+func unzip(ctx context.Context, src string) (string, error) {
+	tempDir, err := os.MkdirTemp("", "arkassets_unzip-*")
+	if err != nil {
+		return "", err
+	}
+
+	return tempDir, filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -24,7 +29,7 @@ func unzip(ctx context.Context, src string, dst string) error {
 			return err
 		}
 
-		err = unzipFile(ctx, path, dst)
+		err = unzipFile(ctx, path, tempDir)
 		if err != nil {
 			return err
 		}

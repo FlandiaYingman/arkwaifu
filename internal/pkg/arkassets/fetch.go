@@ -1,8 +1,10 @@
-package hgapi
+package arkassets
 
 import (
 	"context"
 	"fmt"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/cols"
+	"os"
 	"path/filepath"
 
 	"github.com/cavaliergopher/grab/v3"
@@ -10,26 +12,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const poolSize = 16
-const retryPoolSize = 1
+const fetchWorkers = 16
+const retryWorkers = 1
 
-// fetch fetches the resources specified by srcs into dst.
-// dst must exist.
-func fetch(ctx context.Context, srcs []Info, dst string) error {
+func fetch(ctx context.Context, infoList []Info) (string, error) {
+	tempDir, err := os.MkdirTemp("", "arkassets_fetch-*")
+	if err != nil {
+		return "", err
+	}
+
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	requests := make([]*grab.Request, len(srcs))
-	for i, src := range srcs {
-		request, err := grab.NewRequest(dst, src.CreateURL())
+	requests, err := cols.MapErr(infoList, func(i Info) (*grab.Request, error) {
+		request, err := grab.NewRequest(tempDir, i.Url())
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		requests[i] = request.WithContext(ctx)
-	}
-
-	responses := grab.DefaultClient.DoBatch(poolSize, requests...)
+		request = request.WithContext(ctx)
+		return request, nil
+	})
+	responses := grab.DefaultClient.DoBatch(fetchWorkers, requests...)
 
 	num := 0
 	total := len(requests)
@@ -58,7 +61,7 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 		num++
 	}
 
-	responses = grab.DefaultClient.DoBatch(retryPoolSize, requests...)
+	responses = grab.DefaultClient.DoBatch(retryWorkers, requests...)
 
 	num = 0
 	total = len(requests)
@@ -68,7 +71,7 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 
 		err := response.Err()
 		if err != nil {
-			return errors.Wrapf(err, "srcFile：%v; dstFile: %v", srcFile, dstFile)
+			return "", errors.Wrapf(err, "srcFile：%v; dstFile: %v", srcFile, dstFile)
 		}
 		log.Info().
 			Str("src", srcFile).
@@ -79,5 +82,5 @@ func fetch(ctx context.Context, srcs []Info, dst string) error {
 			Msg("Fetched resource in retry queue.")
 		num++
 	}
-	return nil
+	return tempDir, nil
 }

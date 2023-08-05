@@ -1,35 +1,39 @@
-package hgapi
+package arkassets
 
 import (
 	"bufio"
 	"context"
+	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
-
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 )
 
-var (
+const (
 	extractorLocation = "./tools/extractor"
 )
 
-// TODO: Change to a direct call of Python API.
-func unpack(ctx context.Context, src string, dst string) error {
-	err := preCheck()
+func unpack(ctx context.Context, src string) (string, error) {
+	tempDir, err := os.MkdirTemp("", "arkassets_unpack-*")
 	if err != nil {
-		return err
+		return "", err
+	}
+
+	err = findExtractor()
+	if err != nil {
+		return "", err
 	}
 
 	srcAbs, err := filepath.Abs(src)
 	if err != nil {
-		return errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
-	dstAbs, err := filepath.Abs(dst)
+	dstAbs, err := filepath.Abs(tempDir)
 	if err != nil {
-		return errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	args := []string{"-u", "main.py", "unpack", srcAbs, dstAbs}
@@ -38,7 +42,7 @@ func unpack(ctx context.Context, src string, dst string) error {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return "", err
 	}
 	scanner := bufio.NewScanner(stdout)
 	go func(scanner *bufio.Scanner) {
@@ -61,7 +65,7 @@ func unpack(ctx context.Context, src string, dst string) error {
 	}(scanner)
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return "", err
 	}
 	errScanner := bufio.NewScanner(stderr)
 	go func(errScanner *bufio.Scanner) {
@@ -75,22 +79,24 @@ func unpack(ctx context.Context, src string, dst string) error {
 
 	err = cmd.Start()
 	if err != nil {
-		return errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return errors.WithStack(err)
+		return "", errors.WithStack(err)
 	}
 
-	return nil
+	return tempDir, nil
 }
 
-func unpackPreCheck() error {
-	// check extractor existence
-	_, err := os.Stat(extractorLocation)
+func findExtractor() error {
+	exists, err := fileutil.Exists(extractorLocation)
 	if err != nil {
-		return errors.Wrap(err, "extractor doesn't exist")
+		return err
+	}
+	if !exists {
+		return errors.New("cannot find extractor")
 	}
 	return nil
 }
