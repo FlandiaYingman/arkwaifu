@@ -11,7 +11,7 @@ type CharacterArt struct {
 	StoryID  string     `json:"storyID" gorm:"primaryKey"`
 	Category string     `json:"category" gorm:""`
 
-	Names pq.StringArray `json:"names" gorm:"type:text[]"`
+	Names pq.StringArray `json:"names" gorm:"type:text[];default:array[]::text[]"`
 
 	SortID *uint64 `json:"-" gorm:"unique;autoIncrement"`
 }
@@ -21,5 +21,5 @@ type AggregatedCharacterArt struct {
 	ID       string     `json:"id"`
 	Category string     `json:"category"`
 
-	Names pq.StringArray `json:"names" gorm:"type:text[]"`
+	Names pq.StringArray `json:"names" gorm:"type:text[];default:array[]::text[]"`
 }
