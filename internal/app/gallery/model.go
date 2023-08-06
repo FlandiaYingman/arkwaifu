@@ -23,6 +23,7 @@ type Art struct {
 	ID          string `json:"id" gorm:"primaryKey;type:text COLLATE numeric;check:id=lower(id)"`
 	Name        string `json:"name" gorm:""`
 	Description string `json:"description" gorm:""`
+	ArtID       string `json:"artID" gorm:"type:text COLLATE numeric;check:id=lower(id)"`
 }
 
 func (a Art) TableName() string {

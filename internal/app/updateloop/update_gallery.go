@@ -124,9 +124,10 @@ func ParseToGalleries(server ark.Server, root string) ([]gallery.Gallery, error)
 			Server:      server,
 			GalleryID:   "", // Auto Generated
 			SortID:      0,
-			ID:          strings.ToLower(c.S("assetPath").Data().(string)),
+			ID:          strings.ToLower(c.S("id").Data().(string)),
 			Name:        c.S("desc").Data().(string),
 			Description: c.S("picDescription").Data().(string),
+			ArtID:       strings.ToLower(c.S("assetPath").Data().(string)),
 		}
 	}
 
