@@ -15,7 +15,6 @@ func newController(service *Service) *Controller {
 
 type RegisterParams struct {
 	fx.In
-	App    *fiber.App
 	Router fiber.Router `optional:"true"`
 }
 
