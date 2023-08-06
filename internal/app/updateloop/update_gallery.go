@@ -88,6 +88,15 @@ func (s *Service) updateGalleries(ctx context.Context, server ark.Server, versio
 	if err != nil {
 		return errors.WithStack(err)
 	}
+
+	err = s.repo.upsertGalleryVersion(ctx, &galleryVersion{
+		Server:  server,
+		Version: version,
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
