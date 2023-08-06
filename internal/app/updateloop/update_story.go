@@ -27,8 +27,8 @@ func (s *Service) getRemoteStoryVersion(ctx context.Context, server ark.Server) 
 	return resourceVersion.ResourceVersion, err
 }
 
-func (s *Service) getLocalStoryVersion(_ context.Context, server ark.Server) (ark.Version, error) {
-	return s.repo.selectStoryVersion(server)
+func (s *Service) getLocalStoryVersion(ctx context.Context, server ark.Server) (ark.Version, error) {
+	return s.repo.selectStoryVersion(ctx, server)
 }
 
 func (s *Service) attemptUpdateStory(ctx context.Context, server ark.Server) {
@@ -102,7 +102,7 @@ func (s *Service) updateStories(ctx context.Context, server ark.Server, version 
 		return err
 	}
 
-	err = s.repo.upsertStoryVersion(&storyVersion{
+	err = s.repo.upsertStoryVersion(ctx, &storyVersion{
 		Server:  server,
 		Version: version,
 	})

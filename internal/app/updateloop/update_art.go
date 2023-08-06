@@ -29,15 +29,15 @@ var (
 
 type task func() error
 
-func (s *Service) getRemoteArtVersion() (ark.Version, error) {
+func (s *Service) getRemoteArtVersion(ctx context.Context) (ark.Version, error) {
 	return arkassets.GetLatestVersion()
 }
-func (s *Service) getLocalArtVersion() (ark.Version, error) {
-	return s.repo.selectArtVersion()
+func (s *Service) getLocalArtVersion(ctx context.Context) (ark.Version, error) {
+	return s.repo.selectArtVersion(ctx)
 }
 
 func (s *Service) attemptUpdateArt(ctx context.Context) {
-	localArtVersion, err := s.getLocalArtVersion()
+	localArtVersion, err := s.getLocalArtVersion(ctx)
 	if err != nil {
 		log.Error().
 			Err(err).
@@ -45,7 +45,7 @@ func (s *Service) attemptUpdateArt(ctx context.Context) {
 			Msg("Failed to get the remote art version.")
 		return
 	}
-	remoteArtVersion, err := s.getRemoteArtVersion()
+	remoteArtVersion, err := s.getRemoteArtVersion(ctx)
 	if err != nil {
 		log.Error().
 			Err(err).
@@ -105,7 +105,7 @@ func (s *Service) updateArts(ctx context.Context, oldVersion, newVersion string)
 		return err
 	}
 
-	err = s.repo.upsertArtVersion(&artVersion{
+	err = s.repo.upsertArtVersion(ctx, &artVersion{
 		Lock:    zeroPtr,
 		Version: newVersion,
 	})

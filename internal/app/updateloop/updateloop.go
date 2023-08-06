@@ -25,6 +25,7 @@ package updateloop
 import (
 	"context"
 	"github.com/flandiayingman/arkwaifu/internal/app/art"
+	"github.com/flandiayingman/arkwaifu/internal/app/gallery"
 	"github.com/flandiayingman/arkwaifu/internal/app/story"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/ark"
 	"github.com/rs/zerolog"
@@ -54,19 +55,22 @@ func FxModule() fx.Option {
 type Service struct {
 	repo *repo
 
-	artService   *art.Service
-	storyService *story.Service
+	artService     *art.Service
+	storyService   *story.Service
+	galleryService *gallery.Service
 }
 
 func newService(
 	artService *art.Service,
 	storyService *story.Service,
+	galleryService *gallery.Service,
 	repo *repo,
 ) *Service {
 	return &Service{
-		artService:   artService,
-		storyService: storyService,
-		repo:         repo,
+		artService:     artService,
+		storyService:   storyService,
+		galleryService: galleryService,
+		repo:           repo,
 	}
 }
 
@@ -111,6 +115,7 @@ func (s *Service) AttemptUpdate(ctx context.Context) {
 			continue
 		}
 		s.attemptUpdateStory(ctx, server)
+		s.attemptUpdateGalleries(ctx, server)
 	}
 
 	log.Info().Msg("Update loop has completed this attempt to update the assets..")
