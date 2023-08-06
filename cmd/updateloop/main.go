@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/flandiayingman/arkwaifu/internal/app"
 	"github.com/flandiayingman/arkwaifu/internal/app/infra"
+	"github.com/flandiayingman/arkwaifu/internal/app/updateloop"
 	"go.uber.org/fx"
 )
 
@@ -12,7 +13,8 @@ func main() {
 			infra.ProvideConfig,
 			infra.ProvideGorm,
 		),
-		app.FxOptions(),
+		app.FxModules(),
+		updateloop.FxModule(),
 	)
 	fxApp.Run()
 }
