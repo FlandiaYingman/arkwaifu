@@ -24,6 +24,7 @@ package updateloop
 
 import (
 	"context"
+	"fmt"
 	"github.com/flandiayingman/arkwaifu/internal/app/art"
 	"github.com/flandiayingman/arkwaifu/internal/app/gallery"
 	"github.com/flandiayingman/arkwaifu/internal/app/story"
@@ -105,6 +106,15 @@ func (s *Service) AttemptUpdate(ctx context.Context) {
 	log := log.With().
 		Logger()
 	log.Info().Msg("Update loop is attempting to update the assets... ")
+
+	defer func() {
+		v := recover()
+		if v != nil {
+			log.Error().
+				Str("err", fmt.Sprintf("%+v", v)).
+				Msg("Update loop has recovered from panic.")
+		}
+	}()
 
 	s.attemptUpdateArt(ctx)
 	s.attemptUpdateArtThumbnails(ctx)
