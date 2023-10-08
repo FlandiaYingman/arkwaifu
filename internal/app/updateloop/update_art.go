@@ -93,7 +93,7 @@ func (s *Service) updateArts(ctx context.Context, oldVersion, newVersion string)
 	begin := time.Now()
 	pool := pond.New(workerNum, taskNum)
 	defer pool.Stop()
-	group, ctx := pool.GroupContext(ctx)
+	group, _ := pool.GroupContext(ctx)
 	for _, artTask := range pictureArtTasks {
 		group.Submit(artTask)
 	}
@@ -200,6 +200,9 @@ func (s *Service) submitCharacterArt(root string, char *arkscanner.CharacterArt)
 	imgs, err := processor.ProcessCharacterArt((*arkprocessor.CharacterArt)(char))
 	if err != nil {
 		return err
+	}
+	if len(imgs) == 0 {
+		return nil
 	}
 
 	err = s.artService.UpsertArts(cols.Map(imgs, func(img arkprocessor.CharacterArtImage) *art.Art {
