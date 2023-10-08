@@ -42,10 +42,21 @@ func (p *Processor) ProcessCharacterArt(art *CharacterArt) ([]CharacterArtImage,
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
+		// Sometimes, there are some character arts that have no actual images given. We'll just skip them.
+		// Hope HyperGryph will remember what they've removed and remember to remove them from the stories.
+		// Thanks HyperGryph ^^
+		if bodyImage == nil {
+			continue
+		}
 		for j, face := range body.FaceVariations {
 			faceImage, err := art.decode(p.Root, i+1, j+1)
 			if err != nil {
 				return nil, errors.WithStack(err)
+			}
+			// Same reason above.
+			// Thanks HyperGryph ^^
+			if faceImage == nil {
+				continue
 			}
 			if !face.WholeBody {
 				faceImage, err = mergeCharacterFace(bodyImage, faceImage, body.FaceRectangle)
@@ -131,6 +142,9 @@ func mergeAlphaChannel(base image.Image, alpha image.Image) (*image.NRGBA, error
 }
 
 func mergeCharacterFace(body image.Image, face image.Image, faceRect image.Rectangle) (*image.NRGBA, error) {
+	if body == nil || face == nil {
+		return nil, errors.Errorf("the images are nil! ")
+	}
 	if !faceRect.In(body.Bounds()) {
 		return nil, errors.Errorf("merge character face: face rectangle %v is not in the body's bounds %v", faceRect, body.Bounds())
 	}
