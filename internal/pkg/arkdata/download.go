@@ -23,10 +23,12 @@ func download(ctx context.Context, repoOwner, repoName, sha string) (string, err
 	}
 
 	request = request.WithContext(ctx)
-	response := grab.DefaultClient.Do(request)
+	client := grab.NewClient()
+	client.UserAgent = "FlandiaYingman/arkwaifu"
+	response := client.Do(request)
 	return response.Filename, response.Err()
 }
 
 func urlOfZipball(repoOwner, repoName, sha string) string {
-	return fmt.Sprintf("https://github.com/%s/%s/archive/%s.zip", repoOwner, repoName, sha)
+	return fmt.Sprintf("https://api.github.com/repos/%s/%s/zipball/%s", repoOwner, repoName, sha)
 }
