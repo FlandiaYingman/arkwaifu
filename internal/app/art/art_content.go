@@ -3,7 +3,10 @@ package art
 import (
 	"bytes"
 	"fmt"
+	_ "github.com/chai2010/webp"
 	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"path"
 )
 
