@@ -9,6 +9,7 @@ import (
 )
 
 func download(ctx context.Context, repoOwner, repoName, sha string) (string, string, error) {
+	temp, err := os.MkdirTemp("", "arkdata_download-*")
 	if err != nil {
 		return "", "", errors.WithStack(err)
 	}
