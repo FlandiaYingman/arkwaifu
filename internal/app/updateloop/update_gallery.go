@@ -158,13 +158,14 @@ func ParseToGalleries(server ark.Server, root string) ([]gallery.Gallery, error)
 		if jsonReplicateTable.Exists(id) {
 			continue
 		}
-		gallery := galleryMap[strings.ToLower(id)]
-		for _, pic := range c.S("pic", "pics").Children() {
-			art := artMap[strings.ToLower(pic.S("picId").Data().(string))]
-			art.SortID = int(pic.S("picSortId").Data().(float64))
-			gallery.Arts = append(gallery.Arts, art)
+		if gallery, ok := galleryMap[strings.ToLower(id)]; ok {
+			for _, pic := range c.S("pic", "pics").Children() {
+				art := artMap[strings.ToLower(pic.S("picId").Data().(string))]
+				art.SortID = int(pic.S("picSortId").Data().(float64))
+				gallery.Arts = append(gallery.Arts, art)
+			}
+			galleries = append(galleries, gallery)
 		}
-		galleries = append(galleries, gallery)
 	}
 
 	return galleries, nil
