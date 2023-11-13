@@ -76,10 +76,11 @@ func getGameData(ctx context.Context, server ark.Server, version ark.Version, re
 		sha = dataVersion.CommitSHA
 	}
 
-	zipball, err := download(ctx, repoOwner, repoName, sha)
+	zipballDir, zipball, err := download(ctx, repoOwner, repoName, sha)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer os.RemoveAll(zipballDir)
 	defer os.RemoveAll(zipball)
 
 	data, err := unzip(ctx, zipball, patterns, server)

@@ -9,6 +9,7 @@ import (
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/fileutil"
 	"github.com/flandiayingman/arkwaifu/internal/pkg/util/pathutil"
 	"github.com/pkg/errors"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -137,14 +138,18 @@ func get(ctx context.Context, infoList []Info, dst string) error {
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer os.RemoveAll(fetch)
 	unzip, err := unzip(ctx, fetch)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer os.RemoveAll(unzip)
 	unpack, err := unpack(ctx, unzip)
 	if err != nil {
 		return errors.WithStack(err)
 	}
+	defer os.RemoveAll(unpack)
+
 	err = fileutil.MoveAllContent(unpack, dst)
 	if err != nil {
 		return errors.WithStack(err)

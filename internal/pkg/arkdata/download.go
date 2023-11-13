@@ -8,10 +8,9 @@ import (
 	"os"
 )
 
-func download(ctx context.Context, repoOwner, repoName, sha string) (string, error) {
-	temp, err := os.MkdirTemp("", "arkdata_download")
+func download(ctx context.Context, repoOwner, repoName, sha string) (string, string, error) {
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", "", errors.WithStack(err)
 	}
 
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -19,14 +18,15 @@ func download(ctx context.Context, repoOwner, repoName, sha string) (string, err
 
 	request, err := grab.NewRequest(temp, urlOfZipball(repoOwner, repoName, sha))
 	if err != nil {
-		return "", errors.WithStack(err)
+		os.RemoveAll(temp)
+		return "", "", errors.WithStack(err)
 	}
 
 	request = request.WithContext(ctx)
 	client := grab.NewClient()
 	client.UserAgent = "FlandiaYingman/arkwaifu"
 	response := client.Do(request)
-	return response.Filename, response.Err()
+	return temp, response.Filename, response.Err()
 }
 
 func urlOfZipball(repoOwner, repoName, sha string) string {
