@@ -97,6 +97,18 @@ func (r *repository) SelectArtsByCategory(category string) ([]*Art, error) {
 	}
 	return arts, nil
 }
+func (r *repository) SelectArtsByIDLike(like string) ([]*Art, error) {
+	arts := make([]*Art, 0)
+	result := r.db.
+		Preload("Variants", func(db *gorm.DB) *gorm.DB { return db.Order("variants.variation") }).
+		Where("id LIKE ?", like).
+		Order("category, id").
+		Find(&arts)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return arts, nil
+}
 func (r *repository) SelectArt(id string) (*Art, error) {
 	art := new(Art)
 	result := r.db.

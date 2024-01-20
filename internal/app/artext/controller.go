@@ -24,5 +24,13 @@ func (c *Controller) register(params RegisterParams) {
 		return
 	}
 
-	router.Get("arts", c.GetArtsOfStoryGroup, c.GetArtsOfStory, c.GetArtsExceptForStoryArts)
+	// extension of story
+	router.Get("arts",
+		c.GetArtsOfStoryGroup,
+		c.GetArtsOfStory,
+		c.GetArtsExceptForStoryArts,
+	)
+
+	// extension of character
+	router.Get("arts/:id/siblings", c.GetSiblingsOfCharacterArt)
 }
