@@ -63,8 +63,8 @@ func (c *Controller) GetArtsExceptForStoryArts(ctx *fiber.Ctx) error {
 	return ctx.JSON(arts)
 }
 
-func (service *Service) GetArtsOfStoryGroup(server ark.Server, groupID string) ([]*art.Art, error) {
-	group, err := service.story.GetStoryGroup(server, groupID)
+func (s *Service) GetArtsOfStoryGroup(server ark.Server, groupID string) ([]*art.Art, error) {
+	group, err := s.story.GetStoryGroup(server, groupID)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (service *Service) GetArtsOfStoryGroup(server ark.Server, groupID string) (
 		}
 	}
 
-	arts, err := service.art.SelectArtsByIDs(ids)
+	arts, err := s.art.SelectArtsByIDs(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -87,8 +87,8 @@ func (service *Service) GetArtsOfStoryGroup(server ark.Server, groupID string) (
 	return arts, err
 }
 
-func (service *Service) GetArtsOfStory(server ark.Server, storyID string) ([]*art.Art, error) {
-	story, err := service.story.GetStory(server, storyID)
+func (s *Service) GetArtsOfStory(server ark.Server, storyID string) ([]*art.Art, error) {
+	story, err := s.story.GetStory(server, storyID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (service *Service) GetArtsOfStory(server ark.Server, storyID string) ([]*ar
 		ids = append(ids, art.ID)
 	}
 
-	arts, err := service.art.SelectArtsByIDs(ids)
+	arts, err := s.art.SelectArtsByIDs(ids)
 	if err != nil {
 		return nil, err
 	}
@@ -110,12 +110,12 @@ func (service *Service) GetArtsOfStory(server ark.Server, storyID string) ([]*ar
 }
 
 // GetArtsExceptForStoryArts gets all arts but except for the arts which are present in the story tree.
-func (service *Service) GetArtsExceptForStoryArts(server ark.Server) ([]*art.Art, error) {
-	pictureArts, err := service.story.GetPictureArts(server)
+func (s *Service) GetArtsExceptForStoryArts(server ark.Server) ([]*art.Art, error) {
+	pictureArts, err := s.story.GetPictureArts(server)
 	if err != nil {
 		return nil, err
 	}
-	characterArts, err := service.story.GetCharacterArts(server)
+	characterArts, err := s.story.GetCharacterArts(server)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (service *Service) GetArtsExceptForStoryArts(server ark.Server) ([]*art.Art
 		storyArtsIDSet[characterArt.ID] = true
 	}
 
-	arts, err := service.art.SelectArts()
+	arts, err := s.art.SelectArts()
 	if err != nil {
 		return nil, err
 	}
