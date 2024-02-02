@@ -145,6 +145,15 @@ func mergeCharacterFace(body image.Image, face image.Image, faceRect image.Recta
 	if body == nil || face == nil {
 		return nil, errors.Errorf("the images are nil! ")
 	}
+
+	// If the body is not a square, add offsets.
+	// Because faceRect is based on body as if it is a square, we need to adjust it.
+	dx := body.Bounds().Dx()
+	dy := body.Bounds().Dy()
+	xOffset := (dx - max(dx, dy)) / 2
+	yOffset := (dy - max(dx, dy)) / 2
+	faceRect = faceRect.Add(image.Pt(xOffset, yOffset))
+
 	if !faceRect.In(body.Bounds()) {
 		return nil, errors.Errorf("merge character face: face rectangle %v is not in the body's bounds %v", faceRect, body.Bounds())
 	}
