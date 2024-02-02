@@ -94,7 +94,7 @@ func (a *CharacterArt) decode(root string, bodyNum, faceNum int) (image.Image, e
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
-	if filePathAlpha != "" {
+	if filePathAlpha != root {
 		imgAlpha, err = decode(filePathAlpha)
 		if err != nil {
 			return nil, errors.WithStack(err)
