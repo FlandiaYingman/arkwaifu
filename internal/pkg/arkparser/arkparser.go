@@ -86,10 +86,12 @@ func (p *Parser) Parse() (*StoryTree, error) {
 			Stories: nil,
 		}
 		for _, jsonStory := range jsonGroup.Stories {
-			info, err := p.GetInfo(jsonStory.Info)
-			if err != nil {
-				return nil, errors.WithStack(err)
-			}
+			info, _ := p.GetInfo(jsonStory.Info)
+			// If info is not found, it is likely that there is no info for the story.
+			// Example: main_14_level_main_14-20_beg
+			//if err != nil {
+			//	return nil, errors.WithStack(err)
+			//}
 			directives, err := p.ParseStoryText(jsonStory.Text)
 			if err != nil {
 				return nil, errors.WithStack(err)
