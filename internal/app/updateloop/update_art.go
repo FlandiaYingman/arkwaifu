@@ -42,7 +42,7 @@ func (s *Service) attemptUpdateArt(ctx context.Context) {
 		log.Error().
 			Err(err).
 			Caller().
-			Msg("Failed to get the remote art version.")
+			Msg("Failed to get the local art version.")
 		return
 	}
 	remoteArtVersion, err := s.getRemoteArtVersion(ctx)
@@ -50,7 +50,7 @@ func (s *Service) attemptUpdateArt(ctx context.Context) {
 		log.Error().
 			Err(err).
 			Caller().
-			Msg("Failed to get the local art version.")
+			Msg("Failed to get the remote art version.")
 		return
 	}
 	if localArtVersion != remoteArtVersion {
