@@ -3,7 +3,7 @@
 # service.Dockerfile is used for build the service part of ArkWaifu. It does not contain the updateloop part, therefore
 # python is not needed. The image size is only 28.79 MiB for reference (built on 2022/03/03).
 
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
 RUN apk update && \

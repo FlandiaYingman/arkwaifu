@@ -3,7 +3,7 @@
 # updateloop.Dockerfile is used for build the updateloop part of ArkWaifu. It contains the updateloop part, therefore
 # python is needed.
 
-FROM golang:1.21-bullseye AS builder
+FROM golang:1.24-bullseye AS builder
 WORKDIR /app
 
 COPY ./go.mod ./go.sum ./
@@ -14,7 +14,7 @@ COPY ./cmd  ./cmd
 COPY ./internal ./internal
 RUN go build -o updateloop github.com/flandiayingman/arkwaifu/cmd/updateloop
 
-FROM python:3.10-slim-bullseye AS deploy
+FROM python:3.12-slim-bullseye AS deploy
 
 WORKDIR /app
 COPY ./tools/extractor ./tools/extractor

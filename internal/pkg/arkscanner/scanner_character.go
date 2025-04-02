@@ -24,11 +24,21 @@ type (
 		BodySpriteAlpha string
 		FaceRectangle   image.Rectangle
 		FaceVariations  []CharacterArtFaceVariation
+
+		// PixelToUnits is the ratio of pixel to unit.
+		// In other words, the resulting image is scaled by *dividing* this value.
+		// This is because the original image is in units, and we convert it to pixels.
+		PixelToUnits float64
 	}
 	CharacterArtFaceVariation struct {
 		FaceSprite      string
 		FaceSpriteAlpha string
 		WholeBody       bool
+
+		// PixelToUnits is the ratio of pixel to unit.
+		// In other words, the resulting image is scaled by *dividing* this value.
+		// This is because the original image is in units, and we convert it to pixels.
+		PixelToUnits float64
 	}
 )
 
@@ -133,7 +143,12 @@ func (scanner *Scanner) scanHubGroupOfCharacter(id string) (*CharacterArt, error
 		return nil, errors.WithStack(err)
 	}
 
-	art := hubGroup.toArt(id, pathIDMap)
+	ttMap, err := scanner.scanTypeTreeMapOfCharacter(id)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	art := hubGroup.toArt(id, pathIDMap, ttMap)
 	return &art, nil
 }
 func (scanner *Scanner) scanHubOfCharacter(id string) (*CharacterArt, error) {
@@ -157,8 +172,13 @@ func (scanner *Scanner) scanHubOfCharacter(id string) (*CharacterArt, error) {
 		return nil, errors.WithStack(err)
 	}
 
+	ttMap, err := scanner.scanTypeTreeMapOfCharacter(id)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	hubGroup := CharacterSpriteHubGroup{SpriteGroups: []CharacterSpriteHub{hub}}
-	art := hubGroup.toArt(id, pathIDMap)
+	art := hubGroup.toArt(id, pathIDMap, ttMap)
 	return &art, nil
 }
 func (scanner *Scanner) scanPathIDMapOfCharacter(id string) (map[int64]string, error) {
@@ -175,6 +195,37 @@ func (scanner *Scanner) scanPathIDMapOfCharacter(id string) (map[int64]string, e
 	}
 
 	return pathIDMap, nil
+}
+func (scanner *Scanner) scanTypeTreeMapOfCharacter(id string) (map[int64]SpriteTypeTree, error) {
+	mapPath := filepath.Join(scanner.Root, characterPrefix, fmt.Sprintf("%s.typetree.json", id))
+	mapJson, err := os.ReadFile(mapPath)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	ttPathIDMap := make(map[int64]string)
+	err = json.Unmarshal(mapJson, &ttPathIDMap)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	ttMap := make(map[int64]SpriteTypeTree)
+	for k, v := range ttPathIDMap {
+		subMapPath := filepath.Join(scanner.Root, characterPrefix, id, v)
+		subMapJson, err := os.ReadFile(subMapPath)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+
+		var tt SpriteTypeTree
+		err = json.Unmarshal(subMapJson, &tt)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		ttMap[k] = tt
+	}
+
+	return ttMap, nil
 }
 
 type (
@@ -201,10 +252,13 @@ type (
 		} `json:"alphaTex"`
 		IsWholeBody int `json:"isWholeBody"`
 	}
+	SpriteTypeTree struct {
+		PixelsToUnits float64 `json:"m_PixelsToUnits"`
+	}
 )
 
-func (c *CharacterSpriteHubGroup) toArt(id string, pathIDMap map[int64]string) (a CharacterArt) {
-	convertSpriteHubToArt := func(i CharacterSpriteHub) (o CharacterArtBodyVariation) { return i.toArt(pathIDMap) }
+func (c *CharacterSpriteHubGroup) toArt(id string, pathIDMap map[int64]string, ttMap map[int64]SpriteTypeTree) (a CharacterArt) {
+	convertSpriteHubToArt := func(i CharacterSpriteHub) (o CharacterArtBodyVariation) { return i.toArt(pathIDMap, ttMap) }
 	a = CharacterArt{
 		ID:             id,
 		Kind:           "character",
@@ -212,8 +266,8 @@ func (c *CharacterSpriteHubGroup) toArt(id string, pathIDMap map[int64]string) (
 	}
 	return
 }
-func (c *CharacterSpriteHub) toArt(pathIDMap map[int64]string) (a CharacterArtBodyVariation) {
-	convertSpriteToArt := func(i CharacterSprite) (o CharacterArtFaceVariation) { return i.toArt(pathIDMap) }
+func (c *CharacterSpriteHub) toArt(pathIDMap map[int64]string, ttMap map[int64]SpriteTypeTree) (a CharacterArtBodyVariation) {
+	convertSpriteToArt := func(i CharacterSprite) (o CharacterArtFaceVariation) { return i.toArt(pathIDMap, ttMap) }
 	a = CharacterArtBodyVariation{
 		BodySprite:      "",
 		BodySpriteAlpha: "",
@@ -224,6 +278,7 @@ func (c *CharacterSpriteHub) toArt(pathIDMap map[int64]string) (a CharacterArtBo
 			int(math.Round(c.FacePos.Y+c.FaceSize.Y)),
 		),
 		FaceVariations: cols.Map(c.Sprites, convertSpriteToArt),
+		PixelToUnits:   1.0,
 	}
 	// If the face pos is valid, then extract the last face variation as the body.
 	// Otherwise, all variations contain the whole body.
@@ -231,6 +286,7 @@ func (c *CharacterSpriteHub) toArt(pathIDMap map[int64]string) (a CharacterArtBo
 		lastVariation := a.FaceVariations[len(a.FaceVariations)-1]
 		a.BodySprite = lastVariation.FaceSprite
 		a.BodySpriteAlpha = lastVariation.FaceSpriteAlpha
+		a.PixelToUnits = lastVariation.PixelToUnits
 		a.FaceVariations = a.FaceVariations[:len(a.FaceVariations)-1]
 	} else {
 		for i := range a.FaceVariations {
@@ -239,11 +295,12 @@ func (c *CharacterSpriteHub) toArt(pathIDMap map[int64]string) (a CharacterArtBo
 	}
 	return
 }
-func (c *CharacterSprite) toArt(pathIDMap map[int64]string) (a CharacterArtFaceVariation) {
+func (c *CharacterSprite) toArt(pathIDMap map[int64]string, ttMap map[int64]SpriteTypeTree) (a CharacterArtFaceVariation) {
 	a = CharacterArtFaceVariation{
 		FaceSprite:      pathIDMap[c.Sprite.MPathID],
 		FaceSpriteAlpha: pathIDMap[c.AlphaTex.MPathID],
 		WholeBody:       c.IsWholeBody != 0,
+		PixelToUnits:    ttMap[c.Sprite.MPathID].PixelsToUnits / 100.0,
 	}
 	return
 }

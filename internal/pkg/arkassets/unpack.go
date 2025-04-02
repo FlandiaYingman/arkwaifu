@@ -36,7 +36,7 @@ func unpack(ctx context.Context, src string) (string, error) {
 		return "", errors.WithStack(err)
 	}
 
-	args := []string{"-u", "main.py", "unpack", srcAbs, dstAbs}
+	args := []string{"-u", "main.py", srcAbs, dstAbs}
 	cmd := exec.CommandContext(ctx, "python", args...)
 	cmd.Dir = extractorLocation
 

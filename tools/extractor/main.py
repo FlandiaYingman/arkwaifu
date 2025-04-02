@@ -1,19 +1,15 @@
 import argparse
 import functools
 import json
-import os.path
+import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Any
-from typing import Dict
-from typing import List
+from typing import Dict, Tuple
 
 import PIL.Image
 import UnityPy
-from UnityPy.classes import Object
-from UnityPy.classes import PPtr
-from UnityPy.classes.Object import NodeHelper
+from UnityPy.classes import Object, Texture2D, Sprite, TextAsset, MonoBehaviour, GameObject
 
 # flush every line to prevent blocking outputs
 # noinspection PyShadowingBuiltins
@@ -24,167 +20,142 @@ PIL.Image.preinit()
 PIL.Image.init()
 
 
-def list_assets(src: Path, filters: List[str]):
-    if src.is_file():
-        env = UnityPy.load(str(src))
-        for path, obj in env.container.items():
-            if any(path.startswith(f) for f in filters):
-                print(f"{path}")
-    else:
-        for it in src.glob('**/*'):
-            if it.is_file():
-                list_assets(it, filters)
+def unpack_assets(src: Path, dst: Path, workers=None):
+    try:
+        if src.is_dir():
+            print(f"searching files in {src}...")
+            with ProcessPoolExecutor(max_workers=workers) as executor:
+                for it in src.glob('**/*'):
+                    if it.is_file():
+                        print(f"found {it} in {src}...")
+                        executor.submit(unpack_assets, it, dst, None)
 
-
-def unpack(src: Path, dst: Path, filters: List[str], workers=None):
-    if src.is_dir():
-        print(f"searching files in {src}...")
-        with ProcessPoolExecutor(max_workers=workers) as executor:
-            for it in src.glob('**/*'):
-                if it.is_file():
-                    print(f"found {it} in {src}...")
-                    executor.submit(unpack, it, dst, filters)
-    elif src.is_file():
-        env = UnityPy.load(str(src))
-        for container, obj_reader in env.container.items():
-            if any(container.startswith(f) for f in filters):
+        elif src.is_file():
+            env = UnityPy.load(str(src))
+            for container, obj_reader in env.container.items():
+                container = Path(container)
                 obj = obj_reader.read()
-                container_path = os.path.normpath(os.path.join(obj.container, '..', obj.name))
-                path_id_path = dst / os.path.normpath(os.path.join(obj.container, '..', f"{obj.name}.json"))
-                path_id_dict = export(obj, dst, container_path)
+
+                dst_subdir = container / '..' / obj.m_Name
+                path_id_path = (dst / container / '..' / f"{obj.m_Name}.json").resolve()
+                tt_path_id_path = (dst / container / '..' / f"{obj.m_Name}.typetree.json").resolve()
+                path_id_dict, tt_path_id_dict = export(obj, dst, dst_subdir)
                 if len(path_id_dict) > 0:
                     with open(path_id_path, "w", encoding="utf8") as file:
                         json.dump(path_id_dict, file, ensure_ascii=False, indent=4)
+                    with open(tt_path_id_path, "w", encoding="utf8") as file:
+                        json.dump(tt_path_id_dict, file, ensure_ascii=False, indent=4)
 
-    else:
-        print(f"WARN: {src} is not dir neither file; skipping")
-
-
-def export(obj: Object, dst: Path, container_path: str, path_id_dict: Dict[int, str] = None) -> Dict[int, str]:
-    path_id_dict = {} if path_id_dict is None else path_id_dict
-
-    obj_name = getattr(obj, 'name', '')
-    obj_path = obj.container or f"{container_path}/{obj_name}"
-    if obj.type.name in ["Texture2D", "Sprite"]:
-        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.png"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        path_id_dict[obj.path_id] = str(dest.name)
-        if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
-            obj.image.save(dest)
-            print(f"{obj_path}({obj.type.name})=>{dest}")
         else:
-            print(f"cannot export {obj_path}({obj.type.name}), format is not supported", file=sys.stderr)
-
-    if obj.type.name in ["TextAsset"]:
-        dest = dst / obj.container if obj.container else dst / container_path / f"{obj.name}.txt"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        path_id_dict[obj.path_id] = str(dest.name)
-        with open(dest, "wb") as file:
-            file.write(bytes(obj.script))
-        print(f"{obj_path}({obj.type.name})=>{dest}")
-
-    if obj.type.name in ["MonoBehaviour"]:
-        script = obj.m_Script.read()
-        obj_name = script.name
-        dest = dst / obj.container if obj.container else dst / container_path / f"{obj_name}.json"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        path_id_dict[obj.path_id] = str(dest.name)
-        with open(dest, "w", encoding="utf8") as file:
-            json.dump(obj.read_typetree(), file, ensure_ascii=False, indent=4)
-        print(f"{obj_path}({obj.type.name})=>{dest}")
-
-    if obj.type.name in ["GameObject"]:
-        nodes = traverse(obj)
-        container_path = os.path.normpath(os.path.join(container_path, '..', obj.name))
-        for node in nodes:
-            export(node, dst, container_path, path_id_dict)
-
-    return path_id_dict
+            print(f"WARN: {src} is not dir neither file; skipping", file=sys.stderr)
+    except Exception as e:
+        print(f"ERROR: {src} failed to unpack: {e}", file=sys.stderr)
 
 
-def traverse(obj: Object) -> List[Object]:
-    """
-    traverse() traverses through an UnityPy Object, returning all sub UnityPy Objects.
-    """
+def export(
+        obj: Object, dst: Path, dst_subdir: Path,
+        path_id_dict: Dict[int, str] = None,
+        tt_path_id_dict: Dict[int, str] = None
+) -> Tuple[Dict[int, str], Dict[int, str]]:
+    path_id_dict = {} if path_id_dict is None else path_id_dict
+    tt_path_id_dict = {} if tt_path_id_dict is None else tt_path_id_dict
 
-    def traverse_tree(o: Any, r: List[Object]):
-        if not o:
-            return
-        if isinstance(o, PPtr):
-            o = o.read()
-            r += [o]
+    container = Path(obj.object_reader.container) if obj.object_reader.container else None
 
-        skipping_attr_names = ["m_GameObject", "m_Father", "m_Script"]
-        match o:
-            case list():
-                for i, attr in enumerate(o):
-                    traverse_tree(attr, r)
-            case dict():
-                for name, attr in o.items():
-                    traverse_tree(attr, r)
-            case NodeHelper():
-                for name, attr in o.items():
-                    if name in skipping_attr_names:
-                        continue
-                    traverse_tree(attr, r)
-            case _:
-                attr_names = dir(o)
-                attr_names = list(filter(lambda x: x.startswith('m_') or x == "type_tree", attr_names))
-                for attr_name in attr_names:
-                    if attr_name in skipping_attr_names:
-                        continue
-                    sub_obj = getattr(o, attr_name)
-                    traverse_tree(sub_obj, r)
+    obj_name = getattr(obj, 'm_Name', '')
+    obj_type = obj.object_reader.type.name
 
-    results = []
-    traverse_tree(obj, results)
-    return results
+    path_id = obj.object_reader.path_id
+
+    match obj:
+        case Texture2D() | Sprite():
+            obj: Texture2D | Sprite
+
+            obj_path = Path(os.path.normpath(container or dst_subdir / f"{obj_name}.png"))
+
+            dest = (dst / (container or obj_path)).resolve()
+            json_dest = (dst / (container or obj_path).with_suffix(f'.{obj_type}.json')).resolve()
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            json_dest.parent.mkdir(parents=True, exist_ok=True)
+            path_id_dict[path_id] = str(dest.name)
+            tt_path_id_dict[path_id] = str(json_dest.name)
+
+            if dest.exists() and obj_type in ["Sprite"]:
+                # Sometimes there are some Sprite and Texture2D with the same name
+                # Texture2D is preferred over Sprite, so we skip the Sprite
+                # This is because Texture2D is usually the original image
+                print(f"skipping {obj_path}({obj_type}), file already exists", file=sys.stderr)
+            else:
+                if dest.suffix in PIL.Image.EXTENSION and PIL.Image.EXTENSION[dest.suffix] in PIL.Image.SAVE:
+                    obj.image.save(dest)
+                    print(f"{obj_path}({obj_type})=>{dest}")
+                else:
+                    print(f"cannot export {obj_path}({obj_type}), format is not supported", file=sys.stderr)
+
+            with open(json_dest, "w", encoding="utf8") as file:
+                json.dump(obj.object_reader.read_typetree(), file,
+                          ensure_ascii=False,
+                          indent=4,
+                          default=lambda o: '<non-serializable>')
+            print(f"{obj_path}({obj_type})=>{json_dest}")
+
+        case MonoBehaviour():
+            obj: MonoBehaviour
+
+            script = obj.m_Script.read()
+            obj_name = script.m_Name
+
+            obj_path = Path(os.path.normpath(container or dst_subdir / f"{obj_name}.json"))
+
+            dest = (dst / (container or obj_path)).resolve()
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            path_id_dict[path_id] = str(dest.name)
+
+            with open(dest, "w", encoding="utf8") as file:
+                json.dump(obj.object_reader.read_typetree(), file,
+                          ensure_ascii=False,
+                          indent=4,
+                          default=lambda o: '<non-serializable>')
+            print(f"{obj_path}({obj_type})=>{dest}")
+
+        case GameObject():
+            obj: GameObject
+
+            obj_readers = obj.assets_file.objects.values()
+            dst_subdir = dst_subdir / '..' / obj_name
+            for obj_reader in obj_readers:
+                if obj_reader is obj.object_reader:
+                    continue
+                export(obj_reader.read(), dst, dst_subdir, path_id_dict, tt_path_id_dict)
+
+        case _:
+            print(f"skipping {obj_name}({obj_type}), type {obj_type} not supported", file=sys.stderr)
+
+    return path_id_dict, tt_path_id_dict
 
 
 def main():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(
-        dest="command",
-        help="commands",
-        required=True,
-    )
-    list_parser = subparsers.add_parser(
-        "list",
-        help="list assets from sources"
-    )
-    list_parser.add_argument(
+    parser.add_argument(
         "src", nargs="+",
         help="Path to source file or directory."
     )
-    unpack_parser = subparsers.add_parser(
-        "unpack",
-        help="unpack image assets from sources"
-    )
-    unpack_parser.add_argument(
-        "src", nargs="+",
-        help="Path to source file or directory."
-    )
-    unpack_parser.add_argument(
+    parser.add_argument(
         "dst",
         help="Path to destination directory."
     )
-    unpack_parser.add_argument(
+    parser.add_argument(
         "-w", "--workers", nargs="?", default=None,
         help="Specify the concurrency workers count."
     )
-    parser.add_argument(
-        "-f", "--filter", nargs="+", default=[""],
-        help="Specify a path prefix. Only process the assets which match the prefix."
-    )
     args = parser.parse_args()
-    match args.command:
-        case "list":
-            for src in args.src:
-                list_assets(Path(src), filters=args.filter)
-        case "unpack":
-            for src in args.src:
-                unpack(Path(src), Path(args.dst), filters=args.filter,
-                       workers=int(args.workers) if args.workers else None)
+
+    for src in args.src:
+        unpack_assets(
+            Path(src),
+            Path(args.dst),
+            workers=int(args.workers) if args.workers else None
+        )
 
 
 if __name__ == '__main__':
